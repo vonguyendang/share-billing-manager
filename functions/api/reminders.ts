@@ -46,12 +46,36 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 const tokenRec = await DB.prepare("SELECT user_token FROM subscriptions WHERE id = ?").bind(sub.id).first<{user_token: string}>();
                 const actualLink = `${context.env.APP_URL}/portal.html?token=${tokenRec?.user_token}`;
 
-                const emailBody = `Chào ${sub.full_name},\n\nGói ${sub.plan_name} của bạn sẽ hết hạn trong ${sub.days_left} ngày tới (vào ${sub.next_due_date}).\nSố tiền cần thanh toán: ${sub.amount_due} VNĐ.\n\nVui lòng truy cập link sau để xem chi tiết và báo thanh toán:\n${actualLink}\n\nCảm ơn bạn!`;
+                const emailBody = `Chào ${sub.full_name},\n\nGói ${sub.plan_name} của bạn sẽ hết hạn trong ${sub.days_left} ngày tới (vào ${sub.next_due_date}).\nSố tiền cần thanh toán: ${sub.amount_due.toLocaleString()} VNĐ.\n\nVui lòng truy cập link sau để xem chi tiết và báo thanh toán:\n${actualLink}\n\nCảm ơn bạn!`;
                 
+                const htmlBody = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div style="background-color: #4F46E5; padding: 20px; text-align: center;">
+                        <h2 style="color: white; margin: 0;">Share Billing Manager</h2>
+                    </div>
+                    <div style="padding: 30px; background-color: #ffffff;">
+                        <h3 style="color: #111827; margin-top: 0;">Chào ${sub.full_name},</h3>
+                        <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Gói dịch vụ <strong>${sub.plan_name}</strong> của bạn sắp đến hạn thanh toán.</p>
+                        
+                        <div style="background-color: #F3F4F6; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Ngày đến hạn:</strong> <span style="color: #EF4444;">${sub.next_due_date}</span> (còn ${sub.days_left} ngày)</p>
+                            <p style="margin: 5px 0;"><strong>Số tiền cần đóng:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span></p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${actualLink}" style="background-color: #4F46E5; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">Xem Chi Tiết & Thanh Toán</a>
+                        </div>
+                        
+                        <p style="color: #6B7280; font-size: 14px; text-align: center;">Nếu bạn đã thanh toán, vui lòng nhấn vào nút bên trên để báo cáo cho Admin.</p>
+                    </div>
+                </div>
+                `;
+
                 const success = await sendEmail(context.env, {
                     to: sub.email,
                     subject: `[Nhắc nhở] Sắp đến hạn thanh toán - ${sub.plan_name}`,
-                    body: emailBody
+                    body: emailBody,
+                    htmlBody: htmlBody
                 });
 
                 if (success) {

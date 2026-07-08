@@ -49,11 +49,17 @@ function doPost(e) {
     }
 
     // Send email using MailApp (quota: ~100/day for consumer, 1500/day for Workspace)
-    MailApp.sendEmail({
+    const emailOptions = {
       to: payload.to,
       subject: payload.subject,
-      body: payload.body
-    });
+      body: payload.body || "Please view in HTML format."
+    };
+    
+    if (payload.htmlBody) {
+      emailOptions.htmlBody = payload.htmlBody;
+    }
+
+    MailApp.sendEmail(emailOptions);
 
     return ContentService.createTextOutput(JSON.stringify({ success: true }))
       .setMimeType(ContentService.MimeType.JSON);

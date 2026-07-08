@@ -8,59 +8,69 @@ Dự án MVP quản lý chia sẻ chi phí gia đình trên Cloudflare Pages (Ch
 - **Database:** Cloudflare D1 (SQLite).
 - **Email:** Google Apps Script Webhook (gửi qua Gmail cá nhân).
 
-## Hướng dẫn triển khai miễn phí
+## Hướng dẫn triển khai miễn phí (Production Deployment)
 
-### 1. Chuẩn bị tài khoản
-- Tài khoản Cloudflare (Miễn phí)
-- Tài khoản GitHub
-- Tài khoản Google (để dùng Apps Script gửi email)
+Dự án này được thiết kế tối ưu để chạy trên nền tảng **Cloudflare Pages** (chứa giao diện tĩnh và API backend) kết hợp với **Cloudflare D1** (Database). Dưới đây là các bước chi tiết để đưa dự án lên mạng thực tế.
 
-### 2. Triển khai Database (Cloudflare D1)
-1. Cài đặt Wrangler CLI: `npm install -g wrangler`
-2. Đăng nhập: `wrangler login`
-3. Tạo database: `wrangler d1 create billing-manager-db`
-4. Copy `database_id` từ kết quả trả về và dán vào file `wrangler.toml`.
-5. Chạy migration tạo bảng: `wrangler d1 execute billing-manager-db --remote --file=./migrations/0001_initial.sql`
-6. (Tùy chọn) Đổ dữ liệu mẫu: `wrangler d1 execute billing-manager-db --remote --file=./migrations/0002_seed.sql`
+### 1. Tạo Database D1 (Trên Production)
+Bạn cần tạo một cơ sở dữ liệu thật trên máy chủ Cloudflare bằng dòng lệnh sau:
 
-### 3. Thiết lập Google Apps Script (Email Webhook)
+```bash
+npx wrangler d1 create billing-manager-db
+```
+Sau khi chạy xong, màn hình sẽ in ra một đoạn cấu hình gồm `database_name` và `database_id`. Hãy copy cái `database_id` đó.
+
+### 2. Cập nhật `wrangler.toml`
+Mở file `wrangler.toml` và dán `database_id` vừa copy vào thay cho dòng `your-database-id-here`. Sau đó nhớ **commit và push** sự thay đổi này lên GitHub.
+
+```bash
+git add wrangler.toml
+git commit -m "chore: update production d1 id"
+git push
+```
+
+### 3. Khởi tạo cấu trúc bảng Database
+Bạn cần đẩy cấu trúc bảng từ máy lên Cloudflare D1 bằng lệnh:
+
+```bash
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0001_initial.sql
+```
+*(Lưu ý cờ `--remote` ở đây báo cho Cloudflare biết là bạn đang muốn can thiệp vào Database thật trên mạng).*
+
+### 4. Thiết lập Google Apps Script (Email Webhook) - Tuỳ chọn
+Nếu bạn muốn dùng tính năng gửi Email tự động:
 1. Truy cập [script.google.com](https://script.google.com/) tạo project mới.
 2. Copy code từ `scripts/webhook.gs` dán vào.
 3. Đổi biến `SECRET_KEY` thành một chuỗi ngẫu nhiên khó đoán (VD: `my-super-secret-123`).
 4. Bấm nút **Deploy > New deployment**.
 5. Chọn loại **Web app**. Execute as: **Me**. Who has access: **Anyone**.
-6. Deploy và cấp quyền (Authorize).
-7. Copy **Web app URL**.
+6. Deploy, cấp quyền và Copy **Web app URL**.
 
-### 4. Triển khai Cloudflare Pages
-1. Push toàn bộ code lên GitHub repo.
-2. Vào Cloudflare Dashboard > Pages > Create a project > Connect to Git.
-3. Chọn repo `share-billing-manager`.
-4. Build settings:
-   - Framework preset: `None`
-   - Build command: Để trống
-   - Build output directory: `public`
-5. **Quan trọng:** Cấu hình D1 binding và Environment Variables trước khi lưu và deploy.
+### 5. Deploy Mã Nguồn qua GitHub
+Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất là liên kết trực tiếp Cloudflare với GitHub:
 
-#### Cấu hình D1 Binding
-- Vào Settings của Pages project > Bindings > Thêm D1 Database:
-  - Variable name: `DB`
-  - D1 Database: Chọn database đã tạo ở bước 2.
+1. Đăng nhập vào trang quản trị [Cloudflare Dashboard](https://dash.cloudflare.com).
+2. Vào mục **Workers & Pages** -> Chọn **Create application** -> Chuyển sang tab **Pages** -> Bấm **Connect to Git**.
+3. Chọn Repository `share-billing-manager` của bạn.
+4. Ở bước **Set up builds and deployments**, cấu hình:
+   - **Framework preset**: `None`
+   - **Build command**: *(để trống)*
+   - **Build output directory**: `public`
+5. Bấm **Save and Deploy**. Sau khoảng 1-2 phút, Cloudflare sẽ cấp cho bạn một đường link (ví dụ: `https://share-billing-manager.pages.dev`).
 
-#### Cấu hình Environment Variables
-- Thêm các biến sau vào Settings > Environment Variables (cả Production và Preview):
-  - `APP_URL`: URL trang web của bạn (VD: `https://your-app.pages.dev`).
-  - `ADMIN_PASSWORD_HASH`: Mã băm SHA-256 của mật khẩu admin (Có thể dùng công cụ online để tạo hash cho mật khẩu của bạn).
-  - `ADMIN_COOKIE_SECRET`: Một chuỗi ngẫu nhiên dài dùng làm session.
-  - `GAS_WEBHOOK_URL`: Link Web app URL ở bước 3.
-  - `GAS_WEBHOOK_SECRET`: Chuỗi secret đã tạo ở bước 3.
+### 6. Cài Đặt Biến Môi Trường (Quan trọng)
+1. Tại Cloudflare Dashboard, vào trang quản lý của dự án Pages vừa tạo.
+2. Chọn tab **Settings** -> **Environment variables** -> Cột **Production**.
+3. Bấm **Add variables** và thêm các biến sau:
+   - `ADMIN_PASSWORD_HASH`: Mã băm SHA-256 mật khẩu admin của bạn.
+   - `ADMIN_COOKIE_SECRET`: Một chuỗi ký tự ngẫu nhiên dùng để mã hóa Cookie.
+   - `APP_URL`: Đường link Cloudflare Pages vừa cấp (VD: `https://share-billing-manager.pages.dev`).
+   - `GAS_WEBHOOK_URL` *(Nếu dùng)*: Link Web app URL ở bước 4.
+   - `GAS_WEBHOOK_SECRET` *(Nếu dùng)*: Chuỗi secret đã tạo ở bước 4.
+4. Chuyển sang tab **Deployments** -> Bấm vào dấu `...` ở bản deploy mới nhất -> Chọn **Retry deployment** để hệ thống nhận diện biến mới.
 
-### 5. Vận hành (Lazy Reminder)
-- Truy cập `<APP_URL>` để vào Admin Dashboard.
-- Đăng nhập bằng password (bản gốc của cái hash bạn đã cài).
-- Thay vì dùng Cron Trigger phức tạp, hãy bấm nút **"Run Reminders"** trên thanh menu bên trái.
-- Hệ thống sẽ lọc những ai sắp hết hạn (7 ngày, 3 ngày, 1 ngày) và gọi Webhook gửi email. Các email đã gửi sẽ không bị gửi trùng (Idempotency).
-- Hạn mức Google cá nhân là ~100 emails/ngày. Phù hợp dùng cho nhóm gia đình.
+🎉 **Hoàn Tất!** Giờ đây bạn đã có thể truy cập đường link thực tế và bắt đầu quản lý.
+
 
 ## Hướng dẫn chạy thử ở Local (Máy cá nhân)
 

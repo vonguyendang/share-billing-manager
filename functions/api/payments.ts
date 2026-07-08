@@ -59,11 +59,33 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             ]);
 
             // Try sending email
-            const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${reqInfo.amount} cho gói ${reqInfo.plan_name}.\nHạn dùng tiếp theo của bạn là: ${newDateStr}.\n\nCảm ơn bạn!`;
+            const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${reqInfo.amount.toLocaleString()} VNĐ cho gói ${reqInfo.plan_name}.\nHạn dùng tiếp theo của bạn là: ${newDateStr}.\n\nCảm ơn bạn!`;
+            
+            const htmlBody = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #10B981; padding: 20px; text-align: center;">
+                    <h2 style="color: white; margin: 0;">Thanh Toán Thành Công 🎉</h2>
+                </div>
+                <div style="padding: 30px; background-color: #ffffff;">
+                    <h3 style="color: #111827; margin-top: 0;">Chào ${reqInfo.full_name},</h3>
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Admin đã nhận được khoản thanh toán của bạn cho gói dịch vụ <strong>${reqInfo.plan_name}</strong>.</p>
+                    
+                    <div style="background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #A7F3D0;">
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã đóng:</strong> ${reqInfo.amount.toLocaleString()} VNĐ</p>
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Ngày đến hạn tiếp theo:</strong> <span style="font-size: 18px; font-weight: bold;">${newDateStr}</span></p>
+                    </div>
+                    
+                    <p style="color: #4b5563; font-size: 16px;">Chúc bạn có những trải nghiệm tuyệt vời cùng gia đình và bạn bè!</p>
+                    <p style="color: #6B7280; font-size: 14px; margin-top: 30px; text-align: center;">Share Billing Manager</p>
+                </div>
+            </div>
+            `;
+
             await sendEmail(context.env, {
                 to: reqInfo.email,
                 subject: `[Xác nhận] Thanh toán thành công - ${reqInfo.plan_name}`,
-                body: emailBody
+                body: emailBody,
+                htmlBody: htmlBody
             });
 
         } else if (action === 'reject') {

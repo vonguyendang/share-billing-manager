@@ -4,6 +4,7 @@ export interface EmailPayload {
     to: string;
     subject: string;
     body: string;
+    htmlBody?: string;
 }
 
 export async function sendEmail(env: Env, payload: EmailPayload): Promise<boolean> {
