@@ -181,7 +181,7 @@ async function loadSubscriptions() {
 }
 
 async function loadPayments() {
-    const res = await apiCall('/payments/pending');
+    const res = await apiCall('/payments');
     const tbody = document.getElementById('payment-list');
     tbody.innerHTML = '';
     res.data.forEach(req => {
@@ -190,7 +190,7 @@ async function loadPayments() {
             <td>${req.member_name}</td>
             <td>${req.plan_name}</td>
             <td>${req.amount.toLocaleString()}</td>
-            <td>${req.user_note}</td>
+            <td>${req.user_note || ''}</td>
             <td>${formatDate(req.created_at)}</td>
             <td>
                 <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}')">Approve</button>
@@ -239,7 +239,7 @@ window.adminApp = {
     approvePayment: async (id) => {
         if (!confirm('Approve this payment and update subscription?')) return;
         try {
-            await apiCall('/payments/approve', 'POST', { request_id: id, action: 'approve' });
+            await apiCall('/payments', 'POST', { request_id: id, action: 'approve' });
             loadView('payments');
         } catch (e) { alert(e.message); }
     },
