@@ -1,0 +1,14 @@
+{
+  "name": "share-billing-manager",
+  "version": "1.0.0",
+  "description": "Family Subscription Manager",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240320.1",
+    "typescript": "^5.4.3",
+    "wrangler": "^3.38.0"
+  }
+}

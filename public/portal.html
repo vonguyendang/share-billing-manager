@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Dịch Vụ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div id="loading" class="card">Loading...</div>
+
+        <div id="errorView" class="card hidden">
+            <h2 style="color: var(--danger)">Lỗi truy cập</h2>
+            <p>Liên kết không hợp lệ hoặc đã hết hạn.</p>
+        </div>
+
+        <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px;">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Thông Tin Gói Dịch Vụ</h2>
+
+            <div style="background: var(--bg-main); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                <p><strong>Gói:</strong> <span id="p-plan"></span></p>
+                <p><strong>Thành viên:</strong> <span id="p-member"></span></p>
+                <p><strong>Ngày bắt đầu:</strong> <span id="p-start"></span></p>
+                <p><strong>Hạn thanh toán:</strong> <span id="p-due"
+                        style="color: var(--danger); font-weight: bold;"></span></p>
+                <p><strong>Số tiền cần đóng:</strong> <span id="p-amount" style="font-weight: bold;"></span> VNĐ</p>
+                <p><strong>Trạng thái:</strong> <span id="p-status"></span></p>
+            </div>
+
+            <div
+                style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                <div style="flex: 1; min-width: 200px;">
+                    <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Thông tin chuyển khoản:</h4>
+                    <p>Ngân hàng: <strong>Timo - Ngân hàng số Timo by Ban Viet Bank</strong></p>
+                    <p>Số tài khoản: <strong>0944353323</strong></p>
+                    <p>Chủ tài khoản: <strong>VO NGUYEN DANG</strong></p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Nội dung CK: <strong id="p-transfer-note"></strong></p>
+                </div>
+                <div style="text-align: center;">
+                    <img id="qr-code" src="" alt="Mã QR Chuyển Khoản"
+                        style="max-width: 150px; border-radius: 0.5rem; display: none;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Quét QR để thanh
+                        toán</div>
+                </div>
+            </div>
+
+            <div id="paymentFormSection">
+                <h3>Xác nhận đã thanh toán</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên dưới.
+                </p>
+                <textarea id="p-note" class="form-control" rows="2"
+                    placeholder="Ghi chú (VD: Đã CK Vietcombank)"></textarea>
+                <button id="btnConfirmPay" class="btn btn-success"
+                    style="width: 100%; margin-top: 1rem; padding: 1rem;">
+                    Tôi đã chuyển khoản
+                </button>
+            </div>
+
+            <div id="paymentPendingSection" class="hidden"
+                style="text-align: center; color: var(--warning); margin-top: 1rem;">
+                Đã gửi báo cáo thanh toán. Vui lòng chờ admin duyệt.
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/portal.js"></script>
+</body>
+
+</html>
