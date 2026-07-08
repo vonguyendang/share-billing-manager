@@ -36,9 +36,18 @@
                 <div style="flex: 1; min-width: 200px;">
                     <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Thông tin chuyển khoản:</h4>
                     <p>Ngân hàng: <strong>Timo - Ngân hàng số Timo by Ban Viet Bank</strong></p>
-                    <p>Số tài khoản: <strong>0944353323</strong></p>
+                    <p style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.25rem 0;">
+                        <span>Số tài khoản: <strong>0944353323</strong></span>
+                        <button id="btnCopyAcc" class="btn"
+                            style="padding: 2px 8px; font-size: 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); cursor: pointer; border-radius: 4px;">Copy</button>
+                    </p>
                     <p>Chủ tài khoản: <strong>VO NGUYEN DANG</strong></p>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Nội dung CK: <strong id="p-transfer-note"></strong></p>
+                    <p
+                        style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span>Nội dung CK: <strong id="p-transfer-note"></strong></span>
+                        <button id="btnCopyNote" class="btn"
+                            style="padding: 2px 8px; font-size: 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); cursor: pointer; border-radius: 4px;">Copy</button>
+                    </p>
                 </div>
                 <div style="text-align: center;">
                     <img id="qr-code" src="" alt="Mã QR Chuyển Khoản"
@@ -53,8 +62,7 @@
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
                     Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên dưới.
                 </p>
-                <textarea id="p-note" class="form-control" rows="2"
-                    placeholder="Ghi chú (VD: Đã CK Vietcombank)"></textarea>
+                <textarea id="p-note" class="form-control" rows="2" placeholder="Ghi chú (VD: Đã CK Timo)"></textarea>
                 <button id="btnConfirmPay" class="btn btn-success"
                     style="width: 100%; margin-top: 1rem; padding: 1rem;">
                     Tôi đã chuyển khoản

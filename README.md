@@ -3,6 +3,7 @@
 Dự án MVP quản lý chia sẻ chi phí gia đình trên Cloudflare Pages (Chi phí 0 đồng).
 
 ## Kiến trúc
+
 - **Frontend:** Vanilla JS, HTML, CSS.
 - **Backend:** Cloudflare Pages Functions (TypeScript).
 - **Database:** Cloudflare D1 (SQLite).
@@ -13,14 +14,17 @@ Dự án MVP quản lý chia sẻ chi phí gia đình trên Cloudflare Pages (Ch
 Dự án này được thiết kế tối ưu để chạy trên nền tảng **Cloudflare Pages** (chứa giao diện tĩnh và API backend) kết hợp với **Cloudflare D1** (Database). Dưới đây là các bước chi tiết để đưa dự án lên mạng thực tế.
 
 ### 1. Tạo Database D1 (Trên Production)
+
 Bạn cần tạo một cơ sở dữ liệu thật trên máy chủ Cloudflare bằng dòng lệnh sau:
 
 ```bash
 npx wrangler d1 create billing-manager-db
 ```
+
 Sau khi chạy xong, màn hình sẽ in ra một đoạn cấu hình gồm `database_name` và `database_id`. Hãy copy cái `database_id` đó.
 
 ### 2. Cập nhật `wrangler.toml`
+
 Mở file `wrangler.toml` và dán `database_id` vừa copy vào thay cho dòng `your-database-id-here`. Sau đó nhớ **commit và push** sự thay đổi này lên GitHub.
 
 ```bash
@@ -30,15 +34,19 @@ git push
 ```
 
 ### 3. Khởi tạo cấu trúc bảng Database
+
 Bạn cần đẩy cấu trúc bảng từ máy lên Cloudflare D1 bằng lệnh:
 
 ```bash
 npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0001_initial.sql
 ```
+
 *(Lưu ý cờ `--remote` ở đây báo cho Cloudflare biết là bạn đang muốn can thiệp vào Database thật trên mạng).*
 
 ### 4. Thiết lập Google Apps Script (Email Webhook) - Tuỳ chọn
+
 Nếu bạn muốn dùng tính năng gửi Email tự động:
+
 1. Truy cập [script.google.com](https://script.google.com/) tạo project mới.
 2. Copy code từ `scripts/webhook.gs` dán vào.
 3. Đổi biến `SECRET_KEY` thành một chuỗi ngẫu nhiên khó đoán (VD: `my-super-secret-123`).
@@ -47,6 +55,7 @@ Nếu bạn muốn dùng tính năng gửi Email tự động:
 6. Deploy, cấp quyền và Copy **Web app URL**.
 
 ### 5. Deploy Mã Nguồn qua GitHub
+
 Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất là liên kết trực tiếp Cloudflare với GitHub:
 
 1. Đăng nhập vào trang quản trị [Cloudflare Dashboard](https://dash.cloudflare.com).
@@ -59,6 +68,7 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 5. Bấm **Save and Deploy**. Sau khoảng 1-2 phút, Cloudflare sẽ cấp cho bạn một đường link (ví dụ: `https://share-billing-manager.pages.dev`).
 
 ### 6. Cài Đặt Biến Môi Trường (Quan trọng)
+
 1. Tại Cloudflare Dashboard, vào trang quản lý của dự án Pages vừa tạo.
 2. Chọn tab **Settings** -> **Environment variables** -> Cột **Production**.
 3. Bấm **Add variables** và thêm các biến sau:
@@ -71,7 +81,6 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 
 🎉 **Hoàn Tất!** Giờ đây bạn đã có thể truy cập đường link thực tế và bắt đầu quản lý.
 
-
 ## Hướng dẫn chạy thử ở Local (Máy cá nhân)
 
 Để test hệ thống ngay trên máy của bạn trước khi deploy lên Cloudflare:
@@ -79,17 +88,18 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 **Lựa chọn 1: Dành cho người dùng NPM**
 
 1. **Cài đặt thư viện:**
+
    ```bash
    npm install
    ```
-
 2. **Khởi tạo database D1 Local:**
+
    ```bash
    npx wrangler d1 execute billing-manager-db --local --file=./migrations/0001_initial.sql
    npx wrangler d1 execute billing-manager-db --local --file=./migrations/0002_seed.sql
    ```
-
 3. **Khởi động server:**
+
    ```bash
    npm run dev
    ```
@@ -99,18 +109,20 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 **Lựa chọn 2: Dành cho người dùng PNPM**
 
 1. **Cài đặt thư viện:**
+
    ```bash
    pnpm install
    ```
-   *(Lưu ý: Nếu gặp cảnh báo chặn script, hãy chạy `pnpm approve-builds`, ấn `a` để chọn tất cả -> `Enter`, rồi chạy lại `pnpm install`)*
 
+   *(Lưu ý: Nếu gặp cảnh báo chặn script, hãy chạy `pnpm approve-builds`, ấn `a` để chọn tất cả -> `Enter`, rồi chạy lại `pnpm install`)*
 2. **Khởi tạo database D1 Local:**
+
    ```bash
    pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0001_initial.sql
    pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0002_seed.sql
    ```
-
 3. **Khởi động server:**
+
    ```bash
    pnpm run dev
    ```
@@ -121,6 +133,7 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 
 4. **Cấu hình biến môi trường Local:**
    Tạo file `.dev.vars` ở thư mục gốc (ngang hàng `wrangler.toml`) với nội dung sau:
+
    ```env
    APP_URL="http://localhost:8788"
    # Hash SHA-256 của chữ "admin"
@@ -129,7 +142,7 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
    GAS_WEBHOOK_URL=""
    GAS_WEBHOOK_SECRET=""
    ```
-   
 5. **Truy cập:**
+
    - Mở trình duyệt vào `http://localhost:8788`
    - Đăng nhập bằng mật khẩu: `admin`

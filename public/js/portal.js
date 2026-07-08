@@ -10,6 +10,14 @@ const portalView = document.getElementById('portalView');
 const paymentForm = document.getElementById('paymentFormSection');
 const paymentPending = document.getElementById('paymentPendingSection');
 
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = dateStr.split(' ')[0];
+    const parts = d.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return dateStr;
+}
+
 async function init() {
     if (!token) {
         showError();
@@ -22,8 +30,8 @@ async function init() {
 
         document.getElementById('p-plan').innerText = sub.plan_name;
         document.getElementById('p-member').innerText = sub.member_name;
-        document.getElementById('p-start').innerText = sub.start_date;
-        document.getElementById('p-due').innerText = sub.next_due_date;
+        document.getElementById('p-start').innerText = formatDate(sub.start_date);
+        document.getElementById('p-due').innerText = formatDate(sub.next_due_date);
         document.getElementById('p-amount').innerText = sub.amount_due.toLocaleString();
 
         let statusText = sub.status;
@@ -35,7 +43,7 @@ async function init() {
         const bankBin = '963388'; // TIMO
         const accNo = '0944353323';
         const accName = 'VO NGUYEN DANG';
-        const addInfo = `${sub.member_name} chuyen tien ${sub.plan_name}`;
+        const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
 
         // Hiển thị nội dung chuyển khoản ra màn hình cho người dùng copy nếu cần
         const noteEl = document.getElementById('p-transfer-note');
@@ -45,6 +53,26 @@ async function init() {
         const qrImg = document.getElementById('qr-code');
         qrImg.src = qrUrl;
         qrImg.style.display = 'block';
+
+        const btnCopyAcc = document.getElementById('btnCopyAcc');
+        if (btnCopyAcc) {
+            btnCopyAcc.addEventListener('click', () => {
+                navigator.clipboard.writeText(accNo);
+                const originalText = btnCopyAcc.innerText;
+                btnCopyAcc.innerText = 'Copied!';
+                setTimeout(() => btnCopyAcc.innerText = originalText, 2000);
+            });
+        }
+
+        const btnCopyNote = document.getElementById('btnCopyNote');
+        if (btnCopyNote) {
+            btnCopyNote.addEventListener('click', () => {
+                navigator.clipboard.writeText(addInfo);
+                const originalText = btnCopyNote.innerText;
+                btnCopyNote.innerText = 'Copied!';
+                setTimeout(() => btnCopyNote.innerText = originalText, 2000);
+            });
+        }
 
         if (sub.status === 'pending_payment') {
             paymentForm.classList.add('hidden');

@@ -47,7 +47,7 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
 document.getElementById('btnRunReminders').addEventListener('click', async () => {
     if (!confirm('Run email reminders for subscriptions due in 7, 3, or 1 days?')) return;
     try {
-        const res = await apiCall('/reminders/run', 'POST');
+        const res = await apiCall('/reminders', 'POST');
         alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
     } catch (e) {
         alert('Error: ' + e.message);
@@ -64,6 +64,15 @@ navItems.forEach(item => {
         loadView(view);
     });
 });
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = dateStr.split(' ')[0];
+    const parts = d.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return dateStr;
+}
+
 
 async function loadView(view) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -158,7 +167,7 @@ async function loadSubscriptions() {
         tr.innerHTML = `
             <td>${sub.member_name}</td>
             <td>${sub.plan_name}</td>
-            <td>${sub.next_due_date}</td>
+            <td>${formatDate(sub.next_due_date)}</td>
             <td>${sub.amount_due.toLocaleString()}</td>
             <td><span class="badge ${sub.status === 'active' ? 'badge-active' : 'badge-pending'}">${sub.status}</span></td>
             <td><a href="${link}" target="_blank" style="font-size: 0.8rem">Portal</a></td>
@@ -182,7 +191,7 @@ async function loadPayments() {
             <td>${req.plan_name}</td>
             <td>${req.amount.toLocaleString()}</td>
             <td>${req.user_note}</td>
-            <td>${req.created_at}</td>
+            <td>${formatDate(req.created_at)}</td>
             <td>
                 <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}')">Approve</button>
             </td>
