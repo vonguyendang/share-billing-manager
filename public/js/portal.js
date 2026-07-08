@@ -99,7 +99,7 @@ document.getElementById('btnConfirmPay').addEventListener('click', async () => {
     btn.innerText = 'Đang xử lý...';
 
     try {
-        await apiCall(`/user/${token}/pay`, 'POST', { user_note: note });
+        await apiCall(`/user/${token}`, 'POST', { user_note: note });
         alert('Cảm ơn bạn! Yêu cầu đã được gửi.');
         window.location.reload();
     } catch (e) {
