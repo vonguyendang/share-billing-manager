@@ -73,7 +73,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         // 3. Update subscription status
         await DB.prepare("UPDATE subscriptions SET status = 'pending_payment' WHERE id = ?").bind(subInfo.id).run();
 
-        const emailBody = `Chào ${subInfo.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nCảm ơn bạn!`;
+        const emailBody = `Chào ${subInfo.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
         
         const htmlBody = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
@@ -89,7 +89,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 </div>
                 
                 <p style="color: #4b5563; font-size: 16px;">Vui lòng chờ Admin kiểm tra tài khoản và xác nhận trong thời gian sớm nhất. Hệ thống sẽ tự động thông báo cho bạn ngay khi khoản thanh toán được duyệt.</p>
-                <p style="color: #6B7280; font-size: 14px; margin-top: 30px; text-align: center;">Cảm ơn bạn đã đồng hành cùng chúng tôi!</p>
+                
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+                <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
+                    <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin:</strong></p>
+                    <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
+                    <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
+                    <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                </div>
             </div>
         </div>
         `;
