@@ -169,6 +169,7 @@ async function loadSubscriptions() {
             <td>${sub.plan_name}</td>
             <td>${formatDate(sub.next_due_date)}</td>
             <td>${sub.amount_due.toLocaleString()}</td>
+            <td>${sub.billing_cycle_months}</td>
             <td><span class="badge ${sub.status === 'active' ? 'badge-active' : 'badge-pending'}">${sub.status}</span></td>
             <td><a href="${link}" target="_blank" style="font-size: 0.8rem">Portal</a></td>
             <td>
@@ -311,6 +312,7 @@ window.adminApp = {
         document.getElementById('sub-modal-title').innerText = 'Add Subscription';
         document.getElementById('form-sub').reset();
         document.getElementById('sub-id').value = '';
+        document.getElementById('sub-cycle').value = '1';
         document.getElementById('sub-status').value = 'active';
         document.getElementById('modal-sub').classList.add('active');
     },
@@ -325,6 +327,7 @@ window.adminApp = {
         document.getElementById('sub-start').value = s.start_date;
         document.getElementById('sub-due').value = s.next_due_date;
         document.getElementById('sub-amount').value = s.amount_due;
+        document.getElementById('sub-cycle').value = s.billing_cycle_months;
         document.getElementById('sub-status').value = s.status;
         document.getElementById('modal-sub').classList.add('active');
     },
@@ -391,7 +394,7 @@ document.getElementById('form-sub').addEventListener('submit', async (e) => {
         start_date: document.getElementById('sub-start').value,
         next_due_date: document.getElementById('sub-due').value,
         amount_due: parseFloat(document.getElementById('sub-amount').value),
-        billing_cycle_months: 1,
+        billing_cycle_months: parseInt(document.getElementById('sub-cycle').value) || 1,
         status: document.getElementById('sub-status').value
     };
     try {
