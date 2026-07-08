@@ -237,9 +237,17 @@ async function populateSubSelects() {
 // Global actions & modals
 window.adminApp = {
     approvePayment: async (id) => {
-        if (!confirm('Approve this payment and update subscription?')) return;
+        const cyclesInput = prompt('Khách đã thanh toán cho bao nhiêu chu kỳ? (Ví dụ: Nhập 6 nếu đóng trước 6 tháng)', '1');
+        if (cyclesInput === null) return; // User cancelled
+        
+        const cycles = parseInt(cyclesInput);
+        if (isNaN(cycles) || cycles <= 0) {
+            alert('Vui lòng nhập một số hợp lệ lớn hơn 0.');
+            return;
+        }
+
         try {
-            await apiCall('/payments', 'POST', { request_id: id, action: 'approve' });
+            await apiCall('/payments', 'POST', { request_id: id, action: 'approve', cycles: cycles });
             loadView('payments');
         } catch (e) { alert(e.message); }
     },

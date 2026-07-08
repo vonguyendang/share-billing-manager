@@ -26,7 +26,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     try {
         const body = await context.request.json() as any;
-        const { request_id, action } = body;
+        const { request_id, action, cycles } = body;
+        const paymentCycles = cycles && typeof cycles === 'number' && cycles > 0 ? cycles : 1;
 
         if (action !== 'approve' && action !== 'reject') {
             return jsonResponse({ success: false, error: 'Invalid action' }, 400);
@@ -47,14 +48,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
 
         if (action === 'approve') {
+            const totalPaid = reqInfo.amount * paymentCycles;
             // Calculate new due date (add months)
             const oldDate = new Date(reqInfo.next_due_date);
-            oldDate.setMonth(oldDate.getMonth() + reqInfo.billing_cycle_months);
+            oldDate.setMonth(oldDate.getMonth() + (reqInfo.billing_cycle_months * paymentCycles));
             const newDateStr = oldDate.toISOString().split('T')[0];
 
             // Update in transaction-like manner using batch
             await DB.batch([
-                DB.prepare("UPDATE payment_requests SET status = 'approved', approved_at = CURRENT_TIMESTAMP WHERE id = ?").bind(request_id),
+                DB.prepare("UPDATE payment_requests SET status = 'approved', amount = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ?").bind(totalPaid, request_id),
                 DB.prepare("UPDATE subscriptions SET next_due_date = ?, status = 'active' WHERE id = ?").bind(newDateStr, reqInfo.subscription_id)
             ]);
 
@@ -62,7 +64,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const newDateParts = newDateStr.split('-');
             const formattedNewDate = newDateParts.length === 3 ? `${newDateParts[2]}-${newDateParts[1]}-${newDateParts[0]}` : newDateStr;
 
-            const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${reqInfo.amount.toLocaleString()} VNĐ cho gói ${reqInfo.plan_name}.\nHạn dùng tiếp theo của bạn là: ${formattedNewDate}.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
+            const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${totalPaid.toLocaleString()} VNĐ cho gói ${reqInfo.plan_name}.\nHạn dùng tiếp theo của bạn là: ${formattedNewDate}.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
             
             const htmlBody = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
@@ -74,7 +76,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Admin đã nhận được khoản thanh toán của bạn cho gói dịch vụ <strong>${reqInfo.plan_name}</strong>.</p>
                     
                     <div style="background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #A7F3D0;">
-                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã đóng:</strong> ${reqInfo.amount.toLocaleString()} VNĐ</p>
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã đóng:</strong> ${totalPaid.toLocaleString()} VNĐ</p>
                         <p style="margin: 5px 0; color: #065F46;"><strong>Ngày đến hạn tiếp theo:</strong> <span style="font-size: 18px; font-weight: bold;">${formattedNewDate}</span></p>
                     </div>
                     
