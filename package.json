@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Family Subscription Manager",
   "scripts": {
+    "build": "echo 'No build step required'",
     "dev": "wrangler pages dev public",
     "deploy": "wrangler pages deploy public"
   },
