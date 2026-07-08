@@ -26,8 +26,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     try {
         const body = await context.request.json() as any;
-        const { request_id, action, cycles } = body;
-        const paymentCycles = cycles && typeof cycles === 'number' && cycles > 0 ? cycles : 1;
+        const { request_id, action, total_paid } = body;
 
         if (action !== 'approve' && action !== 'reject') {
             return jsonResponse({ success: false, error: 'Invalid action' }, 400);
@@ -48,10 +47,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
 
         if (action === 'approve') {
-            const totalPaid = reqInfo.amount * paymentCycles;
-            // Calculate new due date (add months)
+            const totalPaid = total_paid || reqInfo.amount;
+            
+            // Calculate monthly price and how many months they paid for
+            const monthlyPrice = reqInfo.amount_due / reqInfo.billing_cycle_months;
+            const addedMonths = totalPaid / monthlyPrice;
+            
+            const wholeMonths = Math.floor(addedMonths);
+            const fractionalMonth = addedMonths - wholeMonths;
+            const addedDays = Math.round(fractionalMonth * 30); // Approximate 1 month = 30 days
+
+            // Calculate new due date
             const oldDate = new Date(reqInfo.next_due_date);
-            oldDate.setMonth(oldDate.getMonth() + (reqInfo.billing_cycle_months * paymentCycles));
+            oldDate.setMonth(oldDate.getMonth() + wholeMonths);
+            oldDate.setDate(oldDate.getDate() + addedDays);
             const newDateStr = oldDate.toISOString().split('T')[0];
 
             // Update in transaction-like manner using batch

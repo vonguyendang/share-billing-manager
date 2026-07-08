@@ -194,7 +194,7 @@ async function loadPayments() {
             <td>${req.user_note || ''}</td>
             <td>${formatDate(req.created_at)}</td>
             <td>
-                <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}')">Approve</button>
+                <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}', ${req.amount})">Approve</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -237,18 +237,18 @@ async function populateSubSelects() {
 
 // Global actions & modals
 window.adminApp = {
-    approvePayment: async (id) => {
-        const cyclesInput = prompt('Khách đã thanh toán cho bao nhiêu chu kỳ? (Ví dụ: Nhập 6 nếu đóng trước 6 tháng)', '1');
-        if (cyclesInput === null) return; // User cancelled
+    approvePayment: async (id, expectedAmount) => {
+        const amountInput = prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
+        if (amountInput === null) return; // User cancelled
         
-        const cycles = parseInt(cyclesInput);
-        if (isNaN(cycles) || cycles <= 0) {
-            alert('Vui lòng nhập một số hợp lệ lớn hơn 0.');
+        const totalPaid = parseFloat(amountInput);
+        if (isNaN(totalPaid) || totalPaid <= 0) {
+            alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0.');
             return;
         }
 
         try {
-            await apiCall('/payments', 'POST', { request_id: id, action: 'approve', cycles: cycles });
+            await apiCall('/payments', 'POST', { request_id: id, action: 'approve', total_paid: totalPaid });
             loadView('payments');
         } catch (e) { alert(e.message); }
     },
