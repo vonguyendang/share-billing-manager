@@ -73,11 +73,33 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         // 3. Update subscription status
         await DB.prepare("UPDATE subscriptions SET status = 'pending_payment' WHERE id = ?").bind(subInfo.id).run();
 
+        const emailBody = `Chào ${subInfo.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nCảm ơn bạn!`;
+        
+        const htmlBody = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #3B82F6; padding: 20px; text-align: center;">
+                <h2 style="color: white; margin: 0;">Yêu cầu đã được ghi nhận ⏳</h2>
+            </div>
+            <div style="padding: 30px; background-color: #ffffff;">
+                <h3 style="color: #111827; margin-top: 0;">Chào ${subInfo.full_name},</h3>
+                <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Hệ thống đã ghi nhận yêu cầu báo thanh toán của bạn cho gói dịch vụ <strong>${subInfo.plan_name}</strong>.</p>
+                
+                <div style="background-color: #EFF6FF; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #BFDBFE;">
+                    <p style="margin: 0; color: #1E40AF; text-align: center;">Trạng thái: <strong>Đang chờ Admin duyệt</strong></p>
+                </div>
+                
+                <p style="color: #4b5563; font-size: 16px;">Vui lòng chờ Admin kiểm tra tài khoản và xác nhận trong thời gian sớm nhất. Hệ thống sẽ tự động thông báo cho bạn ngay khi khoản thanh toán được duyệt.</p>
+                <p style="color: #6B7280; font-size: 14px; margin-top: 30px; text-align: center;">Cảm ơn bạn đã đồng hành cùng chúng tôi!</p>
+            </div>
+        </div>
+        `;
+
         // 4. Send email confirmation to user (optional, can be disabled)
         await sendEmail(context.env, {
             to: subInfo.email,
             subject: `[Đã ghi nhận] Yêu cầu thanh toán - ${subInfo.plan_name}`,
-            body: `Chào ${subInfo.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nCảm ơn bạn!`
+            body: emailBody,
+            htmlBody: htmlBody
         });
 
         return jsonResponse({ success: true });
