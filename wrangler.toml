@@ -5,7 +5,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB" # Available in your Pages Functions as env.DB
 database_name = "billing-manager-db"
-database_id = "your-database-id-here" # Replace with actual ID after `wrangler d1 create`
+database_id = "4a3218d8-6572-4c69-9336-b54b48afa0e2" # Replace with actual ID after `wrangler d1 create`
 
 [vars]
 # APP_URL = "https://your-pages-domain.pages.dev" # Set this in Cloudflare dashboard
