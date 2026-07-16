@@ -341,7 +341,10 @@ window.adminApp = {
         document.getElementById('modal-plan').classList.add('active');
     },
     deletePlan: async (id) => {
-        if (!(await window.ui.confirm('Are you sure you want to delete this plan? This will also delete all associated subscriptions!'))) return;
+        const p = plansData.find(x => x.id === id);
+        if (!p) return;
+        const input = await window.ui.prompt(`Cảnh báo: Xóa gói này sẽ xóa toàn bộ Subscriptions liên quan! Gõ chữ "XOA" (viết hoa) để xác nhận xóa gói "${p.name}":`, '');
+        if (input !== 'XOA') return;
         try {
             await apiCall(`/plans?id=${id}`, 'DELETE');
             loadView('plans');
@@ -368,7 +371,10 @@ window.adminApp = {
         document.getElementById('modal-member').classList.add('active');
     },
     deleteMember: async (id) => {
-        if (!(await window.ui.confirm('Are you sure you want to delete this member? This will also delete all associated subscriptions!'))) return;
+        const m = membersData.find(x => x.id === id);
+        if (!m) return;
+        const input = await window.ui.prompt(`Cảnh báo: Xóa thành viên sẽ xóa luôn các Subscriptions của người này. Gõ chữ "XOA" (viết hoa) để xác nhận xóa "${m.full_name}":`, '');
+        if (input !== 'XOA') return;
         try {
             await apiCall(`/members?id=${id}`, 'DELETE');
             loadView('members');
@@ -401,7 +407,10 @@ window.adminApp = {
         document.getElementById('modal-sub').classList.add('active');
     },
     deleteSub: async (id) => {
-        if (!(await window.ui.confirm('Are you sure you want to delete this subscription?'))) return;
+        const s = subsData.find(x => x.id === id);
+        if (!s) return;
+        const input = await window.ui.prompt(`Gõ chữ "XOA" (viết hoa) để xác nhận xóa Subscription của "${s.member_name}" (Gói: ${s.plan_name}):`, '');
+        if (input !== 'XOA') return;
         try {
             await apiCall(`/subscriptions?id=${id}`, 'DELETE');
             loadView('subscriptions');
