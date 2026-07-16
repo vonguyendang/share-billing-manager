@@ -231,6 +231,11 @@ async function loadPlans() {
         `;
         tbody.appendChild(tr);
     });
+    
+    const searchInput = document.getElementById('search-plan');
+    if (searchInput && searchInput.value) {
+        searchInput.dispatchEvent(new Event('keyup'));
+    }
 }
 
 async function loadMembers() {
@@ -254,6 +259,11 @@ async function loadMembers() {
         `;
         tbody.appendChild(tr);
     });
+    
+    const searchInput = document.getElementById('search-member');
+    if (searchInput && searchInput.value) {
+        searchInput.dispatchEvent(new Event('keyup'));
+    }
 }
 
 async function loadSubscriptions() {
@@ -279,6 +289,11 @@ async function loadSubscriptions() {
         `;
         tbody.appendChild(tr);
     });
+    
+    const searchInput = document.getElementById('search-sub');
+    if (searchInput && searchInput.value) {
+        searchInput.dispatchEvent(new Event('keyup'));
+    }
 }
 
 async function loadPayments() {
