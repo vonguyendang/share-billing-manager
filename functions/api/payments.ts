@@ -34,7 +34,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         const { DB } = context.env;
         const reqInfo = await DB.prepare(`
-            SELECT pr.*, s.billing_cycle_months, s.next_due_date, m.email, m.full_name, p.name as plan_name
+            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, m.email, m.full_name, p.name as plan_name
             FROM payment_requests pr
             JOIN subscriptions s ON pr.subscription_id = s.id
             JOIN members m ON s.member_id = m.id
@@ -57,8 +57,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const fractionalMonth = addedMonths - wholeMonths;
             const addedDays = Math.round(fractionalMonth * 30); // Approximate 1 month = 30 days
 
+            // Handle potentially malformed dates (e.g. DD/MM/YYYY)
+            let rawDate = reqInfo.next_due_date.split(' ')[0];
+            if (rawDate.includes('/')) {
+                const parts = rawDate.split('/');
+                if (parts.length === 3) rawDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            } else if (rawDate.split('-').length === 3 && rawDate.split('-')[0].length <= 2) {
+                const parts = rawDate.split('-');
+                rawDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+
             // Calculate new due date
-            const oldDate = new Date(reqInfo.next_due_date);
+            const oldDate = new Date(rawDate);
+            if (isNaN(oldDate.getTime())) {
+                throw new Error("Dữ liệu ngày tháng không hợp lệ trong database: " + reqInfo.next_due_date);
+            }
+            
             oldDate.setMonth(oldDate.getMonth() + wholeMonths);
             oldDate.setDate(oldDate.getDate() + addedDays);
             const newDateStr = oldDate.toISOString().split('T')[0];
