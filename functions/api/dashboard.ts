@@ -15,12 +15,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         // Count active members
         const membersQuery = await DB.prepare("SELECT COUNT(*) as count FROM members WHERE active = 1").first<{count: number}>();
         
-        // Subscriptions due in next 14 days
+        // Subscriptions due in next 7 days
         const dueSoonQuery = await DB.prepare(`
             SELECT COUNT(*) as count 
             FROM subscriptions 
             WHERE status = 'active' 
-            AND next_due_date <= date('now', '+14 days')
+            AND next_due_date <= date('now', '+7 days')
         `).first<{count: number}>();
 
         // Pending payments
@@ -49,7 +49,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
         const totalMonthlyRevenue = revenueQuery?.amount || 0;
 
-        // 3. Due Soon List (Next 14 days)
+        // 3. Due Soon List (Next 7 days)
         const dueSoonList = await DB.prepare(`
             SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due
             FROM subscriptions s
@@ -57,7 +57,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             JOIN plans p ON s.plan_id = p.id
             WHERE s.status != 'paused' 
             AND s.next_due_date >= date('now', 'localtime')
-            AND s.next_due_date <= date('now', '+14 days', 'localtime')
+            AND s.next_due_date <= date('now', '+7 days', 'localtime')
             ORDER BY s.next_due_date ASC
             LIMIT 5
         `).all();
