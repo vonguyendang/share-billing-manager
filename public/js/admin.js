@@ -96,8 +96,16 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
     showLogin();
 });
 
+let settingsData = { reminders_enabled: 1, reminder_days: '7,3,1,0,-2,-4' };
+
 document.getElementById('btnRunReminders').addEventListener('click', async () => {
-    if (!(await window.ui.confirm('Chạy toàn bộ tiến trình gửi email nhắc nhở (Sắp đến hạn & Quá hạn)?'))) return;
+    try {
+        const res = await apiCall('/settings');
+        if (res.data) settingsData = res.data;
+    } catch (e) { console.error('Could not fetch settings', e); }
+
+    const days = settingsData.reminder_days || '7,3,1,0,-2,-4';
+    if (!(await window.ui.confirm(`Chạy tiến trình gửi email nhắc nhở cho các mốc ngày: ${days}?`))) return;
     try {
         const res = await apiCall('/reminders', 'POST');
         await window.ui.alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
@@ -136,6 +144,7 @@ async function loadView(view) {
         if (view === 'members') await loadMembers();
         if (view === 'subscriptions') await loadSubscriptions();
         if (view === 'payments') await loadPayments();
+        if (view === 'settings') await loadSettings();
     } catch (e) {
         console.error(e);
         await window.ui.alert('Error loading ' + view);
@@ -161,6 +170,14 @@ async function loadDashboard() {
 let plansData = [];
 let membersData = [];
 let subsData = [];
+
+async function loadSettings() {
+    const res = await apiCall('/settings');
+    if (res.data) settingsData = res.data;
+    
+    document.getElementById('setting-reminders-enabled').checked = settingsData.reminders_enabled === 1;
+    document.getElementById('setting-reminder-days').value = settingsData.reminder_days || '7,3,1,0,-2,-4';
+}
 
 async function loadPlans() {
     const res = await apiCall('/plans');
@@ -457,6 +474,19 @@ document.getElementById('form-sub').addEventListener('submit', async (e) => {
         }
         adminApp.closeModal('modal-sub');
         loadView('subscriptions');
+    } catch (e) { await window.ui.alert(e.message); }
+});
+
+document.getElementById('form-settings').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        reminders_enabled: document.getElementById('setting-reminders-enabled').checked ? 1 : 0,
+        reminder_days: document.getElementById('setting-reminder-days').value
+    };
+    try {
+        await apiCall('/settings', 'PUT', data);
+        settingsData = data;
+        await window.ui.alert('Lưu cài đặt thành công!');
     } catch (e) { await window.ui.alert(e.message); }
 });
 

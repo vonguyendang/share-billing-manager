@@ -9,12 +9,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const { DB } = context.env;
         
         // 1. Check if reminders are globally enabled
-        const settings = await DB.prepare("SELECT reminders_enabled FROM admin_settings WHERE id = 'global'").first<{reminders_enabled: number}>();
+        const settings = await DB.prepare("SELECT reminders_enabled, reminder_days FROM admin_settings WHERE id = 'global'").first<{reminders_enabled: number, reminder_days: string}>();
         if (settings && settings.reminders_enabled === 0) {
             return jsonResponse({ success: false, error: 'Reminders are disabled in settings' }, 400);
         }
 
-        // 2. Find subscriptions due in 7, 3, or 1 days
+        const reminderDaysStr = settings?.reminder_days || '7,3,1,0,-2,-4';
+        const reminderDaysArr = reminderDaysStr.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+        
+        if (reminderDaysArr.length === 0) {
+            return jsonResponse({ success: true, data: { sent: 0, errors: 0, message: "No reminder days configured" } });
+        }
+
+        // 2. Find subscriptions due based on configured days
         const dueQuery = await DB.prepare(`
             SELECT s.id, s.next_due_date, s.amount_due, m.email, m.full_name, p.name as plan_name,
                    CAST(julianday(s.next_due_date) - julianday(date('now')) AS INTEGER) as days_left
@@ -22,7 +29,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             JOIN members m ON s.member_id = m.id
             JOIN plans p ON s.plan_id = p.id
             WHERE s.status = 'active'
-            AND days_left IN (7, 3, 1, 0, -2, -4)
+            AND days_left IN (${reminderDaysArr.join(',')})
         `).all<any>();
 
         let sentCount = 0;
