@@ -418,8 +418,8 @@ window.adminApp = {
     deletePlan: async (id) => {
         const p = plansData.find(x => x.id === id);
         if (!p) return;
-        const input = await window.ui.prompt(`Cảnh báo: Xóa gói này sẽ xóa toàn bộ Subscriptions liên quan! Gõ chữ "DELETE" (viết hoa) để xác nhận xóa gói "${p.name}":`, '');
-        if (input !== 'DELETE') return;
+        const input = await window.ui.prompt(`Cảnh báo: Xóa gói này sẽ xóa toàn bộ Subscriptions liên quan! Gõ chữ "DELETE" để xác nhận xóa gói "${p.name}":`, '');
+        if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/plans?id=${id}`, 'DELETE');
             loadView('plans');
@@ -448,8 +448,8 @@ window.adminApp = {
     deleteMember: async (id) => {
         const m = membersData.find(x => x.id === id);
         if (!m) return;
-        const input = await window.ui.prompt(`Cảnh báo: Xóa thành viên sẽ xóa luôn các Subscriptions của người này. Gõ chữ "DELETE" (viết hoa) để xác nhận xóa "${m.full_name}":`, '');
-        if (input !== 'DELETE') return;
+        const input = await window.ui.prompt(`Cảnh báo: Xóa thành viên sẽ xóa luôn các Subscriptions của người này. Gõ chữ "DELETE" để xác nhận xóa "${m.full_name}":`, '');
+        if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/members?id=${id}`, 'DELETE');
             loadView('members');
@@ -484,8 +484,8 @@ window.adminApp = {
     deleteSub: async (id) => {
         const s = subsData.find(x => x.id === id);
         if (!s) return;
-        const input = await window.ui.prompt(`Gõ chữ "DELETE" (viết hoa) để xác nhận xóa Subscription của "${s.member_name}" (Gói: ${s.plan_name}):`, '');
-        if (input !== 'DELETE') return;
+        const input = await window.ui.prompt(`Gõ chữ "DELETE" để xác nhận xóa Subscription của "${s.member_name}" (Gói: ${s.plan_name}):`, '');
+        if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/subscriptions?id=${id}`, 'DELETE');
             loadView('subscriptions');
