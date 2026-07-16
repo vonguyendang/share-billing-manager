@@ -7,7 +7,7 @@ const loginForm = document.getElementById('loginForm');
 const navItems = document.querySelectorAll('.nav-item');
 
 window.ui = {
-    showDialog: function(title, message, type = 'alert', defaultInputValue = '') {
+    showDialog: function(title, message, type = 'alert', defaultInputValue = '', options = []) {
         return new Promise((resolve) => {
             const modal = document.getElementById('modal-dialog');
             document.getElementById('dialog-title').innerText = title;
