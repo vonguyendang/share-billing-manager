@@ -275,7 +275,10 @@ async function loadPayments() {
             <td>${req.user_note || ''}</td>
             <td>${formatDate(req.created_at)}</td>
             <td>
-                <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}', ${req.amount})">Approve</button>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}', ${req.amount})">Approve</button>
+                    <button class="btn btn-danger" onclick="adminApp.rejectPayment('${req.id}')">Reject</button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -347,6 +350,16 @@ window.adminApp = {
 
         try {
             await apiCall('/payments', 'POST', { request_id: id, action: 'approve', total_paid: totalPaid });
+            loadView('payments');
+        } catch (e) { await window.ui.alert(e.message); }
+    },
+    
+    rejectPayment: async (id) => {
+        const reason = await window.ui.prompt('Nhập lý do TỪ CHỐI thanh toán (VD: Kiểm tra chưa nhận được tiền):', '');
+        if (reason === null || reason === false) return; // Cancelled
+        
+        try {
+            await apiCall('/payments', 'POST', { request_id: id, action: 'reject', reject_reason: reason });
             loadView('payments');
         } catch (e) { await window.ui.alert(e.message); }
     },
