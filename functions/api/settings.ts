@@ -1,7 +1,13 @@
+import { checkAuth } from '../utils/auth';
+
 export async function onRequest(context: any) {
     const { request, env } = context;
     const DB = env.DB;
     const method = request.method;
+
+    if (!checkAuth(request, env)) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401 });
+    }
 
     try {
         if (method === 'GET') {
