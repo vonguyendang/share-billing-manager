@@ -25,10 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateToggleBtn(btn, theme) {
+        const iconOnly = btn.hasAttribute('data-icon-only');
         if (theme === 'light') {
-            btn.innerHTML = '<i class="ph ph-moon"></i> Giao diện Tối';
+            btn.innerHTML = iconOnly ? '<i class="ph ph-moon"></i>' : '<i class="ph ph-moon"></i> Giao diện Tối';
         } else {
-            btn.innerHTML = '<i class="ph ph-sun"></i> Giao diện Sáng';
+            btn.innerHTML = iconOnly ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-sun"></i> Giao diện Sáng';
         }
     }
 });
