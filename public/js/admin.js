@@ -390,10 +390,14 @@ window.adminApp = {
     },
     
     filterSubByPlan: async (planName) => {
-        await loadView('subscriptions');
-        const input = document.getElementById('search-sub');
-        input.value = planName;
-        input.dispatchEvent(new Event('keyup'));
+        document.querySelector('.nav-item[data-view="subscriptions"]').click();
+        
+        // Wait for the view to load before applying the filter
+        setTimeout(() => {
+            const input = document.getElementById('search-sub');
+            input.value = planName;
+            input.dispatchEvent(new Event('keyup'));
+        }, 100);
     },
     
     // Plans
