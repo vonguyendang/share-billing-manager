@@ -127,6 +127,7 @@
                             <th>Category</th>
                             <th>Price</th>
                             <th>Cycle (Months)</th>
+                            <th>Slots</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -224,6 +225,7 @@
             <div class="form-group"><label>Category</label><input id="plan-category" class="form-control" required></div>
             <div class="form-group"><label>Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
             <div class="form-group"><label>Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
+            <div class="form-group"><label>Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-plan')">Cancel</button>
@@ -290,6 +292,6 @@
 </div>
 
 <!-- Scripts -->
-<script type="module" src="js/admin.js?v=5"></script>
+<script type="module" src="js/admin.js?v=6"></script>
 </body>
 </html>

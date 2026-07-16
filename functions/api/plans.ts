@@ -20,11 +20,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const id = 'plan_' + Date.now();
         
         await context.env.DB.prepare(`
-            INSERT INTO plans (id, name, category, total_price, renewal_cycle_months, renewal_anchor_date, note, active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO plans (id, name, category, total_price, renewal_cycle_months, renewal_anchor_date, note, active, max_slots)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             id, body.name, body.category, body.total_price, 
-            body.renewal_cycle_months || 1, body.renewal_anchor_date || null, body.note || null, body.active === false ? 0 : 1
+            body.renewal_cycle_months || 1, body.renewal_anchor_date || null, body.note || null, body.active === false ? 0 : 1,
+            body.max_slots || 0
         ).run();
 
         return jsonResponse({ success: true, data: { id } });
@@ -45,11 +46,11 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         
         await context.env.DB.prepare(`
             UPDATE plans 
-            SET name = ?, category = ?, total_price = ?, renewal_cycle_months = ?, active = ?
+            SET name = ?, category = ?, total_price = ?, renewal_cycle_months = ?, active = ?, max_slots = ?
             WHERE id = ?
         `).bind(
             body.name, body.category, body.total_price, 
-            body.renewal_cycle_months || 1, body.active === false ? 0 : 1, id
+            body.renewal_cycle_months || 1, body.active === false ? 0 : 1, body.max_slots || 0, id
         ).run();
 
         return jsonResponse({ success: true });

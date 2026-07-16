@@ -37,6 +37,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const id = 'sub_' + Date.now();
         const token = generateToken();
         
+        // Validate slots
+        const plan = await context.env.DB.prepare("SELECT max_slots FROM plans WHERE id = ?").bind(body.plan_id).first<{max_slots: number}>();
+        if (plan && plan.max_slots > 0) {
+            const activeSubs = await context.env.DB.prepare("SELECT count(*) as count FROM subscriptions WHERE plan_id = ? AND status != 'paused'").bind(body.plan_id).first<{count: number}>();
+            if (activeSubs && activeSubs.count >= plan.max_slots) {
+                return jsonResponse({ success: false, error: 'Gói này đã đạt giới hạn slot tối đa.' }, 400);
+            }
+        }
+        
         await context.env.DB.prepare(`
             INSERT INTO subscriptions (id, member_id, plan_id, start_date, end_date, next_due_date, amount_due, billing_cycle_months, status, user_token, personal_note)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -61,14 +70,32 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         if (!id) return jsonResponse({ success: false, error: 'ID required' }, 400);
 
         const body = await context.request.json() as any;
+
+        // Validate slots (only if we are modifying an existing sub and it's not paused, or changing plans)
+        const sub = await context.env.DB.prepare("SELECT plan_id, status FROM subscriptions WHERE id = ?").bind(id).first<{plan_id: string, status: string}>();
+        if (!sub) return jsonResponse({ success: false, error: 'Subscription not found' }, 404);
         
+        // If we change plan or if we are activating a previously paused sub, we must check capacity
+        const targetPlanId = body.plan_id || sub.plan_id;
+        const targetStatus = body.status || sub.status;
+        
+        if (targetStatus !== 'paused' && (targetPlanId !== sub.plan_id || sub.status === 'paused')) {
+            const plan = await context.env.DB.prepare("SELECT max_slots FROM plans WHERE id = ?").bind(targetPlanId).first<{max_slots: number}>();
+            if (plan && plan.max_slots > 0) {
+                const activeSubs = await context.env.DB.prepare("SELECT count(*) as count FROM subscriptions WHERE plan_id = ? AND status != 'paused' AND id != ?").bind(targetPlanId, id).first<{count: number}>();
+                if (activeSubs && activeSubs.count >= plan.max_slots) {
+                    return jsonResponse({ success: false, error: 'Gói này đã đạt giới hạn slot tối đa.' }, 400);
+                }
+            }
+        }
+
         await context.env.DB.prepare(`
             UPDATE subscriptions 
-            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?
+            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?
             WHERE id = ?
         `).bind(
             body.start_date, body.next_due_date, body.amount_due, 
-            body.billing_cycle_months || 1, body.status, id
+            body.billing_cycle_months || 1, body.status, targetPlanId, id
         ).run();
 
         return jsonResponse({ success: true });

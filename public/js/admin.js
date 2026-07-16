@@ -182,9 +182,20 @@ async function loadSettings() {
 async function loadPlans() {
     const res = await apiCall('/plans');
     plansData = res.data;
+    if (subsData.length === 0) {
+        const resSubs = await apiCall('/subscriptions');
+        subsData = resSubs.data || [];
+    }
     const tbody = document.getElementById('plan-list');
     tbody.innerHTML = '';
     plansData.forEach(p => {
+        const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused').length;
+        const maxSlots = p.max_slots || 0;
+        const slotsDisplay = maxSlots > 0 ? `${usedSlots}/${maxSlots}` : `${usedSlots}/∞`;
+        const slotsHtml = usedSlots > 0 
+            ? `<a href="#" onclick="window.adminApp.filterSubByPlan('${p.name.replace(/'/g, "\\'")}')">${slotsDisplay}</a>`
+            : slotsDisplay;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><code>${p.id}</code></td>
@@ -192,6 +203,7 @@ async function loadPlans() {
             <td>${p.category}</td>
             <td>${p.total_price.toLocaleString()}</td>
             <td>${p.renewal_cycle_months}</td>
+            <td>${slotsHtml}</td>
             <td>${p.active ? 'Active' : 'Inactive'}</td>
             <td>
                 <button class="btn btn-primary" onclick="adminApp.editPlan('${p.id}')">Edit</button>
@@ -271,7 +283,7 @@ async function loadPayments() {
 }
 
 // Helper to populate select dropdowns for Subscriptions
-async function populateSubSelects() {
+async function populateSubSelects(currentSubId = null) {
     if (plansData.length === 0) {
         const res = await apiCall('/plans');
         plansData = res.data;
@@ -281,6 +293,11 @@ async function populateSubSelects() {
         membersData = res.data;
     }
     
+    if (subsData.length === 0) {
+        const resSubs = await apiCall('/subscriptions');
+        subsData = resSubs.data || [];
+    }
+
     const memberSelect = document.getElementById('sub-member');
     memberSelect.innerHTML = '<option value="">-- Choose Member --</option>';
     membersData.forEach(m => {
@@ -296,9 +313,21 @@ async function populateSubSelects() {
     planSelect.innerHTML = '<option value="">-- Choose Plan --</option>';
     plansData.forEach(p => {
         if (p.active) {
+            const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused' && s.id !== currentSubId).length;
+            const maxSlots = p.max_slots || 0;
             const opt = document.createElement('option');
             opt.value = p.id;
-            opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND)`;
+            
+            if (maxSlots > 0) {
+                const remaining = maxSlots - usedSlots;
+                opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND) - Còn ${remaining} slot`;
+                if (remaining <= 0) {
+                    opt.disabled = true;
+                    opt.innerText = `${p.name} (Đã Đầy)`;
+                }
+            } else {
+                opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND) - Không giới hạn`;
+            }
             planSelect.appendChild(opt);
         }
     });
@@ -322,6 +351,13 @@ window.adminApp = {
         } catch (e) { await window.ui.alert(e.message); }
     },
     
+    filterSubByPlan: async (planName) => {
+        await loadView('subscriptions');
+        const input = document.getElementById('search-sub');
+        input.value = planName;
+        input.dispatchEvent(new Event('keyup'));
+    },
+    
     // Plans
     showAddPlanModal: () => {
         document.getElementById('plan-modal-title').innerText = 'Add Plan';
@@ -338,6 +374,7 @@ window.adminApp = {
         document.getElementById('plan-category').value = p.category;
         document.getElementById('plan-price').value = p.total_price;
         document.getElementById('plan-cycle').value = p.renewal_cycle_months;
+        document.getElementById('plan-slots').value = p.max_slots || 0;
         document.getElementById('modal-plan').classList.add('active');
     },
     deletePlan: async (id) => {
@@ -383,7 +420,7 @@ window.adminApp = {
     
     // Subscriptions
     showAddSubModal: async () => {
-        await populateSubSelects();
+        await populateSubSelects(null);
         document.getElementById('sub-modal-title').innerText = 'Add Subscription';
         document.getElementById('form-sub').reset();
         document.getElementById('sub-id').value = '';
@@ -392,7 +429,7 @@ window.adminApp = {
         document.getElementById('modal-sub').classList.add('active');
     },
     editSub: async (id) => {
-        await populateSubSelects();
+        await populateSubSelects(id);
         const s = subsData.find(x => x.id === id);
         if (!s) return;
         document.getElementById('sub-modal-title').innerText = 'Edit Subscription';
@@ -429,6 +466,7 @@ document.getElementById('form-plan').addEventListener('submit', async (e) => {
         category: document.getElementById('plan-category').value,
         total_price: parseFloat(document.getElementById('plan-price').value),
         renewal_cycle_months: parseInt(document.getElementById('plan-cycle').value),
+        max_slots: parseInt(document.getElementById('plan-slots').value) || 0,
         active: true
     };
     try {
