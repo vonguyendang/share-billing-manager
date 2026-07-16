@@ -42,8 +42,14 @@
         <div id="view-dashboard" class="view-section">
             <div class="card-header">
                 <h2>Dashboard Overview</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
+                </div>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                 <div class="card">
                     <h3>Active Plans</h3>
                     <p id="stat-plans" style="font-size: 2rem; font-weight: bold;">-</p>
@@ -62,10 +68,10 @@
                 </div>
             </div>
 
-            <div class="card-header" style="margin-top: 1.5rem;">
+            <div class="card-header">
                 <h2>Monthly Budget & Financials</h2>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                 <div class="card">
                     <h3>Total Cost</h3>
                     <p id="stat-cost" style="font-size: 2rem; font-weight: bold; color: var(--danger);">-</p>
@@ -77,6 +83,47 @@
                 <div class="card">
                     <h3>Net Profit/Loss</h3>
                     <p id="stat-profit" style="font-size: 2rem; font-weight: bold;">-</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Overdue -->
+                <div>
+                    <h3 style="margin-bottom: 1rem; color: var(--danger);">Overdue / Unpaid</h3>
+                    <div class="card" style="padding: 0;">
+                        <table id="table-dashboard-overdue">
+                            <thead>
+                                <tr><th>Member</th><th>Plan</th><th>Due Date</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Due Soon -->
+                <div>
+                    <h3 style="margin-bottom: 1rem; color: var(--warning);">Due in Next 14 Days</h3>
+                    <div class="card" style="padding: 0;">
+                        <table id="table-dashboard-duesoon">
+                            <thead>
+                                <tr><th>Member</th><th>Plan</th><th>Due Date</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Plan Utilization -->
+                <div style="grid-column: 1 / -1; margin-top: 1rem;">
+                    <h3 style="margin-bottom: 1rem;">Plan Utilization (Slots)</h3>
+                    <div class="card" style="padding: 0;">
+                        <table id="table-dashboard-utilization">
+                            <thead>
+                                <tr><th>Plan</th><th>Slots Used</th><th>Progress</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -291,6 +338,6 @@
 </div>
 
 <!-- Scripts -->
-<script type="module" src="js/admin.js?v=13"></script>
+<script type="module" src="js/admin.js?v=14"></script>
 </body>
 </html>

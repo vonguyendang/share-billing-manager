@@ -183,6 +183,83 @@ async function loadDashboard() {
     const profitEl = document.getElementById('stat-profit');
     profitEl.innerText = budget.netProfit.toLocaleString();
     profitEl.style.color = budget.netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+
+    // Populate overdue list
+    const tbodyOverdue = document.querySelector('#table-dashboard-overdue tbody');
+    tbodyOverdue.innerHTML = '';
+    if (res.data.overdueList && res.data.overdueList.length === 0) {
+        tbodyOverdue.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No overdue subscriptions 🎉</td></tr>';
+    } else if (res.data.overdueList) {
+        res.data.overdueList.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.member_name}</td>
+                <td>${item.plan_name}</td>
+                <td style="color: var(--danger); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+            `;
+            tbodyOverdue.appendChild(tr);
+        });
+    }
+
+    // Populate due soon list
+    const tbodyDue = document.querySelector('#table-dashboard-duesoon tbody');
+    tbodyDue.innerHTML = '';
+    if (res.data.dueSoonList && res.data.dueSoonList.length === 0) {
+        tbodyDue.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No upcoming renewals</td></tr>';
+    } else if (res.data.dueSoonList) {
+        res.data.dueSoonList.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.member_name}</td>
+                <td>${item.plan_name}</td>
+                <td style="color: var(--warning); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+            `;
+            tbodyDue.appendChild(tr);
+        });
+    }
+
+    // Populate plan utilization
+    const tbodyUtil = document.querySelector('#table-dashboard-utilization tbody');
+    tbodyUtil.innerHTML = '';
+    if (res.data.planUtilList) {
+        res.data.planUtilList.forEach(item => {
+            const tr = document.createElement('tr');
+            const max = item.max_slots || 0;
+            const used = item.used_slots || 0;
+            let progressHtml = '';
+            let slotText = '';
+            
+            if (max === 0) {
+                slotText = `${used} / ∞`;
+                progressHtml = `<div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="flex-grow: 1; background: #2a2d3e; height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div style="width: 100%; background: var(--primary); height: 100%;"></div>
+                                    </div>
+                                    <span style="font-size: 0.8rem; width: 40px; color: #8892b0;">-</span>
+                                </div>`;
+            } else {
+                slotText = `${used} / ${max}`;
+                const percent = Math.min(100, Math.round((used / max) * 100));
+                let color = 'var(--success)';
+                if (percent >= 100) color = 'var(--danger)';
+                else if (percent >= 80) color = 'var(--warning)';
+                
+                progressHtml = `<div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="flex-grow: 1; background: #2a2d3e; height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div style="width: ${percent}%; background: ${color}; height: 100%;"></div>
+                                    </div>
+                                    <span style="font-size: 0.8rem; width: 40px; color: #8892b0;">${percent}%</span>
+                                </div>`;
+            }
+            
+            tr.innerHTML = `
+                <td><a href="#" onclick="window.adminApp.filterSubByPlan('${item.name.replace(/'/g, "\\'")}')">${item.name}</a></td>
+                <td>${slotText}</td>
+                <td style="width: 40%;">${progressHtml}</td>
+            `;
+            tbodyUtil.appendChild(tr);
+        });
+    }
 }
 
 // Global data stores for easy edit access

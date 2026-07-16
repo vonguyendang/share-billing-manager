@@ -49,6 +49,39 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
         const totalMonthlyRevenue = revenueQuery?.amount || 0;
 
+        // 3. Due Soon List (Next 14 days)
+        const dueSoonList = await DB.prepare(`
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due
+            FROM subscriptions s
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.status != 'paused' 
+            AND s.next_due_date >= date('now', 'localtime')
+            AND s.next_due_date <= date('now', '+14 days', 'localtime')
+            ORDER BY s.next_due_date ASC
+            LIMIT 5
+        `).all();
+
+        // 4. Overdue List
+        const overdueList = await DB.prepare(`
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due
+            FROM subscriptions s
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.status != 'paused' 
+            AND s.next_due_date < date('now', 'localtime')
+            ORDER BY s.next_due_date ASC
+            LIMIT 5
+        `).all();
+
+        // 5. Plan Utilization
+        const planUtilList = await DB.prepare(`
+            SELECT p.id, p.name, p.max_slots, 
+                (SELECT COUNT(*) FROM subscriptions s WHERE s.plan_id = p.id AND s.status != 'paused') as used_slots
+            FROM plans p
+            WHERE p.active = 1
+        `).all();
+
         return jsonResponse({
             success: true,
             data: {
@@ -60,7 +93,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                     monthlyCost: Math.round(totalMonthlyCost),
                     monthlyRevenue: Math.round(totalMonthlyRevenue),
                     netProfit: Math.round(totalMonthlyRevenue - totalMonthlyCost)
-                }
+                },
+                dueSoonList: dueSoonList.results || [],
+                overdueList: overdueList.results || [],
+                planUtilList: planUtilList.results || []
             }
         });
 
