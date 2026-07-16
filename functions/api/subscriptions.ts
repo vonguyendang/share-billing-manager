@@ -45,6 +45,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 return jsonResponse({ success: false, error: 'Gói này đã đạt giới hạn slot tối đa.' }, 400);
             }
         }
+
+        // Prevent duplicate member in same plan
+        const existingSub = await context.env.DB.prepare(
+            "SELECT id FROM subscriptions WHERE member_id = ? AND plan_id = ?"
+        ).bind(body.member_id, body.plan_id).first();
+        
+        if (existingSub) {
+            return jsonResponse({ success: false, error: 'Thành viên này đã có sẵn trong gói rồi! Nếu một người muốn mua 2 slot, hãy tạo thêm 1 Member mới (VD: "Tên Khách - Slot 2") để dễ quản lý.' }, 400);
+        }
         
         await context.env.DB.prepare(`
             INSERT INTO subscriptions (id, member_id, plan_id, start_date, end_date, next_due_date, amount_due, billing_cycle_months, status, user_token, personal_note)
@@ -72,7 +81,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         const body = await context.request.json() as any;
 
         // Validate slots (only if we are modifying an existing sub and it's not paused, or changing plans)
-        const sub = await context.env.DB.prepare("SELECT plan_id, status FROM subscriptions WHERE id = ?").bind(id).first<{plan_id: string, status: string}>();
+        const sub = await context.env.DB.prepare("SELECT plan_id, status, member_id FROM subscriptions WHERE id = ?").bind(id).first<{plan_id: string, status: string, member_id: string}>();
         if (!sub) return jsonResponse({ success: false, error: 'Subscription not found' }, 404);
         
         // If we change plan or if we are activating a previously paused sub, we must check capacity
@@ -89,13 +98,24 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
             }
         }
 
+        // Prevent duplicate member in same plan when editing
+        const targetMemberId = body.member_id || sub.member_id;
+        if (targetPlanId !== sub.plan_id || targetMemberId !== sub.member_id) {
+            const existingSub = await context.env.DB.prepare(
+                "SELECT id FROM subscriptions WHERE member_id = ? AND plan_id = ? AND id != ?"
+            ).bind(targetMemberId, targetPlanId, id).first();
+            if (existingSub) {
+                return jsonResponse({ success: false, error: 'Thành viên này đã có sẵn trong gói rồi! Nếu một người muốn mua 2 slot, hãy tạo thêm 1 Member mới (VD: "Tên Khách - Slot 2") để dễ quản lý.' }, 400);
+            }
+        }
+
         await context.env.DB.prepare(`
             UPDATE subscriptions 
-            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?
+            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?, member_id = ?
             WHERE id = ?
         `).bind(
             body.start_date, body.next_due_date, body.amount_due, 
-            body.billing_cycle_months || 1, body.status, targetPlanId, id
+            body.billing_cycle_months || 1, body.status, targetPlanId, targetMemberId, id
         ).run();
 
         return jsonResponse({ success: true });
