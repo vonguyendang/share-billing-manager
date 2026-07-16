@@ -51,7 +51,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
         // 3. Due Soon List (Next 7 days)
         const dueSoonList = await DB.prepare(`
-            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due, s.user_token
             FROM subscriptions s
             JOIN members m ON s.member_id = m.id
             JOIN plans p ON s.plan_id = p.id
@@ -64,7 +64,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
         // 4. Overdue List
         const overdueList = await DB.prepare(`
-            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due, s.user_token
             FROM subscriptions s
             JOIN members m ON s.member_id = m.id
             JOIN plans p ON s.plan_id = p.id
@@ -82,6 +82,40 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             WHERE p.active = 1
         `).all();
 
+        // 6. Pending Payments List
+        const pendingList = await DB.prepare(`
+            SELECT pr.*, s.amount_due as expected_amount, m.full_name as member_name, p.name as plan_name 
+            FROM payment_requests pr
+            JOIN subscriptions s ON pr.subscription_id = s.id
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE pr.status = 'pending'
+            ORDER BY pr.created_at ASC
+            LIMIT 5
+        `).all();
+
+        // 7. Recent Successful Payments
+        const recentPayments = await DB.prepare(`
+            SELECT pr.id, pr.amount, pr.approved_at as processed_at, m.full_name as member_name, p.name as plan_name
+            FROM payment_requests pr
+            JOIN subscriptions s ON pr.subscription_id = s.id
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE pr.status = 'approved'
+            ORDER BY pr.approved_at DESC
+            LIMIT 5
+        `).all();
+
+        // 8. Revenue Chart (Last 6 Months)
+        const revenueChart = await DB.prepare(`
+            SELECT strftime('%Y-%m', approved_at) as month, SUM(amount) as revenue
+            FROM payment_requests
+            WHERE status = 'approved'
+              AND approved_at >= date('now', '-5 months', 'start of month')
+            GROUP BY month
+            ORDER BY month ASC
+        `).all();
+
         return jsonResponse({
             success: true,
             data: {
@@ -96,7 +130,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                 },
                 dueSoonList: dueSoonList.results || [],
                 overdueList: overdueList.results || [],
-                planUtilList: planUtilList.results || []
+                planUtilList: planUtilList.results || [],
+                pendingList: pendingList.results || [],
+                recentPayments: recentPayments.results || [],
+                revenueChart: revenueChart.results || []
             }
         });
 

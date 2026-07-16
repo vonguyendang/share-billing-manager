@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Billing Admin</title>
+    <title>Family Billing Manager</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -23,18 +25,24 @@
 </div>
 
 <div id="appView" class="app-container hidden">
-    <aside class="sidebar">
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <div class="mobile-header">
         <h2>Billing Manager</h2>
-        <a href="#dashboard" class="nav-item active" data-view="dashboard">Dashboard</a>
-        <a href="#plans" class="nav-item" data-view="plans">Plans</a>
-        <a href="#members" class="nav-item" data-view="members">Members</a>
-        <a href="#subscriptions" class="nav-item" data-view="subscriptions">Subscriptions</a>
-        <a href="#payments" class="nav-item" data-view="payments">Pending Payments</a>
-        <a href="#settings" class="nav-item" data-view="settings">Settings</a>
+        <button id="btnMobileMenu" class="menu-btn">☰</button>
+    </div>
+    <aside class="sidebar" id="sidebar">
+        <h2><i class="ph ph-wallet"></i> Billing Manager</h2>
+        <a href="#dashboard" class="nav-item active" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</a>
+        <a href="#plans" class="nav-item" data-view="plans"><i class="ph ph-list-dashes"></i> Plans</a>
+        <a href="#members" class="nav-item" data-view="members"><i class="ph ph-users"></i> Members</a>
+        <a href="#subscriptions" class="nav-item" data-view="subscriptions"><i class="ph ph-calendar-check"></i> Subscriptions</a>
+        <a href="#payments" class="nav-item" data-view="payments"><i class="ph ph-currency-circle-dollar"></i> Pending Payments</a>
+        <a href="#settings" class="nav-item" data-view="settings"><i class="ph ph-gear"></i> Settings</a>
         
         <div style="flex-grow: 1;"></div>
-        <button id="btnRunReminders" class="btn btn-primary" style="margin-bottom: 1rem;">▶ Run Reminders</button>
-        <button id="btnLogout" class="btn" style="background: transparent; color: var(--danger);">Logout</button>
+        <button id="btnToggleTheme" class="btn" style="background: transparent; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="ph ph-sun"></i> Giao diện Sáng</button>
+        <button id="btnRunReminders" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="ph ph-bell-ringing"></i> Run Reminders</button>
+        <button id="btnLogout" class="btn" style="background: transparent; color: var(--danger);"><i class="ph ph-sign-out"></i> Logout</button>
     </aside>
 
     <main class="main-content">
@@ -49,40 +57,80 @@
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                <div class="card">
-                    <h3>Active Plans</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="card stat-card" onclick="document.querySelector('[data-view=\'plans\']').click()">
+                    <h3><i class="ph ph-list-dashes"></i> Active Plans</h3>
                     <p id="stat-plans" style="font-size: 2rem; font-weight: bold;">-</p>
                 </div>
-                <div class="card">
-                    <h3>Members</h3>
+                <div class="card stat-card" onclick="document.querySelector('[data-view=\'members\']').click()">
+                    <h3><i class="ph ph-users"></i> Members</h3>
                     <p id="stat-members" style="font-size: 2rem; font-weight: bold;">-</p>
                 </div>
-                <div class="card">
-                    <h3>Due in 7 days</h3>
+                <div class="card stat-card" onclick="adminApp.filterSubByStatus('due_soon')">
+                    <h3><i class="ph ph-warning-circle"></i> Due in 7 days</h3>
                     <p id="stat-due" style="font-size: 2rem; font-weight: bold; color: var(--warning);">-</p>
                 </div>
-                <div class="card">
-                    <h3>Pending Approvals</h3>
+                <div class="card stat-card" onclick="document.querySelector('[data-view=\'payments\']').click()">
+                    <h3><i class="ph ph-clock-countdown"></i> Pending Approvals</h3>
                     <p id="stat-pending" style="font-size: 2rem; font-weight: bold; color: var(--danger);">-</p>
+                </div>
+                <div class="card stat-card" onclick="document.querySelector('[data-view=\'plans\']').click()">
+                    <h3><i class="ph ph-armchair"></i> Empty Slots</h3>
+                    <p id="stat-empty-slots" style="font-size: 2rem; font-weight: bold; color: var(--success);">-</p>
                 </div>
             </div>
 
             <div class="card-header">
-                <h2>Monthly Budget & Financials</h2>
+                <h2>Financials & Activity</h2>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                <div class="card">
-                    <h3>Total Cost</h3>
-                    <p id="stat-cost" style="font-size: 2rem; font-weight: bold; color: var(--danger);">-</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                
+                <!-- Left Column: Budget & Chart -->
+                <div>
+                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-chart-bar"></i> Revenue Overview</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> Total Cost</h4>
+                            <p id="stat-cost" style="font-size: 1.25rem; font-weight: bold; color: var(--danger);">-</p>
+                        </div>
+                        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-up"></i> Expected Rev</h4>
+                            <p id="stat-revenue" style="font-size: 1.25rem; font-weight: bold; color: var(--success);">-</p>
+                        </div>
+                        <div class="card" style="margin-bottom: 0; padding: 1rem;">
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-coins"></i> Net Profit</h4>
+                            <p id="stat-profit" style="font-size: 1.25rem; font-weight: bold;">-</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <canvas id="revenueChart" style="width: 100%; height: 250px;"></canvas>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Expected Revenue</h3>
-                    <p id="stat-revenue" style="font-size: 2rem; font-weight: bold; color: var(--success);">-</p>
+
+                <!-- Right Column: Recent Payments -->
+                <div>
+                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-clock-counter-clockwise"></i> Recent Successful Payments</h3>
+                    <div class="card table-responsive" style="padding: 0; margin-bottom: 0;">
+                        <table id="table-dashboard-recent">
+                            <thead>
+                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Amount</th><th>Date</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Net Profit/Loss</h3>
-                    <p id="stat-profit" style="font-size: 2rem; font-weight: bold;">-</p>
+            </div>
+
+            <!-- Pending Approvals Quick View -->
+            <div id="dashboard-pending-section" class="hidden">
+                <h3 style="margin-bottom: 1rem; color: var(--danger);"><i class="ph ph-clock-countdown"></i> Pending Approvals (Action Required)</h3>
+                <div class="card table-responsive" style="padding: 0; margin-bottom: 2rem;">
+                    <table id="table-dashboard-pending">
+                        <thead>
+                            <tr><th>#</th><th>Member</th><th>Plan</th><th>Amount</th><th>Date</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -90,10 +138,10 @@
                 <!-- Overdue -->
                 <div>
                     <h3 style="margin-bottom: 1rem; color: var(--danger);">Overdue / Unpaid</h3>
-                    <div class="card" style="padding: 0;">
+                    <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-overdue">
                             <thead>
-                                <tr><th>Member</th><th>Plan</th><th>Due Date</th></tr>
+                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Due Date</th><th>Actions</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -103,10 +151,10 @@
                 <!-- Due Soon -->
                 <div>
                     <h3 style="margin-bottom: 1rem; color: var(--warning);">Due in Next 7 Days</h3>
-                    <div class="card" style="padding: 0;">
+                    <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-duesoon">
                             <thead>
-                                <tr><th>Member</th><th>Plan</th><th>Due Date</th></tr>
+                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Due Date</th><th>Actions</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -116,10 +164,10 @@
                 <!-- Plan Utilization -->
                 <div style="grid-column: 1 / -1; margin-top: 1rem;">
                     <h3 style="margin-bottom: 1rem;">Plan Utilization (Slots)</h3>
-                    <div class="card" style="padding: 0;">
+                    <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-utilization">
                             <thead>
-                                <tr><th>Plan</th><th>Slots Used</th><th>Progress</th></tr>
+                                <tr><th>#</th><th>Plan</th><th>Slots (Used / Max)</th><th>Fill Rate</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -137,10 +185,11 @@
                     <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
                 </div>
             </div>
-            <div class="card">
+            <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Member</th>
                             <th>Plan</th>
                             <th>Due Date</th>
@@ -165,10 +214,11 @@
                     <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
                 </div>
             </div>
-            <div class="card">
+            <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Category</th>
@@ -193,10 +243,11 @@
                     <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
                 </div>
             </div>
-            <div class="card">
+            <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
@@ -216,10 +267,11 @@
             <div class="card-header">
                 <h2>Pending Payments</h2>
             </div>
-            <div class="card">
+            <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Member</th>
                             <th>Plan</th>
                             <th>Amount</th>
@@ -338,6 +390,7 @@
 </div>
 
 <!-- Scripts -->
+<script src="js/theme.js"></script>
 <script type="module" src="js/admin.js?v=14"></script>
 </body>
 </html>

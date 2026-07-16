@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh Toán Dịch Vụ</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -18,8 +19,9 @@
             <p>Liên kết không hợp lệ hoặc đã hết hạn.</p>
         </div>
 
-        <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px;">
-            <h2 style="margin-bottom: 1.5rem; text-align: center;">Thông Tin Gói Dịch Vụ</h2>
+        <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px; position: relative;">
+            <button id="btnToggleTheme" class="btn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i class="ph ph-sun"></i></button>
+            <h2 style="margin-bottom: 1.5rem; text-align: center; margin-top: 1rem;">Thông Tin Gói Dịch Vụ</h2>
 
             <div style="background: var(--bg-main); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
                 <p><strong>Gói:</strong> <span id="p-plan"></span></p>
@@ -32,24 +34,24 @@
             </div>
 
             <div
-                style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
-                <div style="flex: 1; min-width: 200px;">
+                style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+                <div style="flex: 1 1 250px;">
                     <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Thông tin chuyển khoản:</h4>
                     <p>Ngân hàng: <strong>Timo - Ngân hàng số Timo by Ban Viet Bank</strong></p>
-                    <p style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.25rem 0;">
+                    <p style="margin: 0.5rem 0; line-height: 1.5;">
                         <span>Số tài khoản: <strong>0944353323</strong></span>
                         <button id="btnCopyAcc" class="btn"
-                            style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500;">Copy</button>
+                            style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500; margin-left: 4px; vertical-align: middle;">Copy</button>
                     </p>
                     <p>Chủ tài khoản: <strong>VO NGUYEN DANG</strong></p>
                     <p
-                        style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5;">
                         <span>Nội dung CK: <strong id="p-transfer-note"></strong></span>
                         <button id="btnCopyNote" class="btn"
-                            style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500;">Copy</button>
+                            style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500; margin-left: 4px; vertical-align: middle;">Copy</button>
                     </p>
                 </div>
-                <div style="text-align: center;">
+                <div style="text-align: center; flex: 0 0 auto; margin: 0 auto; display: flex; flex-direction: column; align-items: center;">
                     <img id="qr-code" src="" alt="Mã QR Chuyển Khoản"
                         style="max-width: 150px; border-radius: 0.5rem; display: none;">
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Quét QR để thanh
@@ -90,6 +92,7 @@
         </div>
     </div>
 
+    <script src="js/theme.js"></script>
     <script type="module" src="js/portal.js"></script>
 </body>
 

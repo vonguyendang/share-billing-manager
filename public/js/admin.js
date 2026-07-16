@@ -133,6 +133,25 @@ document.getElementById('btnRunReminders').addEventListener('click', async () =>
     }
 });
 
+// Mobile Sidebar Toggle
+const btnMobileMenu = document.getElementById('btnMobileMenu');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+function toggleSidebar() {
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+    }
+}
+
+if (btnMobileMenu) {
+    btnMobileMenu.addEventListener('click', toggleSidebar);
+}
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+}
+
 // Routing
 navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -141,6 +160,11 @@ navItems.forEach(item => {
         item.classList.add('active');
         const view = item.getAttribute('data-view');
         loadView(view);
+        
+        // Close sidebar on mobile after navigating
+        if (sidebar && sidebar.classList.contains('open')) {
+            toggleSidebar();
+        }
     });
 });
 
@@ -188,14 +212,21 @@ async function loadDashboard() {
     const tbodyOverdue = document.querySelector('#table-dashboard-overdue tbody');
     tbodyOverdue.innerHTML = '';
     if (res.data.overdueList && res.data.overdueList.length === 0) {
-        tbodyOverdue.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No overdue subscriptions 🎉</td></tr>';
+        tbodyOverdue.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No overdue subscriptions 🎉</td></tr>';
     } else if (res.data.overdueList) {
-        res.data.overdueList.forEach(item => {
+        res.data.overdueList.forEach((item, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>${index + 1}</td>
                 <td>${item.member_name}</td>
                 <td>${item.plan_name}</td>
                 <td style="color: var(--danger); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+                <td>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <button class="btn btn-primary" onclick="adminApp.copyPortalLink('${item.user_token}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Copy Link"><i class="ph ph-link"></i></button>
+                        <button class="btn btn-success" onclick="adminApp.markPaid('${item.id}', ${item.amount_due})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Mark Paid"><i class="ph ph-check"></i></button>
+                    </div>
+                </td>
             `;
             tbodyOverdue.appendChild(tr);
         });
@@ -205,24 +236,32 @@ async function loadDashboard() {
     const tbodyDue = document.querySelector('#table-dashboard-duesoon tbody');
     tbodyDue.innerHTML = '';
     if (res.data.dueSoonList && res.data.dueSoonList.length === 0) {
-        tbodyDue.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 2rem;">No upcoming renewals</td></tr>';
+        tbodyDue.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No upcoming renewals</td></tr>';
     } else if (res.data.dueSoonList) {
-        res.data.dueSoonList.forEach(item => {
+        res.data.dueSoonList.forEach((item, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>${index + 1}</td>
                 <td>${item.member_name}</td>
                 <td>${item.plan_name}</td>
                 <td style="color: var(--warning); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+                <td>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <button class="btn btn-primary" onclick="adminApp.copyPortalLink('${item.user_token}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Copy Link"><i class="ph ph-link"></i></button>
+                        <button class="btn btn-success" onclick="adminApp.markPaid('${item.id}', ${item.amount_due})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Mark Paid"><i class="ph ph-check"></i></button>
+                    </div>
+                </td>
             `;
             tbodyDue.appendChild(tr);
         });
     }
 
     // Populate plan utilization
+    let totalEmptySlots = 0;
     const tbodyUtil = document.querySelector('#table-dashboard-utilization tbody');
     tbodyUtil.innerHTML = '';
     if (res.data.planUtilList) {
-        res.data.planUtilList.forEach(item => {
+        res.data.planUtilList.forEach((item, index) => {
             const tr = document.createElement('tr');
             const max = item.max_slots || 0;
             const used = item.used_slots || 0;
@@ -251,13 +290,110 @@ async function loadDashboard() {
                                     <span style="font-size: 0.8rem; width: 40px; color: #8892b0;">${percent}%</span>
                                 </div>`;
             }
+            if (max > 0) {
+                totalEmptySlots += Math.max(0, max - used);
+            }
             
             tr.innerHTML = `
+                <td>${index + 1}</td>
                 <td><a href="#" onclick="window.adminApp.filterSubByPlan('${item.name.replace(/'/g, "\\'")}')">${item.name}</a></td>
                 <td>${slotText}</td>
                 <td style="width: 40%;">${progressHtml}</td>
             `;
             tbodyUtil.appendChild(tr);
+        });
+    }
+    const emptySlotsEl = document.getElementById('stat-empty-slots');
+    if (emptySlotsEl) emptySlotsEl.innerText = totalEmptySlots;
+
+    // Populate pending payments
+    const pendingSection = document.getElementById('dashboard-pending-section');
+    const tbodyPending = document.querySelector('#table-dashboard-pending tbody');
+    if (res.data.pendingList && res.data.pendingList.length > 0) {
+        pendingSection.classList.remove('hidden');
+        tbodyPending.innerHTML = '';
+        res.data.pendingList.forEach((req, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${req.member_name}</td>
+                <td>${req.plan_name}</td>
+                <td>${req.amount.toLocaleString()}</td>
+                <td>${formatDate(req.created_at)}</td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-success" onclick="adminApp.approvePayment('${req.id}', ${req.amount})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Approve"><i class="ph ph-check"></i></button>
+                        <button class="btn btn-danger" onclick="adminApp.rejectPayment('${req.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Reject"><i class="ph ph-x"></i></button>
+                    </div>
+                </td>
+            `;
+            tbodyPending.appendChild(tr);
+        });
+    } else {
+        pendingSection.classList.add('hidden');
+    }
+
+    // Populate recent payments
+    const tbodyRecent = document.querySelector('#table-dashboard-recent tbody');
+    if (tbodyRecent) {
+        tbodyRecent.innerHTML = '';
+        if (res.data.recentPayments && res.data.recentPayments.length === 0) {
+            tbodyRecent.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No recent payments</td></tr>';
+        } else if (res.data.recentPayments) {
+            res.data.recentPayments.forEach((req, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${req.member_name}</td>
+                    <td>${req.plan_name}</td>
+                    <td style="color: var(--success); font-weight: bold;">+${req.amount.toLocaleString()}</td>
+                    <td style="font-size: 0.8rem; color: var(--text-muted);">${formatDate(req.processed_at)}</td>
+                `;
+                tbodyRecent.appendChild(tr);
+            });
+        }
+    }
+
+    // Render Revenue Chart
+    const chartCtx = document.getElementById('revenueChart');
+    if (chartCtx && res.data.revenueChart && typeof Chart !== 'undefined') {
+        if (window.revenueChartInstance) {
+            window.revenueChartInstance.destroy();
+        }
+        const labels = res.data.revenueChart.map(d => {
+            const parts = d.month.split('-');
+            return parts.length === 2 ? `${parts[1]}/${parts[0]}` : d.month;
+        });
+        const data = res.data.revenueChart.map(d => d.revenue);
+        
+        window.revenueChartInstance = new Chart(chartCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (VND)',
+                    data: data,
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
         });
     }
 }
@@ -284,7 +420,7 @@ async function loadPlans() {
     }
     const tbody = document.getElementById('plan-list');
     tbody.innerHTML = '';
-    plansData.forEach(p => {
+    plansData.forEach((p, index) => {
         const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused').length;
         const maxSlots = p.max_slots || 0;
         const slotsDisplay = maxSlots > 0 ? `${usedSlots}/${maxSlots}` : `${usedSlots}/∞`;
@@ -294,6 +430,7 @@ async function loadPlans() {
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td>${index + 1}</td>
             <td><code>${p.id}</code></td>
             <td>${p.name}</td>
             <td>${p.category}</td>
@@ -302,8 +439,10 @@ async function loadPlans() {
             <td>${slotsHtml}</td>
             <td>${p.active ? 'Active' : 'Inactive'}</td>
             <td>
-                <button class="btn btn-primary" onclick="adminApp.editPlan('${p.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="adminApp.deletePlan('${p.id}')">Del</button>
+                <div style="display: flex; gap: 0.25rem;">
+                    <button class="btn btn-primary" onclick="adminApp.editPlan('${p.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+                    <button class="btn btn-danger" onclick="adminApp.deletePlan('${p.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Delete"><i class="ph ph-trash"></i></button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -320,9 +459,10 @@ async function loadMembers() {
     membersData = res.data;
     const tbody = document.getElementById('member-list');
     tbody.innerHTML = '';
-    membersData.forEach(m => {
+    membersData.forEach((m, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td>${index + 1}</td>
             <td><code>${m.id}</code></td>
             <td>${m.full_name}</td>
             <td>${m.email}</td>
@@ -330,8 +470,10 @@ async function loadMembers() {
             <td>${m.note || '-'}</td>
             <td>${m.active ? 'Active' : 'Inactive'}</td>
             <td>
-                <button class="btn btn-primary" onclick="adminApp.editMember('${m.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="adminApp.deleteMember('${m.id}')">Del</button>
+                <div style="display: flex; gap: 0.25rem;">
+                    <button class="btn btn-primary" onclick="adminApp.editMember('${m.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+                    <button class="btn btn-danger" onclick="adminApp.deleteMember('${m.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Delete"><i class="ph ph-trash"></i></button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -348,10 +490,11 @@ async function loadSubscriptions() {
     subsData = res.data;
     const tbody = document.getElementById('sub-list');
     tbody.innerHTML = '';
-    subsData.forEach(sub => {
+    subsData.forEach((sub, index) => {
         const link = `${window.location.origin}/portal.html?token=${sub.user_token}`;
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td>${index + 1}</td>
             <td>${sub.member_name}</td>
             <td>${sub.plan_name}</td>
             <td>${formatDate(sub.next_due_date)}</td>
@@ -360,8 +503,10 @@ async function loadSubscriptions() {
             <td><span class="badge ${sub.status === 'active' ? 'badge-active' : 'badge-pending'}">${sub.status}</span></td>
             <td><a href="${link}" target="_blank" style="font-size: 0.8rem">Portal</a></td>
             <td>
-                <button class="btn btn-primary" onclick="adminApp.editSub('${sub.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="adminApp.deleteSub('${sub.id}')">Del</button>
+                <div style="display: flex; gap: 0.25rem;">
+                    <button class="btn btn-primary" onclick="adminApp.editSub('${sub.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+                    <button class="btn btn-danger" onclick="adminApp.deleteSub('${sub.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Delete"><i class="ph ph-trash"></i></button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -377,9 +522,10 @@ async function loadPayments() {
     const res = await apiCall('/payments');
     const tbody = document.getElementById('payment-list');
     tbody.innerHTML = '';
-    res.data.forEach(req => {
+    res.data.forEach((req, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td>${index + 1}</td>
             <td>${req.member_name}</td>
             <td>${req.plan_name}</td>
             <td>${req.amount.toLocaleString()}</td>
@@ -449,6 +595,44 @@ async function populateSubSelects(currentSubId = null) {
 
 // Global actions & modals
 window.adminApp = {
+    copyPortalLink: async (token) => {
+        const link = `${window.location.origin}/portal.html?token=${token}`;
+        try {
+            await navigator.clipboard.writeText(link);
+            window.ui.alert('Đã copy link Portal!');
+        } catch (e) {
+            window.ui.prompt('Copy thủ công link bên dưới:', link);
+        }
+    },
+    
+    markPaid: async (subId, expectedAmount) => {
+        const amountInput = await window.ui.prompt('Đánh dấu đã đóng tiền. Nhập số tiền đã nhận (VNĐ):', expectedAmount || '');
+        if (amountInput === null || amountInput === false) return;
+        
+        const totalPaid = parseFloat(amountInput);
+        if (isNaN(totalPaid) || totalPaid <= 0) return;
+        
+        try {
+            await apiCall('/subscriptions', 'POST', { action: 'mark_paid', id: subId, total_paid: totalPaid });
+            loadView('dashboard');
+        } catch (e) {
+            window.ui.alert(e.message);
+        }
+    },
+    
+    navigate: (viewName) => {
+        document.querySelector(`[data-view='${viewName}']`).click();
+    },
+
+    filterSubByStatus: async (status) => {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelector('.nav-item[data-view="subscriptions"]').classList.add('active');
+        await loadView('subscriptions');
+        // A simple search filter isn't perfect for 'due_soon' without complex logic in subscriptions view.
+        // I will just show the subscriptions view as per user request to click to navigate.
+        // Or I can type 'warning' or whatever colors the row but let's just leave it at navigating.
+    },
+
     approvePayment: async (id, expectedAmount) => {
         const amountInput = await window.ui.prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
         if (amountInput === null || amountInput === false) return; // User cancelled

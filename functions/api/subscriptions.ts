@@ -33,6 +33,42 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             return jsonResponse({ success: true, data: { token: newToken } });
         }
 
+        // Direct mark paid from admin dashboard
+        if (body.action === 'mark_paid' && body.id) {
+            const sub = await context.env.DB.prepare("SELECT * FROM subscriptions WHERE id = ?").bind(body.id).first<any>();
+            if (!sub) return jsonResponse({ success: false, error: 'Sub not found' }, 404);
+            
+            const monthlyPrice = sub.amount_due / sub.billing_cycle_months;
+            const addedMonths = body.total_paid / monthlyPrice;
+            const wholeMonths = Math.floor(addedMonths);
+            const fractionalMonth = addedMonths - wholeMonths;
+            const addedDays = Math.round(fractionalMonth * 30);
+            
+            let rawDate = sub.next_due_date.split(' ')[0];
+            if (rawDate.includes('/')) {
+                const parts = rawDate.split('/');
+                if (parts.length === 3) rawDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            } else if (rawDate.split('-').length === 3 && rawDate.split('-')[0].length <= 2) {
+                const parts = rawDate.split('-');
+                rawDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+
+            const oldDate = new Date(rawDate);
+            oldDate.setMonth(oldDate.getMonth() + wholeMonths);
+            oldDate.setDate(oldDate.getDate() + addedDays);
+            const newDateStr = oldDate.toISOString().split('T')[0];
+
+            await context.env.DB.prepare("UPDATE subscriptions SET next_due_date = ?, status = 'active' WHERE id = ?").bind(newDateStr, body.id).run();
+            
+            const reqId = 'pay_' + Date.now();
+            await context.env.DB.prepare(`
+                INSERT INTO payment_requests (id, subscription_id, amount, status, created_at, processed_at)
+                VALUES (?, ?, ?, 'approved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            `).bind(reqId, body.id, body.total_paid).run();
+            
+            return jsonResponse({ success: true, data: { new_date: newDateStr } });
+        }
+
         // Creating new subscription
         const id = 'sub_' + Date.now();
         const token = generateToken();
