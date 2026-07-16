@@ -490,5 +490,25 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
     } catch (e) { await window.ui.alert(e.message); }
 });
 
+// Search/Filter logic
+function setupSearchFilter(inputId, listId) {
+    document.getElementById(inputId).addEventListener('keyup', function(e) {
+        const term = e.target.value.toLowerCase();
+        const rows = document.getElementById(listId).getElementsByTagName('tr');
+        for (let row of rows) {
+            const text = row.innerText.toLowerCase();
+            if (text.includes(term)) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        }
+    });
+}
+
+setupSearchFilter('search-sub', 'sub-list');
+setupSearchFilter('search-member', 'member-list');
+setupSearchFilter('search-plan', 'plan-list');
+
 // Init
 checkSession();

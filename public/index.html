@@ -85,7 +85,10 @@
         <div id="view-subscriptions" class="view-section hidden">
             <div class="card-header">
                 <h2>Subscriptions</h2>
-                <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="search-sub" class="form-control" placeholder="Search subscriptions..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
+                </div>
             </div>
             <div class="card">
                 <table>
@@ -110,7 +113,10 @@
         <div id="view-plans" class="view-section hidden">
             <div class="card-header">
                 <h2>Plans</h2>
-                <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="search-plan" class="form-control" placeholder="Search plans..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
+                </div>
             </div>
             <div class="card">
                 <table>
@@ -134,7 +140,10 @@
         <div id="view-members" class="view-section hidden">
             <div class="card-header">
                 <h2>Members</h2>
-                <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="search-member" class="form-control" placeholder="Search members..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
+                </div>
             </div>
             <div class="card">
                 <table>
@@ -281,6 +290,6 @@
 </div>
 
 <!-- Scripts -->
-<script type="module" src="js/admin.js?v=2"></script>
+<script type="module" src="js/admin.js?v=3"></script>
 </body>
 </html>
