@@ -1,5 +1,57 @@
 import { apiCall } from './api.js';
 
+window.ui = {
+    showDialog: function(title, message, type = 'alert', defaultInputValue = '') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('modal-dialog');
+            document.getElementById('dialog-title').innerText = title;
+            document.getElementById('dialog-message').innerText = message;
+            
+            const btnCancel = document.getElementById('dialog-btn-cancel');
+            const btnOk = document.getElementById('dialog-btn-ok');
+            const inputField = document.getElementById('dialog-input');
+            
+            if (type === 'confirm' || type === 'prompt') {
+                btnCancel.classList.remove('hidden');
+            } else {
+                btnCancel.classList.add('hidden');
+            }
+            
+            if (type === 'prompt') {
+                inputField.classList.remove('hidden');
+                inputField.value = defaultInputValue;
+            } else {
+                inputField.classList.add('hidden');
+            }
+            
+            modal.classList.add('active');
+            
+            if (type === 'prompt') inputField.focus();
+            else btnOk.focus();
+            
+            const cleanup = () => {
+                modal.classList.remove('active');
+                btnOk.onclick = null;
+                btnCancel.onclick = null;
+            };
+            
+            btnOk.onclick = () => {
+                cleanup();
+                if (type === 'prompt') resolve(inputField.value);
+                else resolve(true);
+            };
+            
+            btnCancel.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+        });
+    },
+    alert: (msg) => window.ui.showDialog('Thông báo', msg, 'alert'),
+    confirm: (msg) => window.ui.showDialog('Xác nhận', msg, 'confirm'),
+    prompt: (msg, defaultVal) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal)
+};
+
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get('token');
 
@@ -100,10 +152,10 @@ document.getElementById('btnConfirmPay').addEventListener('click', async () => {
 
     try {
         await apiCall(`/user/${token}`, 'POST', { user_note: note });
-        alert('Cảm ơn bạn! Yêu cầu đã được gửi.');
+        await window.ui.alert('Cảm ơn bạn! Yêu cầu đã được gửi.');
         window.location.reload();
     } catch (e) {
-        alert(e.message);
+        await window.ui.alert(e.message);
         btn.disabled = false;
         btn.innerText = 'Tôi đã chuyển khoản';
     }

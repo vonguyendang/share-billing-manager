@@ -24,8 +24,15 @@ export function generateToken(length: number = 32): string {
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-// Check if admin is authenticated via cookie
+// Check if admin is authenticated via cookie or auth header
 export function checkAuth(request: Request, env: Env): boolean {
+    // 1. Allow API access via Authorization header (for Cron Jobs)
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader && authHeader === `Bearer ${env.ADMIN_COOKIE_SECRET}`) {
+        return true;
+    }
+
+    // 2. Check for session cookie
     const cookieHeader = request.headers.get('Cookie');
     if (!cookieHeader) return false;
     

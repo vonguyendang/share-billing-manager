@@ -239,6 +239,20 @@
     </div>
 </div>
 
+<div id="modal-dialog" class="modal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 id="dialog-title">Thông báo</h2>
+        <p id="dialog-message" style="margin: 1.5rem 0; font-size: 16px; color: #4b5563;"></p>
+        
+        <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1.5rem;" autocomplete="off">
+        
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button id="dialog-btn-cancel" class="btn hidden">Hủy</button>
+            <button id="dialog-btn-ok" class="btn btn-primary">OK</button>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script type="module" src="js/admin.js"></script>
 </body>

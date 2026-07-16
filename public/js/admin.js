@@ -6,6 +6,58 @@ const appView = document.getElementById('appView');
 const loginForm = document.getElementById('loginForm');
 const navItems = document.querySelectorAll('.nav-item');
 
+window.ui = {
+    showDialog: function(title, message, type = 'alert', defaultInputValue = '') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('modal-dialog');
+            document.getElementById('dialog-title').innerText = title;
+            document.getElementById('dialog-message').innerText = message;
+            
+            const btnCancel = document.getElementById('dialog-btn-cancel');
+            const btnOk = document.getElementById('dialog-btn-ok');
+            const inputField = document.getElementById('dialog-input');
+            
+            if (type === 'confirm' || type === 'prompt') {
+                btnCancel.classList.remove('hidden');
+            } else {
+                btnCancel.classList.add('hidden');
+            }
+            
+            if (type === 'prompt') {
+                inputField.classList.remove('hidden');
+                inputField.value = defaultInputValue;
+            } else {
+                inputField.classList.add('hidden');
+            }
+            
+            modal.classList.add('active');
+            
+            if (type === 'prompt') inputField.focus();
+            else btnOk.focus();
+            
+            const cleanup = () => {
+                modal.classList.remove('active');
+                btnOk.onclick = null;
+                btnCancel.onclick = null;
+            };
+            
+            btnOk.onclick = () => {
+                cleanup();
+                if (type === 'prompt') resolve(inputField.value);
+                else resolve(true);
+            };
+            
+            btnCancel.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+        });
+    },
+    alert: (msg) => window.ui.showDialog('Thông báo', msg, 'alert'),
+    confirm: (msg) => window.ui.showDialog('Xác nhận', msg, 'confirm'),
+    prompt: (msg, defaultVal) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal)
+};
+
 async function checkSession() {
     try {
         const res = await apiCall('/auth/session');
@@ -45,12 +97,12 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
 });
 
 document.getElementById('btnRunReminders').addEventListener('click', async () => {
-    if (!confirm('Run email reminders for subscriptions due in 7, 3, or 1 days?')) return;
+    if (!(await window.ui.confirm('Chạy toàn bộ tiến trình gửi email nhắc nhở (Sắp đến hạn & Quá hạn)?'))) return;
     try {
         const res = await apiCall('/reminders', 'POST');
-        alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
+        await window.ui.alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
     } catch (e) {
-        alert('Error: ' + e.message);
+        await window.ui.alert('Error: ' + e.message);
     }
 });
 
@@ -86,7 +138,7 @@ async function loadView(view) {
         if (view === 'payments') await loadPayments();
     } catch (e) {
         console.error(e);
-        alert('Error loading ' + view);
+        await window.ui.alert('Error loading ' + view);
     }
 }
 
@@ -238,19 +290,19 @@ async function populateSubSelects() {
 // Global actions & modals
 window.adminApp = {
     approvePayment: async (id, expectedAmount) => {
-        const amountInput = prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
-        if (amountInput === null) return; // User cancelled
+        const amountInput = await window.ui.prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
+        if (amountInput === null || amountInput === false) return; // User cancelled
         
         const totalPaid = parseFloat(amountInput);
         if (isNaN(totalPaid) || totalPaid <= 0) {
-            alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0.');
+            await window.ui.alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0.');
             return;
         }
 
         try {
             await apiCall('/payments', 'POST', { request_id: id, action: 'approve', total_paid: totalPaid });
             loadView('payments');
-        } catch (e) { alert(e.message); }
+        } catch (e) { await window.ui.alert(e.message); }
     },
     
     // Plans
@@ -272,11 +324,11 @@ window.adminApp = {
         document.getElementById('modal-plan').classList.add('active');
     },
     deletePlan: async (id) => {
-        if (!confirm('Are you sure you want to delete this plan? This will also delete all associated subscriptions!')) return;
+        if (!(await window.ui.confirm('Are you sure you want to delete this plan? This will also delete all associated subscriptions!'))) return;
         try {
             await apiCall(`/plans?id=${id}`, 'DELETE');
             loadView('plans');
-        } catch (e) { alert(e.message); }
+        } catch (e) { await window.ui.alert(e.message); }
     },
     
     // Members
@@ -299,11 +351,11 @@ window.adminApp = {
         document.getElementById('modal-member').classList.add('active');
     },
     deleteMember: async (id) => {
-        if (!confirm('Are you sure you want to delete this member? This will also delete all associated subscriptions!')) return;
+        if (!(await window.ui.confirm('Are you sure you want to delete this member? This will also delete all associated subscriptions!'))) return;
         try {
             await apiCall(`/members?id=${id}`, 'DELETE');
             loadView('members');
-        } catch (e) { alert(e.message); }
+        } catch (e) { await window.ui.alert(e.message); }
     },
     
     // Subscriptions
@@ -332,11 +384,11 @@ window.adminApp = {
         document.getElementById('modal-sub').classList.add('active');
     },
     deleteSub: async (id) => {
-        if (!confirm('Are you sure you want to delete this subscription?')) return;
+        if (!(await window.ui.confirm('Are you sure you want to delete this subscription?'))) return;
         try {
             await apiCall(`/subscriptions?id=${id}`, 'DELETE');
             loadView('subscriptions');
-        } catch (e) { alert(e.message); }
+        } catch (e) { await window.ui.alert(e.message); }
     },
     
     closeModal: (id) => document.getElementById(id).classList.remove('active')
@@ -361,7 +413,7 @@ document.getElementById('form-plan').addEventListener('submit', async (e) => {
         }
         adminApp.closeModal('modal-plan');
         loadView('plans');
-    } catch (e) { alert(e.message); }
+    } catch (e) { await window.ui.alert(e.message); }
 });
 
 document.getElementById('form-member').addEventListener('submit', async (e) => {
@@ -382,7 +434,7 @@ document.getElementById('form-member').addEventListener('submit', async (e) => {
         }
         adminApp.closeModal('modal-member');
         loadView('members');
-    } catch (e) { alert(e.message); }
+    } catch (e) { await window.ui.alert(e.message); }
 });
 
 document.getElementById('form-sub').addEventListener('submit', async (e) => {
@@ -405,7 +457,7 @@ document.getElementById('form-sub').addEventListener('submit', async (e) => {
         }
         adminApp.closeModal('modal-sub');
         loadView('subscriptions');
-    } catch (e) { alert(e.message); }
+    } catch (e) { await window.ui.alert(e.message); }
 });
 
 // Init

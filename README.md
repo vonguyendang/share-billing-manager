@@ -81,6 +81,23 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 
 🎉 **Hoàn Tất!** Giờ đây bạn đã có thể truy cập đường link thực tế và bắt đầu quản lý.
 
+### 7. Cấu hình Tự động chạy mỗi ngày (Cron Job) - Khuyên dùng
+
+Để hệ thống tự động nhắc nhở và khóa dịch vụ khi quá hạn, bạn cần cấu hình một dịch vụ gọi vào API `/api/reminders` mỗi sáng. Cách đơn giản và miễn phí nhất là sử dụng **cron-job.org**.
+
+1. Đăng nhập hoặc tạo tài khoản miễn phí tại [cron-job.org](https://cron-job.org).
+2. Bấm **Create Cronjob**.
+3. Ở ô **URL**, nhập địa chỉ API của bạn: `https://[TÊN_MIỀN_CỦA_BẠN]/api/reminders`.
+4. Lên lịch chạy (Schedule): Chọn **User-defined**, chạy mỗi ngày 1 lần vào lúc **08:00 AM** (chọn múi giờ Asia/Ho_Chi_Minh).
+5. Cuộn xuống phần **Advanced**:
+   - HTTP Method: Chọn `POST`.
+   - Bật **Add custom HTTP Headers**.
+   - Thêm một Header mới với:
+     - Tên Header: `Authorization`
+     - Giá trị Header: `Bearer THAY_BẰNG_SECRET_CỦA_BẠN` (Chuỗi bí mật này chính là biến `ADMIN_COOKIE_SECRET` bạn đã set trên Cloudflare Dashboard).
+6. Bấm **Create** để lưu lại.
+
+Từ nay, cứ 8h sáng, hệ thống này sẽ tự động quét toàn bộ danh sách, gửi email báo sắp đến hạn, quá hạn và tự động khóa những người dùng trễ nợ!
 ## Hướng dẫn chạy thử ở Local (Máy cá nhân)
 
 Để test hệ thống ngay trên máy của bạn trước khi deploy lên Cloudflare:
