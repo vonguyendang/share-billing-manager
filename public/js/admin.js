@@ -23,6 +23,25 @@ window.ui = {
                 btnCancel.classList.add('hidden');
             }
             
+            const optionsContainer = document.getElementById('dialog-options');
+            if (options && options.length > 0) {
+                optionsContainer.classList.remove('hidden');
+                optionsContainer.innerHTML = '';
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'badge badge-pending';
+                    btn.style.cursor = 'pointer';
+                    btn.style.border = 'none';
+                    btn.style.padding = '0.5rem 1rem';
+                    btn.innerText = opt;
+                    btn.onclick = () => { inputField.value = opt; };
+                    optionsContainer.appendChild(btn);
+                });
+            } else {
+                optionsContainer.classList.add('hidden');
+            }
+            
             if (type === 'prompt') {
                 inputField.classList.remove('hidden');
                 inputField.value = defaultInputValue;
@@ -55,7 +74,7 @@ window.ui = {
     },
     alert: (msg) => window.ui.showDialog('Thông báo', msg, 'alert'),
     confirm: (msg) => window.ui.showDialog('Xác nhận', msg, 'confirm'),
-    prompt: (msg, defaultVal) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal)
+    prompt: (msg, defaultVal, options = []) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal, options)
 };
 
 async function checkSession() {
@@ -355,7 +374,13 @@ window.adminApp = {
     },
     
     rejectPayment: async (id) => {
-        const reason = await window.ui.prompt('Nhập lý do TỪ CHỐI thanh toán (VD: Kiểm tra chưa nhận được tiền):', '');
+        const templates = [
+            'Admin chưa nhận được tiền trong tài khoản',
+            'Chuyển khoản thiếu tiền',
+            'Chuyển khoản sai nội dung',
+            'Yêu cầu bị trùng lặp'
+        ];
+        const reason = await window.ui.prompt('Nhập lý do TỪ CHỐI thanh toán:', '', templates);
         if (reason === null || reason === false) return; // Cancelled
         
         try {

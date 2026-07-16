@@ -279,12 +279,11 @@
 
 <div id="modal-dialog" class="modal">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2 id="dialog-title">Thông báo</h2>
-        <p id="dialog-message" style="margin: 1.5rem 0; font-size: 16px; color: #4b5563;"></p>
-        
-        <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1.5rem;" autocomplete="off">
-        
-        <div style="display: flex; gap: 1rem; justify-content: center;">
+        <h2 id="dialog-title"></h2>
+        <p id="dialog-message" style="margin: 1rem 0;"></p>
+        <div id="dialog-options" class="hidden" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
+        <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1rem;">
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
             <button id="dialog-btn-cancel" class="btn hidden">Hủy</button>
             <button id="dialog-btn-ok" class="btn btn-primary">OK</button>
         </div>
@@ -292,6 +291,6 @@
 </div>
 
 <!-- Scripts -->
-<script type="module" src="js/admin.js?v=7"></script>
+<script type="module" src="js/admin.js?v=8"></script>
 </body>
 </html>
