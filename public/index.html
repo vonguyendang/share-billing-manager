@@ -7,7 +7,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
@@ -366,8 +366,23 @@
                     <h3 style="margin-bottom: 1rem;">Cấu hình thanh toán VietQR</h3>
                     <div class="form-group">
                         <label>Mã Ngân Hàng (BIN hoặc Tên viết tắt)</label>
-                        <input type="text" id="setting-bank-id" class="form-control" placeholder="VD: VCB, MB, TPB, hoặc 970436">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Mã BIN (như 970436) hoặc tên ngân hàng viết tắt hỗ trợ VietQR.</p>
+                        <div class="custom-select-wrapper" id="bank-select-wrapper">
+                            <div class="custom-select" id="bank-select">
+                                <div class="custom-select-trigger" id="bank-select-trigger">
+                                    <div style="display: flex; align-items: center;" id="bank-select-content">
+                                        <span>Đang tải danh sách ngân hàng...</span>
+                                    </div>
+                                    <div class="arrow"></div>
+                                </div>
+                                <div class="custom-options" id="bank-options">
+                                    <div class="custom-option-search">
+                                        <input type="text" id="bank-search-input" placeholder="Tìm kiếm ngân hàng...">
+                                    </div>
+                                    <div id="bank-options-list"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="setting-bank-id">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Số Tài Khoản</label>
@@ -524,6 +539,6 @@
 
 <!-- Scripts -->
 <script src="js/theme.js"></script>
-<script type="module" src="js/admin.js?v=15"></script>
+<script type="module" src="js/admin.js?v=16"></script>
 </body>
 </html>

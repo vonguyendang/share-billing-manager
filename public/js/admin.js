@@ -426,6 +426,13 @@ async function loadSettings() {
     document.getElementById('setting-bank-account-number').value = settingsData.bank_account_number || '';
     document.getElementById('setting-bank-account-name').value = settingsData.bank_account_name || '';
     document.getElementById('setting-allow-user-cancel').checked = settingsData.allow_user_cancel === 1;
+
+    if (!window.bankSelectInitialized) {
+        initBankSelect();
+        window.bankSelectInitialized = true;
+    } else {
+        updateBankTriggerDisplay();
+    }
 }
 
 async function loadExpenses() {
@@ -1029,3 +1036,82 @@ setupSearchFilter('search-plan', 'plan-list');
 
 // Init
 checkSession();
+// === Custom Bank Select Logic ===
+let bankDataList = [];
+
+async function initBankSelect() {
+    try {
+        const res = await fetch('https://api.vietqr.io/v2/banks');
+        const json = await res.json();
+        bankDataList = json.data;
+    } catch(e) {
+        const res = await fetch('data/banks.json');
+        const json = await res.json();
+        bankDataList = json.data;
+    }
+
+    renderBankOptions();
+    
+    document.getElementById('bank-select-trigger').addEventListener('click', function(e) {
+        document.getElementById('bank-select').classList.toggle('open');
+        document.getElementById('bank-search-input').focus();
+        e.stopPropagation();
+    });
+
+    document.getElementById('bank-search-input').addEventListener('input', function(e) {
+        renderBankOptions(e.target.value.toLowerCase());
+    });
+
+    document.getElementById('bank-search-input').addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('bank-select-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('bank-select').classList.remove('open');
+        }
+    });
+}
+
+function renderBankOptions(filter = '') {
+    const list = document.getElementById('bank-options-list');
+    list.innerHTML = '';
+    const currentVal = document.getElementById('setting-bank-id').value;
+
+    bankDataList.forEach(bank => {
+        const text = `${bank.shortName} - ${bank.name}`;
+        if (filter && !text.toLowerCase().includes(filter) && !bank.bin.includes(filter)) return;
+
+        const opt = document.createElement('div');
+        opt.className = 'custom-option' + (currentVal === bank.bin || currentVal === bank.shortName ? ' selected' : '');
+        opt.innerHTML = `<img src="${bank.logo}" onerror="this.style.display='none'">
+                         <div class="custom-option-text">${text}</div>`;
+        
+        opt.addEventListener('click', function(e) {
+            document.getElementById('setting-bank-id').value = bank.bin;
+            updateBankTriggerDisplay(bank);
+            document.getElementById('bank-select').classList.remove('open');
+            renderBankOptions(); // re-render to update selected styling
+            e.stopPropagation();
+        });
+        list.appendChild(opt);
+    });
+
+    updateBankTriggerDisplay();
+}
+
+function updateBankTriggerDisplay(bank = null) {
+    if (!bank && bankDataList.length > 0) {
+        const currentVal = document.getElementById('setting-bank-id').value;
+        bank = bankDataList.find(b => b.bin === currentVal || b.shortName === currentVal || b.short_name === currentVal);
+    }
+    const content = document.getElementById('bank-select-content');
+    if (bank) {
+        content.innerHTML = `<img src="${bank.logo}" style="width: 40px; height: 20px; object-fit: contain; margin-right: 10px;" onerror="this.style.display='none'">
+                             <span>${bank.shortName} - ${bank.name}</span>`;
+    } else {
+        const val = document.getElementById('setting-bank-id').value;
+        content.innerHTML = `<span>${val || 'Chọn ngân hàng...'}</span>`;
+    }
+}

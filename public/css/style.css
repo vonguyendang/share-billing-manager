@@ -522,3 +522,32 @@ tbody tr:hover {
     align-items: center !important;
   }
 }
+
+/* Custom Bank Select */
+.custom-select-wrapper { position: relative; user-select: none; width: 100%; }
+.custom-select { position: relative; display: flex; flex-direction: column; }
+.custom-select-trigger {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 1rem; font-size: 1rem; font-weight: 400; line-height: 1.5;
+    color: var(--text-color); background-color: var(--surface);
+    border: 1px solid var(--border-color); border-radius: 0.5rem; cursor: pointer;
+}
+.custom-select-trigger .arrow {
+    border-top: 5px solid var(--text-color); border-left: 5px solid transparent; border-right: 5px solid transparent;
+}
+.custom-options {
+    position: absolute; display: none; top: 100%; left: 0; right: 0;
+    border: 1px solid var(--border-color); border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: var(--surface);
+    z-index: 99; margin-top: 4px; max-height: 300px; overflow-y: auto;
+}
+.custom-select.open .custom-options { display: block; }
+.custom-option {
+    display: flex; align-items: center; padding: 0.5rem 1rem; cursor: pointer;
+}
+.custom-option:hover { background-color: rgba(99, 102, 241, 0.1); }
+.custom-option.selected { background-color: rgba(99, 102, 241, 0.15); font-weight: 500; }
+.custom-option img { width: 60px; height: 30px; object-fit: contain; margin-right: 15px; }
+.custom-option-text { flex: 1; }
+.custom-option-search { padding: 0.5rem; position: sticky; top: 0; background: var(--surface); z-index: 100; border-bottom: 1px solid var(--border-color); }
+.custom-option-search input { width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; outline: none; }
