@@ -186,7 +186,7 @@ const translations = {
         'opt_paused': 'Tạm dừng',
         'opt_pending': 'Chờ thanh toán',
 
-        'lang_switch': 'Ngôn ngữ: Tiếng Việt 🔄',
+        'lang_switch': 'Tiếng Việt (VI)',
         // Additional
         'theme_light': 'Giao diện Sáng',
         'theme_dark': 'Giao diện Tối',
@@ -481,7 +481,7 @@ const translations = {
         'opt_paused': 'Paused',
         'opt_pending': 'Pending Payment',
 
-        'lang_switch': 'Language: English 🔄',
+        'lang_switch': 'English (EN)',
         // Additional
         'theme_light': 'Light Theme',
         'theme_dark': 'Dark Theme',
