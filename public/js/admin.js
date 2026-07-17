@@ -1081,7 +1081,10 @@ function renderBankOptions(filter = '') {
 
     bankDataList.forEach(bank => {
         const text = `${bank.shortName} - ${bank.name}`;
-        if (filter && !text.toLowerCase().includes(filter) && !bank.bin.includes(filter)) return;
+        if (filter) {
+            const searchStr = `${bank.name} ${bank.shortName} ${bank.code} ${bank.bin} ${bank.short_name}`.toLowerCase();
+            if (!searchStr.includes(filter)) return;
+        }
 
         const opt = document.createElement('div');
         opt.className = 'custom-option' + (currentVal === bank.bin || currentVal === bank.shortName ? ' selected' : '');
