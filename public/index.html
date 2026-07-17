@@ -7,6 +7,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/i18n.js"></script>
     <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
@@ -33,40 +34,44 @@
     </div>
     <aside class="sidebar" id="sidebar">
         <h2><i class="ph ph-wallet"></i> Billing Manager</h2>
-        <a href="#dashboard" class="nav-item active" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</a>
-        <a href="#plans" class="nav-item" data-view="plans"><i class="ph ph-list-dashes"></i> Plans</a>
-        <a href="#members" class="nav-item" data-view="members"><i class="ph ph-users"></i> Members</a>
-        <a href="#subscriptions" class="nav-item" data-view="subscriptions"><i class="ph ph-calendar-check"></i> Subscriptions</a>
-        <a href="#payments" class="nav-item" data-view="payments"><i class="ph ph-currency-circle-dollar"></i> Pending Payments</a>
-        <a href="#expenses" class="nav-item" data-view="expenses"><i class="ph ph-wallet"></i> Chi Phí</a>
-        <a href="#history" class="nav-item" data-view="history"><i class="ph ph-clock-counter-clockwise"></i> Lịch sử duyệt</a>
-        <a href="#settings" class="nav-item" data-view="settings"><i class="ph ph-gear"></i> Settings</a>
+        <a href="#dashboard" class="nav-item active" data-view="dashboard"><i class="ph ph-squares-four"></i> <span data-i18n="nav_dashboard">Dashboard</span></a>
+        <a href="#plans" class="nav-item" data-view="plans"><i class="ph ph-list-dashes"></i> <span data-i18n="nav_plans">Plans</span></a>
+        <a href="#members" class="nav-item" data-view="members"><i class="ph ph-users"></i> <span data-i18n="nav_members">Members</span></a>
+        <a href="#subscriptions" class="nav-item" data-view="subscriptions"><i class="ph ph-calendar-check"></i> <span data-i18n="nav_subscriptions">Subscriptions</span></a>
+        <a href="#payments" class="nav-item" data-view="payments"><i class="ph ph-currency-circle-dollar"></i> <span data-i18n="nav_pending_req">Pending Payments</span></a>
+        <a href="#expenses" class="nav-item" data-view="expenses"><i class="ph ph-wallet"></i> <span data-i18n="nav_expenses">Chi Phí</span></a>
+        <a href="#history" class="nav-item" data-view="history"><i class="ph ph-clock-counter-clockwise"></i> <span data-i18n="nav_history">Lịch sử duyệt</span></a>
+        <a href="#settings" class="nav-item" data-view="settings"><i class="ph ph-gear"></i> <span data-i18n="nav_settings">Settings</span></a>
         
         <div style="flex-grow: 1;"></div>
-        <button id="btnToggleTheme" class="btn" style="background: transparent; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="ph ph-sun"></i> Giao diện Sáng</button>
+        <div class="lang-switcher" style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem;">
+            <button class="btn lang-btn" data-lang="vi" onclick="setLanguage('vi')" style="flex: 1; padding: 0.25rem;">VI</button>
+            <button class="btn lang-btn" data-lang="en" onclick="setLanguage('en')" style="flex: 1; padding: 0.25rem;">EN</button>
+        </div>
+        <button id="btnToggleTheme" class="btn" style="background: transparent; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="ph ph-sun"></i> <span data-i18n="theme_light">Giao diện Sáng</span></button>
         <button id="btnRunReminders" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="ph ph-bell-ringing"></i> Run Reminders</button>
-        <button id="btnLogout" class="btn" style="background: transparent; color: var(--danger);"><i class="ph ph-sign-out"></i> Logout</button>
+        <button id="btnLogout" class="btn" style="background: transparent; color: var(--danger);"><i class="ph ph-sign-out"></i> <span data-i18n="nav_logout">Logout</span></button>
     </aside>
 
     <main class="main-content">
         <!-- Dashboard View -->
         <div id="view-dashboard" class="view-section">
             <div class="card-header">
-                <h2>Dashboard Overview</h2>
+                <h2><span data-i18n="nav_dashboard">Dashboard Overview</span></h2>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
-                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
-                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()" data-i18n="plan_add">+ Add Plan</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()" data-i18n="member_add">+ Add Member</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()" data-i18n="sub_add">+ Add Sub</button>
                 </div>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                 <div class="card stat-card" onclick="document.querySelector('[data-view=\'plans\']').click()">
-                    <h3><i class="ph ph-list-dashes"></i> Active Plans</h3>
+                    <h3><i class="ph ph-list-dashes"></i> <span data-i18n="dash_active_plans">Active Plans</span></h3>
                     <p id="stat-plans" style="font-size: 2rem; font-weight: bold;">-</p>
                 </div>
                 <div class="card stat-card" onclick="document.querySelector('[data-view=\'members\']').click()">
-                    <h3><i class="ph ph-users"></i> Members</h3>
+                    <h3><i class="ph ph-users"></i> <span data-i18n="dash_active_members">Members</span></h3>
                     <p id="stat-members" style="font-size: 2rem; font-weight: bold;">-</p>
                 </div>
                 <div class="card stat-card" onclick="adminApp.filterSubByStatus('due_soon')">
@@ -84,7 +89,7 @@
             </div>
 
             <div class="card-header">
-                <h2>Financials & Activity</h2>
+                <h2><span data-i18n="dash_recent_activity">Financials & Activity</span></h2>
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 
@@ -93,7 +98,7 @@
                     <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-chart-bar"></i> Revenue Overview</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
-                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> Chi phí (Dự toán / Thực tế)</h4>
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> <span data-i18n="dash_cost">Chi phí (Dự toán / Thực tế)</span></h4>
                             <p style="font-size: 1.25rem; font-weight: bold; color: var(--danger);">
                                 <span id="stat-cost">-</span> / <span id="stat-actual-cost">-</span>
                             </p>
@@ -103,7 +108,7 @@
                             <p id="stat-revenue" style="font-size: 1.25rem; font-weight: bold; color: var(--success);">-</p>
                         </div>
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
-                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-coins"></i> Lợi nhuận (Dự toán / Thực tế)</h4>
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-coins"></i> <span data-i18n="dash_profit">Lợi nhuận (Dự toán / Thực tế)</span></h4>
                             <p style="font-size: 1.25rem; font-weight: bold;">
                                 <span id="stat-profit">-</span> / <span id="stat-actual-profit">-</span>
                             </p>
@@ -189,7 +194,7 @@
                 <h2>Subscriptions</h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <input type="text" id="search-sub" class="form-control" placeholder="Search subscriptions..." style="width: 220px; padding: 0.5rem 1rem;">
-                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()">+ Add Sub</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddSubModal()" data-i18n="sub_add">+ Add Sub</button>
                 </div>
             </div>
             <div class="card table-responsive">
@@ -218,7 +223,7 @@
                 <h2>Plans</h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <input type="text" id="search-plan" class="form-control" placeholder="Search plans..." style="width: 220px; padding: 0.5rem 1rem;">
-                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()">+ Add Plan</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()" data-i18n="plan_add">+ Add Plan</button>
                 </div>
             </div>
             <div class="card table-responsive">
@@ -247,7 +252,7 @@
                 <h2>Members</h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <input type="text" id="search-member" class="form-control" placeholder="Search members..." style="width: 220px; padding: 0.5rem 1rem;">
-                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()">+ Add Member</button>
+                    <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()" data-i18n="member_add">+ Add Member</button>
                 </div>
             </div>
             <div class="card table-responsive">
@@ -257,7 +262,7 @@
                             <th>#</th>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th data-i18n="member_email">Email</th>
                             <th>Phone</th>
                             <th>Socials / Note</th>
                             <th>Status</th>
@@ -295,18 +300,18 @@
         <!-- Expenses View -->
         <div id="view-expenses" class="view-section hidden">
             <div class="card-header">
-                <h2>Quản lý Chi Phí</h2>
-                <button class="btn btn-primary" onclick="adminApp.openExpenseModal()">+ Thêm chi phí mới</button>
+                <h2><span data-i18n="exp_title">Quản lý Chi Phí</span></h2>
+                <button class="btn btn-primary" onclick="adminApp.openExpenseModal()"><span data-i18n="btn_add_exp">+ Thêm chi phí mới</span></button>
             </div>
             <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Ngày chi</th>
-                            <th>Nội dung</th>
-                            <th>Số tiền</th>
-                            <th>Hành động</th>
+                            <th data-i18n="exp_col_date">Ngày chi</th>
+                            <th data-i18n="exp_col_desc">Nội dung</th>
+                            <th data-i18n="sub_amount">Số tiền</th>
+                            <th data-i18n="exp_col_action">Hành động</th>
                         </tr>
                     </thead>
                     <tbody id="expense-list"></tbody>
@@ -317,66 +322,66 @@
         <!-- Settings View -->
         <div id="view-settings" class="view-section hidden">
             <div class="card-header">
-                <h2>Cài đặt hệ thống</h2>
+                <h2><span data-i18n="setting_title">Cài đặt hệ thống</span></h2>
             </div>
             <div class="card">
                 <form id="form-settings">
                     <div class="form-group">
-                        <label>Lịch gửi nhắc nhở (Các mốc ngày)</label>
+                        <label data-i18n="setting_reminder">Lịch gửi nhắc nhở (Các mốc ngày)</label>
                         <input type="text" id="setting-reminder-days" class="form-control" placeholder="VD: 7, 3, 1, 0, -2, -4">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
-                            Các con số cách nhau bởi dấu phẩy. Dương = Sắp đến hạn. 0 = Đến hạn. Âm = Quá hạn. <br>
-                            Ví dụ: <code>7,3,1,0,-2,-4</code> hoặc <code>1,0,-2,-4</code>
+                            <span data-i18n="setting_reminder_desc1">Các con số cách nhau bởi dấu phẩy. Dương = Sắp đến hạn. 0 = Đến hạn. Âm = Quá hạn.</span> <br>
+                            <span data-i18n="setting_reminder_desc2">Ví dụ: <code>7,3,1,0,-2,-4</code> hoặc <code>1,0,-2,-4</code></span>
                         </p>
                     </div>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="setting-reminders-enabled">
-                            <strong>Bật tính năng gửi email</strong>
+                            <strong data-i18n="setting_enable_email">Bật tính năng gửi email</strong>
                         </label>
                     </div>
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
-                    <h3 style="margin-bottom: 1rem;">Thông báo Telegram</h3>
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_tele_title">Thông báo Telegram</h3>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="setting-telegram-enabled">
-                            <strong>Bật thông báo qua Telegram</strong>
+                            <strong data-i18n="setting_enable_tele">Bật thông báo qua Telegram</strong>
                         </label>
                     </div>
                     <div class="form-group">
                         <label>Bot Token</label>
                         <input type="text" id="setting-telegram-bot-token" class="form-control" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Lấy từ @BotFather</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" data-i18n="setting_bot_token">Lấy từ @BotFather</p>
                     </div>
                     <div class="form-group">
                         <label>Chat ID</label>
                         <input type="text" id="setting-telegram-chat-id" class="form-control" placeholder="-1001234567890">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">ID của Group, Supergroup hoặc User</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" data-i18n="setting_chat_id">ID của Group, Supergroup hoặc User</p>
                     </div>
                     <div class="form-group">
-                        <label>Topic ID (Tuỳ chọn)</label>
+                        <label data-i18n="setting_topic_id">Topic ID (Tuỳ chọn)</label>
                         <input type="text" id="setting-telegram-topic-id" class="form-control" placeholder="1234">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Chỉ dùng nếu Chat ID là Supergroup và bạn muốn gửi vào một Topic cụ thể (Message Thread ID)</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;"><span data-i18n="setting_topic_desc">Chỉ dùng nếu Chat ID là Supergroup và bạn muốn gửi vào một Topic cụ thể (Message Thread ID)</span></p>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <button type="button" class="btn btn-secondary" onclick="adminApp.testTelegram()">🚀 Gửi tin nhắn Test (Test Bot)</button>
+                        <button type="button" class="btn btn-secondary" onclick="adminApp.testTelegram()"><span data-i18n="btn_test_tele">🚀 Gửi tin nhắn Test (Test Bot)</span></button>
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
-                    <h3 style="margin-bottom: 1rem;">Cấu hình thanh toán VietQR</h3>
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_vietqr">Cấu hình thanh toán VietQR</h3>
                     <div class="form-group" style="position: relative; z-index: 100;">
-                        <label>Mã Ngân Hàng (BIN hoặc Tên viết tắt)</label>
+                        <label data-i18n="bank_code">Mã Ngân Hàng (BIN hoặc Tên viết tắt)</label>
                         <div class="custom-select-wrapper" id="bank-select-wrapper">
                             <div class="custom-select" id="bank-select">
                                 <div class="custom-select-trigger" id="bank-select-trigger">
                                     <div style="display: flex; align-items: center;" id="bank-select-content">
-                                        <span>Đang tải danh sách ngân hàng...</span>
+                                        <span data-i18n="bank_loading">Đang tải danh sách ngân hàng...</span>
                                     </div>
                                     <div class="arrow"></div>
                                 </div>
                                 <div class="custom-options" id="bank-options">
                                     <div class="custom-option-search">
-                                        <input type="text" id="bank-search-input" placeholder="Tìm kiếm ngân hàng...">
+                                        <input type="text" id="bank-search-input" data-i18n-placeholder="bank_search" placeholder="Tìm kiếm ngân hàng...">
                                     </div>
                                     <div id="bank-options-list"></div>
                                 </div>
@@ -385,31 +390,31 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Số Tài Khoản</label>
-                        <input type="text" id="setting-bank-account-number" class="form-control" placeholder="Nhập số tài khoản...">
+                        <label data-i18n="bank_acc">Số Tài Khoản</label>
+                        <input type="text" id="setting-bank-account-number" class="form-control" data-i18n-placeholder="bank_acc_ph" placeholder="Nhập số tài khoản...">
                     </div>
                     <div class="form-group">
-                        <label>Tên Chủ Tài Khoản</label>
+                        <label data-i18n="bank_owner">Tên Chủ Tài Khoản</label>
                         <input type="text" id="setting-bank-account-name" class="form-control" placeholder="VD: NGUYEN VAN A">
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
-                    <h3 style="margin-bottom: 1rem;">Quyền của Khách hàng</h3>
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_client_rights">Quyền của Khách hàng</h3>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="setting-allow-user-cancel">
-                            <strong>Cho phép Khách hàng tự thao tác "Huỷ gia hạn" (Cancel)</strong>
+                            <strong data-i18n="setting_client_cancel">Cho phép Khách hàng tự thao tác "Huỷ gia hạn" (Cancel)</strong>
                         </label>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Nếu bật, khách hàng có thể tự nhấn huỷ gia hạn trên Portal. Gói sẽ chuyển sang trạng thái chờ huỷ.</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;"><span data-i18n="setting_client_cancel_desc">Nếu bật, khách hàng có thể tự nhấn huỷ gia hạn trên Portal. Gói sẽ chuyển sang trạng thái chờ huỷ.</span></p>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Lưu Cài Đặt</button>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" data-i18n="btn_save_setting">Lưu Cài Đặt</button>
                 </form>
             </div>
             
             <div class="card" style="margin-top: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Sao lưu Dữ liệu (Export CSV)</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Tải dữ liệu của bạn về máy để sao lưu hoặc làm báo cáo.</p>
+                <h3 style="margin-bottom: 1rem;" data-i18n="setting_export">Sao lưu Dữ liệu (Export CSV)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;"><span data-i18n="setting_export_desc">Tải dữ liệu của bạn về máy để sao lưu hoặc làm báo cáo.</span></p>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                     <button class="btn btn-primary" onclick="adminApp.exportData('members')">Export Members</button>
                     <button class="btn btn-primary" onclick="adminApp.exportData('subscriptions')">Export Subscriptions</button>
@@ -425,18 +430,18 @@
 <!-- History View -->
 <div id="view-history" class="view-section hidden" style="padding: 1.5rem;">
     <div class="card-header" style="margin-bottom: 1rem;">
-        <h2>Lịch sử Giao dịch</h2>
+        <h2><span data-i18n="hist_title">Lịch sử Giao dịch</span></h2>
     </div>
     <div class="card" style="overflow-x: auto;">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Ngày xử lý</th>
-                    <th>Khách hàng</th>
-                    <th>Gói dịch vụ</th>
-                    <th>Số tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th data-i18n="hist_date">Ngày xử lý</th>
+                    <th data-i18n="hist_client">Khách hàng</th>
+                    <th data-i18n="hist_plan">Gói dịch vụ</th>
+                    <th data-i18n="sub_amount">Số tiền</th>
+                    <th data-i18n="member_status">Trạng thái</th>
+                    <th data-i18n="member_action">Thao tác</th>
                 </tr>
             </thead>
             <tbody id="history-list">
@@ -449,12 +454,12 @@
 <!-- Modals -->
 <div id="modal-expense" class="modal">
     <div class="modal-content">
-        <h2 id="expense-modal-title">Thêm Chi Phí</h2>
+        <h2 id="expense-modal-title"><span data-i18n="modal_add_expense">Thêm Chi Phí</span></h2>
         <form id="form-expense" style="margin-top: 1rem;">
             <input type="hidden" id="expense-id">
-            <div class="form-group"><label>Ngày chi</label><input type="date" id="expense-date" class="form-control" required></div>
-            <div class="form-group"><label>Nội dung chi</label><input id="expense-desc" class="form-control" placeholder="VD: Mua gói Netflix" required></div>
-            <div class="form-group"><label>Số tiền (VND)</label><input type="number" id="expense-amount" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_exp_date">Ngày chi</label><input type="date" id="expense-date" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_exp_desc">Nội dung chi</label><input id="expense-desc" class="form-control" data-i18n-placeholder="lbl_exp_desc_ph" placeholder="VD: Mua gói Netflix" required></div>
+            <div class="form-group"><label data-i18n="lbl_exp_amount">Số tiền (VND)</label><input type="number" id="expense-amount" class="form-control" required></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-expense')">Cancel</button>
@@ -472,7 +477,7 @@
             <div class="form-group"><label>Category</label><input id="plan-category" class="form-control" required></div>
             <div class="form-group"><label>Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
             <div class="form-group"><label>Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
-            <div class="form-group"><label>Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
+            <div class="form-group"><label data-i18n="lbl_plan_slots">Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-plan')">Cancel</button>
@@ -508,7 +513,7 @@
             <div class="form-group"><label>Start Date</label><input type="date" id="sub-start" class="form-control" required></div>
             <div class="form-group"><label>Next Due Date</label><input type="date" id="sub-due" class="form-control" required></div>
             <div class="form-group"><label>Amount Due (VND)</label><input type="number" id="sub-amount" class="form-control" required></div>
-            <div class="form-group"><label>Chu kỳ thanh toán (Tháng)</label><input type="number" id="sub-cycle" class="form-control" required value="1" min="1"></div>
+            <div class="form-group"><label data-i18n="lbl_sub_cycle">Chu kỳ thanh toán (Tháng)</label><input type="number" id="sub-cycle" class="form-control" required value="1" min="1"></div>
             <div class="form-group"><label>Status</label>
                 <select id="sub-status" class="form-control">
                     <option value="active">Active</option>
@@ -531,7 +536,7 @@
         <div id="dialog-options" class="hidden" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
         <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1rem;">
         <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-            <button id="dialog-btn-cancel" class="btn hidden">Hủy</button>
+            <button id="dialog-btn-cancel" class="btn hidden" data-i18n="btn_cancel">Hủy</button>
             <button id="dialog-btn-ok" class="btn btn-primary">OK</button>
         </div>
     </div>

@@ -47,9 +47,9 @@ window.ui = {
             };
         });
     },
-    alert: (msg) => window.ui.showDialog('Thông báo', msg, 'alert'),
-    confirm: (msg) => window.ui.showDialog('Xác nhận', msg, 'confirm'),
-    prompt: (msg, defaultVal) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal)
+    alert: (msg) => window.ui.showDialog(t('dialog_title_alert'), msg, 'alert'),
+    confirm: (msg) => window.ui.showDialog(t('dialog_title_confirm'), msg, 'confirm'),
+    prompt: (msg, defaultVal) => window.ui.showDialog(t('dialog_title_prompt'), msg, 'prompt', defaultVal)
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -84,12 +84,12 @@ async function init() {
         document.getElementById('p-member').innerText = sub.member_name;
         document.getElementById('p-start').innerText = formatDate(sub.start_date);
         document.getElementById('p-due').innerText = formatDate(sub.next_due_date);
-        document.getElementById('p-amount').innerText = sub.amount_due.toLocaleString();
+        document.getElementById('p-amount').innerText = formatCurrency(sub.amount_due);
 
         let statusText = sub.status;
-        if (sub.status === 'active') statusText = 'Đang hoạt động';
-        if (sub.status === 'pending_payment') statusText = 'Chờ duyệt thanh toán';
-        if (sub.status === 'cancel_pending') statusText = 'Chờ huỷ gia hạn';
+        if (sub.status === 'active') statusText = t('status_active_txt');
+        if (sub.status === 'pending_payment') statusText = t('status_pending_txt');
+        if (sub.status === 'cancel_pending') statusText = t('status_cancel_txt');
         document.getElementById('p-status').innerText = statusText;
 
         const settings = res.data.settings;
@@ -191,34 +191,34 @@ document.getElementById('btnConfirmPay').addEventListener('click', async () => {
     const note = document.getElementById('p-note').value;
     const btn = document.getElementById('btnConfirmPay');
     btn.disabled = true;
-    btn.innerText = 'Đang xử lý...';
+    btn.innerText = t('txt_processing');
 
     try {
         await apiCall(`/user/${token}`, 'POST', { user_note: note });
-        await window.ui.alert('Cảm ơn bạn! Yêu cầu đã được gửi.');
+        await window.ui.alert(t('msg_portal_sent'));
         window.location.reload();
     } catch (e) {
         await window.ui.alert(e.message);
         btn.disabled = false;
-        btn.innerText = 'Tôi đã chuyển khoản';
+        btn.innerText = t('portal_btn_confirm');
     }
 });
 
 document.getElementById('btnCancelSub')?.addEventListener('click', async () => {
-    if (!await window.ui.confirm('Bạn có chắc chắn muốn hủy gia hạn? Gói dịch vụ của bạn sẽ tự động kết thúc vào kỳ hạn tiếp theo.')) return;
+    if (!await window.ui.confirm(t('msg_portal_confirm_cancel'))) return;
     
     const btn = document.getElementById('btnCancelSub');
     btn.disabled = true;
-    btn.innerText = 'Đang xử lý...';
+    btn.innerText = t('txt_processing');
 
     try {
         await apiCall(`/user/${token}`, 'POST', { action: 'cancel_pending' });
-        await window.ui.alert('Yêu cầu hủy gia hạn thành công.');
+        await window.ui.alert(t('msg_portal_cancel_success'));
         window.location.reload();
     } catch (e) {
         await window.ui.alert(e.message);
         btn.disabled = false;
-        btn.innerText = 'Hủy gia hạn chu kỳ sau';
+        btn.innerText = t('portal_btn_cancel');
     }
 });
 

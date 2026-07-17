@@ -72,9 +72,9 @@ window.ui = {
             };
         });
     },
-    alert: (msg) => window.ui.showDialog('Thông báo', msg, 'alert'),
-    confirm: (msg) => window.ui.showDialog('Xác nhận', msg, 'confirm'),
-    prompt: (msg, defaultVal, options = []) => window.ui.showDialog('Nhập thông tin', msg, 'prompt', defaultVal, options)
+    alert: (msg) => window.ui.showDialog(t('dialog_title_alert'), msg, 'alert'),
+    confirm: (msg) => window.ui.showDialog(t('dialog_title_confirm'), msg, 'confirm'),
+    prompt: (msg, defaultVal, options = []) => window.ui.showDialog(t('dialog_title_prompt'), msg, 'prompt', defaultVal, options)
 };
 
 async function checkSession() {
@@ -124,7 +124,7 @@ document.getElementById('btnRunReminders').addEventListener('click', async () =>
     } catch (e) { console.error('Could not fetch settings', e); }
 
     const days = settingsData.reminder_days || '7,3,1,0,-2,-4';
-    if (!(await window.ui.confirm(`Chạy tiến trình gửi email nhắc nhở cho các mốc ngày: ${days}?`))) return;
+    if (!(await window.ui.confirm(t('msg_run_reminders') + days + '?'))) return;
     try {
         const res = await apiCall('/reminders', 'POST');
         await window.ui.alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
@@ -168,13 +168,7 @@ navItems.forEach(item => {
     });
 });
 
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = dateStr.split(' ')[0];
-    const parts = d.split('-');
-    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    return dateStr;
-}
+
 
 
 async function loadView(view) {
@@ -204,16 +198,16 @@ async function loadDashboard() {
     document.getElementById('stat-pending').innerText = res.data.pendingPayments;
 
     const budget = res.data.budget;
-    document.getElementById('stat-cost').innerText = budget.monthlyCost.toLocaleString();
-    document.getElementById('stat-actual-cost').innerText = budget.actualMonthlyCost.toLocaleString();
-    document.getElementById('stat-revenue').innerText = budget.monthlyRevenue.toLocaleString();
+    document.getElementById('stat-cost').innerText = formatCurrency(budget.monthlyCost);
+    document.getElementById('stat-actual-cost').innerText = formatCurrency(budget.actualMonthlyCost);
+    document.getElementById('stat-revenue').innerText = formatCurrency(budget.monthlyRevenue);
 
     const profitEl = document.getElementById('stat-profit');
-    profitEl.innerText = budget.netProfit.toLocaleString();
+    profitEl.innerText = formatCurrency(budget.netProfit);
     profitEl.style.color = budget.netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
 
     const actualProfitEl = document.getElementById('stat-actual-profit');
-    actualProfitEl.innerText = budget.actualNetProfit.toLocaleString();
+    actualProfitEl.innerText = formatCurrency(budget.actualNetProfit);
     actualProfitEl.style.color = budget.actualNetProfit >= 0 ? 'var(--success)' : 'var(--danger)';
 
     // Populate overdue list
@@ -326,7 +320,7 @@ async function loadDashboard() {
                 <td>${index + 1}</td>
                 <td>${req.member_name}</td>
                 <td>${req.plan_name}</td>
-                <td>${req.amount.toLocaleString()}</td>
+                <td>${formatCurrency(req.amount)}</td>
                 <td>${formatDate(req.created_at)}</td>
                 <td>
                     <div style="display: flex; gap: 0.5rem;">
@@ -354,7 +348,7 @@ async function loadDashboard() {
                     <td>${index + 1}</td>
                     <td>${req.member_name}</td>
                     <td>${req.plan_name}</td>
-                    <td style="color: var(--success); font-weight: bold;">+${req.amount.toLocaleString()}</td>
+                    <td style="color: var(--success); font-weight: bold;">+${formatCurrency(req.amount)}</td>
                     <td style="font-size: 0.8rem; color: var(--text-muted);">${formatDate(req.processed_at)}</td>
                 `;
                 tbodyRecent.appendChild(tr);
@@ -440,7 +434,7 @@ async function loadExpenses() {
     const tbody = document.getElementById('expense-list');
     tbody.innerHTML = '';
     if (!res.data || res.data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">Chưa có dữ liệu chi phí</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">${t('msg_no_expense')}</td></tr>`;
         return;
     }
     res.data.forEach((e, index) => {
@@ -449,7 +443,7 @@ async function loadExpenses() {
             <td>${index + 1}</td>
             <td>${formatDate(e.expense_date)}</td>
             <td>${e.description}</td>
-            <td style="color: var(--danger); font-weight: bold;">-${e.amount.toLocaleString()}</td>
+            <td style="color: var(--danger); font-weight: bold;">-${formatCurrency(e.amount)}</td>
             <td>
                 <div style="display: flex; gap: 0.5rem;">
                     <button class="btn btn-primary" onclick='adminApp.editExpense(${JSON.stringify(e).replace(/'/g, "&apos;")})' style="padding: 0.25rem 0.5rem;"><i class="ph ph-pencil-simple"></i></button>
@@ -484,7 +478,7 @@ async function loadPlans() {
             <td><code>${p.id}</code></td>
             <td>${p.name}</td>
             <td>${p.category}</td>
-            <td>${p.total_price.toLocaleString()}</td>
+            <td>${formatCurrency(p.total_price)}</td>
             <td>${p.renewal_cycle_months}</td>
             <td>${slotsHtml}</td>
             <td>${p.active ? 'Active' : 'Inactive'}</td>
@@ -548,7 +542,7 @@ async function loadSubscriptions() {
             <td>${sub.member_name}</td>
             <td>${sub.plan_name}</td>
             <td>${formatDate(sub.next_due_date)}</td>
-            <td>${sub.amount_due.toLocaleString()}</td>
+            <td>${formatCurrency(sub.amount_due)}</td>
             <td>${sub.billing_cycle_months}</td>
             <td><span class="badge ${sub.status === 'active' ? 'badge-active' : 'badge-pending'}">${sub.status}</span></td>
             <td><a href="${link}" target="_blank" style="font-size: 0.8rem">Portal</a></td>
@@ -578,7 +572,7 @@ async function loadPayments() {
             <td>${index + 1}</td>
             <td>${req.member_name}</td>
             <td>${req.plan_name}</td>
-            <td>${req.amount.toLocaleString()}</td>
+            <td>${formatCurrency(req.amount)}</td>
             <td>${req.user_note || ''}</td>
             <td>${formatDate(req.created_at)}</td>
             <td>
@@ -598,24 +592,24 @@ async function loadHistory() {
     tbody.innerHTML = '';
 
     if (res.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Không có giao dịch nào gần đây</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">${t('hist_empty')}</td></tr>`;
         return;
     }
 
     res.data.forEach(p => {
         const tr = document.createElement('tr');
         const dateObj = p.approved_at ? new Date(p.approved_at + 'Z') : new Date(p.created_at + 'Z');
-        const dateStr = dateObj.toLocaleString('vi-VN');
+        const dateStr = formatDate(dateObj);
 
         let statusBadge = '';
-        if (p.status === 'approved') statusBadge = `<span class="badge badge-success" style="background-color: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Đã duyệt</span>`;
-        else if (p.status === 'rejected') statusBadge = `<span class="badge badge-danger" style="background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Từ chối</span>`;
+        if (p.status === 'approved') statusBadge = `<span class="badge badge-success" style="background-color: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${t('status_approved')}</span>`;
+        else if (p.status === 'rejected') statusBadge = `<span class="badge badge-danger" style="background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${t('status_rejected')}</span>`;
 
         tr.innerHTML = `
             <td>${dateStr}</td>
             <td><strong>${p.member_name}</strong></td>
             <td>${p.plan_name}</td>
-            <td><strong style="color: var(--success);">${p.amount.toLocaleString()} đ</strong></td>
+            <td><strong style="color: var(--success);">${formatCurrency(p.amount)}</strong></td>
             <td>${statusBadge}</td>
             <td>
                 <button class="btn btn-sm" style="background-color: var(--danger); color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;" onclick="window.adminApp.undoPayment('${p.id}')"><i class="ph ph-arrow-counter-clockwise"></i> Undo</button>
@@ -663,13 +657,13 @@ async function populateSubSelects(currentSubId = null) {
 
             if (maxSlots > 0) {
                 const remaining = maxSlots - usedSlots;
-                opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND) - Còn ${remaining} slot`;
+                opt.innerText = `${p.name} (${formatCurrency(p.total_price)} VND)${t('txt_plan_slots_left')} ${remaining}`;
                 if (remaining <= 0) {
                     opt.disabled = true;
-                    opt.innerText = `${p.name} (Đã Đầy)`;
+                    opt.innerText = `${p.name} ${t('txt_plan_full')}`;
                 }
             } else {
-                opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND) - Không giới hạn`;
+                opt.innerText = `${p.name} (${formatCurrency(p.total_price)} VND)${t('txt_plan_unlimited')}`;
             }
             planSelect.appendChild(opt);
         }
@@ -685,7 +679,7 @@ window.adminApp = {
         document.getElementById('form-expense').reset();
         document.getElementById('expense-id').value = '';
         document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
-        document.getElementById('expense-modal-title').innerText = 'Thêm Chi Phí';
+        document.getElementById('expense-modal-title').innerText = t('modal_add_expense');
         document.getElementById('modal-expense').classList.add('active');
     },
     editExpense: (e) => {
@@ -693,21 +687,21 @@ window.adminApp = {
         document.getElementById('expense-date').value = e.expense_date;
         document.getElementById('expense-desc').value = e.description;
         document.getElementById('expense-amount').value = e.amount;
-        document.getElementById('expense-modal-title').innerText = 'Sửa Chi Phí';
+        document.getElementById('expense-modal-title').innerText = t('modal_edit_expense');
         document.getElementById('modal-expense').classList.add('active');
     },
     deleteExpense: async (id) => {
-        if (!await window.ui.confirm('Bạn có chắc chắn muốn xóa chi phí này?')) return;
+        if (!await window.ui.confirm(t('msg_confirm_delete'))) return;
         try {
             await apiCall('/expenses?id=' + id, 'DELETE');
             await loadExpenses();
         } catch (e) { await window.ui.alert(e.message); }
     },
     undoPayment: async (id) => {
-        if (!await window.ui.confirm('Bạn có chắc chắn muốn hoàn tác (Undo) giao dịch này không? Ngày đến hạn của khách hàng sẽ bị lùi lại.')) return;
+        if (!await window.ui.confirm(t('msg_confirm_undo'))) return;
         try {
             await apiCall('/history?id=' + id, 'DELETE');
-            await window.ui.alert('Hoàn tác thành công!');
+            await window.ui.alert(t('msg_save_success'));
             await loadHistory();
         } catch (e) {
             await window.ui.alert(e.message);
@@ -717,14 +711,14 @@ window.adminApp = {
         const link = `${window.location.origin}/portal.html?token=${token}`;
         try {
             await navigator.clipboard.writeText(link);
-            window.ui.alert('Đã copy link Portal!');
+            window.ui.alert(t('msg_link_copied'));
         } catch (e) {
-            window.ui.prompt('Copy thủ công link bên dưới:', link);
+            window.ui.prompt(t('msg_prompt_copy'), link);
         }
     },
 
     markPaid: async (subId, expectedAmount) => {
-        const amountInput = await window.ui.prompt('Đánh dấu đã thanh toán tiền. Nhập số tiền đã nhận (VNĐ):', expectedAmount || '');
+        const amountInput = await window.ui.prompt(t('msg_prompt_paid'), expectedAmount || '');
         if (amountInput === null || amountInput === false) return;
 
         const totalPaid = parseFloat(amountInput);
@@ -752,12 +746,12 @@ window.adminApp = {
     },
 
     approvePayment: async (id, expectedAmount) => {
-        const amountInput = await window.ui.prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
+        const amountInput = await window.ui.prompt(t('msg_prompt_received'), expectedAmount || '');
         if (amountInput === null || amountInput === false) return; // User cancelled
 
         const totalPaid = parseFloat(amountInput);
         if (isNaN(totalPaid) || totalPaid <= 0) {
-            await window.ui.alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0.');
+            await window.ui.alert(t('msg_err_amount'));
             return;
         }
 
@@ -769,12 +763,12 @@ window.adminApp = {
 
     rejectPayment: async (id) => {
         const templates = [
-            'Admin chưa nhận được tiền trong tài khoản',
-            'Chuyển khoản thiếu tiền',
-            'Chuyển khoản sai nội dung',
-            'Yêu cầu bị trùng lặp'
+            t('reject_reason_1'),
+            t('reject_reason_2'),
+            t('reject_reason_3'),
+            t('reject_reason_4')
         ];
-        const reason = await window.ui.prompt('Nhập lý do TỪ CHỐI thanh toán:', '', templates);
+        const reason = await window.ui.prompt(t('msg_prompt_reject'), '', templates);
         if (reason === null || reason === false) return; // Cancelled
 
         try {
@@ -816,7 +810,7 @@ window.adminApp = {
     deletePlan: async (id) => {
         const p = plansData.find(x => x.id === id);
         if (!p) return;
-        const input = await window.ui.prompt(`Cảnh báo: Xóa gói này sẽ xóa toàn bộ Subscriptions liên quan! Gõ chữ "DELETE" để xác nhận xóa gói "${p.name}":`, '');
+        const input = await window.ui.prompt(t('msg_warn_del_plan') + '\"' + p.name + '\":', '');
         if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/plans?id=${id}`, 'DELETE');
@@ -846,7 +840,7 @@ window.adminApp = {
     deleteMember: async (id) => {
         const m = membersData.find(x => x.id === id);
         if (!m) return;
-        const input = await window.ui.prompt(`Cảnh báo: Xóa thành viên sẽ xóa luôn các Subscriptions của người này. Gõ chữ "DELETE" để xác nhận xóa "${m.full_name}":`, '');
+        const input = await window.ui.prompt(t('msg_warn_del_member') + '\"' + m.full_name + '\":', '');
         if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/members?id=${id}`, 'DELETE');
@@ -882,7 +876,7 @@ window.adminApp = {
     deleteSub: async (id) => {
         const s = subsData.find(x => x.id === id);
         if (!s) return;
-        const input = await window.ui.prompt(`Gõ chữ "DELETE" để xác nhận xóa Subscription của "${s.member_name}" (Gói: ${s.plan_name}):`, '');
+        const input = await window.ui.prompt(t('msg_warn_del_sub') + '"' + s.member_name + '" (' + t('sub_plan') + ': ' + s.plan_name + '):', '');
         if (!input || input.trim().toUpperCase() !== 'DELETE') return;
         try {
             await apiCall(`/subscriptions?id=${id}`, 'DELETE');
@@ -896,12 +890,12 @@ window.adminApp = {
         const topicId = document.getElementById('setting-telegram-topic-id').value;
 
         if (!token || !chatId) {
-            return window.ui.alert('Vui lòng nhập Bot Token và Chat ID để test!');
+            return window.ui.alert(t('msg_err_bot'));
         }
 
         try {
             const res = await apiCall('/test-telegram', 'POST', { token, chatId, topicId });
-            window.ui.alert(res.message || 'Thành công!');
+            window.ui.alert(res.message || t('msg_success'));
         } catch (e) {
             window.ui.alert(e.message);
         }
@@ -994,7 +988,7 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
     try {
         await apiCall('/settings', 'PUT', data);
         settingsData = data;
-        await window.ui.alert('Lưu cài đặt thành công!');
+        await window.ui.alert(t('msg_save_success'));
     } catch (e) { await window.ui.alert(e.message); }
 });
 
@@ -1010,7 +1004,7 @@ document.getElementById('form-expense').addEventListener('submit', async (e) => 
         await apiCall('/expenses', 'POST', data);
         adminApp.closeModal('modal-expense');
         await loadExpenses();
-        window.ui.alert('Lưu chi phí thành công');
+        window.ui.alert(t('msg_save_success'));
     } catch (e) { window.ui.alert(e.message); }
 });
 
@@ -1115,6 +1109,6 @@ function updateBankTriggerDisplay(bank = null) {
                              <span>${bank.shortName} - ${bank.name}</span>`;
     } else {
         const val = document.getElementById('setting-bank-id').value;
-        content.innerHTML = `<span>${val || 'Chọn ngân hàng...'}</span>`;
+        content.innerHTML = `<span>${val || t('lbl_select_bank')}</span>`;
     }
 }
