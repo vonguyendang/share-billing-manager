@@ -657,13 +657,13 @@ async function populateSubSelects(currentSubId = null) {
 
             if (maxSlots > 0) {
                 const remaining = maxSlots - usedSlots;
-                opt.innerText = `${p.name} (${formatCurrency(p.total_price)} VND)${t('txt_plan_slots_left')} ${remaining}`;
+                opt.innerText = `${p.name} (${formatCurrency(p.total_price)})${t('txt_plan_slots_left')} ${remaining}`;
                 if (remaining <= 0) {
                     opt.disabled = true;
                     opt.innerText = `${p.name} ${t('txt_plan_full')}`;
                 }
             } else {
-                opt.innerText = `${p.name} (${formatCurrency(p.total_price)} VND)${t('txt_plan_unlimited')}`;
+                opt.innerText = `${p.name} (${formatCurrency(p.total_price)})${t('txt_plan_unlimited')}`;
             }
             planSelect.appendChild(opt);
         }
