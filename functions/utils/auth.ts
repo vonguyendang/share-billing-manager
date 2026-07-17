@@ -32,6 +32,14 @@ export function checkAuth(request: Request, env: Env): boolean {
         return true;
     }
 
+    // 1.5 Allow API access via cron_key URL parameter (easier for cron-job.org)
+    try {
+        const url = new URL(request.url);
+        if (url.searchParams.get('cron_key') === env.ADMIN_COOKIE_SECRET) {
+            return true;
+        }
+    } catch(e) {}
+
     // 2. Check for session cookie
     const cookieHeader = request.headers.get('Cookie');
     if (!cookieHeader) return false;
