@@ -102,6 +102,15 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
      - Giá trị Header: `Bearer THAY_BẰNG_SECRET_CỦA_BẠN` (Chuỗi bí mật này chính là biến `ADMIN_COOKIE_SECRET` bạn đã set trên Cloudflare Dashboard).
 6. Bấm **Create** để lưu lại.
 
+> **💡 Mẹo sửa lỗi 401 Unauthorized:**
+> Nếu bạn bấm Test bị lỗi 401, hãy kiểm tra kỹ 3 lỗi thường gặp:
+> 1. Ô Header Value **phải có chữ** `Bearer ` (kèm khoảng trắng) trước mã bí mật.
+> 2. Đảm bảo bạn đang copy đúng mã `ADMIN_COOKIE_SECRET` (chứ không phải mã của Webhook).
+> 3. Tên Header phải nhập chuẩn chữ `Authorization` (viết hoa chữ A).
+
+> **🕵️ Mẹo lấy mã bí mật cực nhanh:**
+> Nếu bạn quên mã bí mật, không cần phải vào Cloudflare! Chỉ cần đăng nhập vào trang Admin trên trình duyệt, nhấn **F12** -> chọn tab **Application** (hoặc **Storage**) -> mục **Cookies**. Giá trị của cookie tên là `admin_session` chính là mã bí mật của bạn. Bạn chỉ cần copy nó và thêm chữ `Bearer ` vào trước là xong!
+
 Từ nay, cứ 8h sáng, hệ thống này sẽ tự động quét toàn bộ danh sách, gửi email báo sắp đến hạn, quá hạn và tự động khóa những người dùng trễ nợ!
 
 ### 8. Cấu hình Telegram Bot (Tuỳ chọn)
