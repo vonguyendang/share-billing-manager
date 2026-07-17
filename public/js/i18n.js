@@ -647,17 +647,27 @@ function formatCurrency(amount) {
     }
 }
 
-function formatDate(dateStr, options = {}) {
-    if (!dateStr) return '';
-    // Fix timezone issues when parsing date
-    const date = new Date(dateStr + (dateStr.includes('T') ? (dateStr.includes('Z') ? '' : 'Z') : 'T00:00:00Z'));
+function formatDate(dateInput, options = {}) {
+    if (!dateInput) return '';
+    let date;
+    let hasTime = false;
+    
+    if (dateInput instanceof Date) {
+        date = dateInput;
+        hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
+    } else {
+        const dateStr = String(dateInput);
+        hasTime = dateStr.includes('T');
+        date = new Date(dateStr + (hasTime ? (dateStr.includes('Z') ? '' : 'Z') : 'T00:00:00Z'));
+    }
+    
     const locale = currentLanguage === 'vi' ? 'vi-VN' : 'en-US';
 
     // Default options if none provided and dateStr doesn't include time
     let finalOptions = { ...options };
     if (Object.keys(options).length === 0) {
         finalOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-        if (dateStr.includes('T')) {
+        if (hasTime) {
             finalOptions.hour = '2-digit';
             finalOptions.minute = '2-digit';
         }
