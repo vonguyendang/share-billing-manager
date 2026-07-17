@@ -79,7 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     messageHtml = `Gói dịch vụ <strong>${sub.plan_name}</strong> của bạn sắp đến hạn thanh toán.
                     <br/><br/>
                     <strong>Ngày đến hạn:</strong> <span style="color: #EF4444;">${formattedDate}</span> (còn ${sub.days_left} ngày)<br/>
-                    <strong>Số tiền cần đóng:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
+                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
                     <br/><br/>
                     Vui lòng thanh toán trước ngày hạn chót <strong>${formattedDeadline}</strong> để đảm bảo dịch vụ được duy trì liên tục.`;
                 } else if (sub.days_left === 0) {
@@ -88,7 +88,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     headerColor = '#F59E0B'; // Amber
                     messageHtml = `Hôm nay (<strong>${formattedDate}</strong>) là ngày đến hạn thanh toán gói dịch vụ <strong>${sub.plan_name}</strong> của bạn.
                     <br/><br/>
-                    <strong>Số tiền cần đóng:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
+                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
                     <br/><br/>
                     Vui lòng thanh toán sớm trước ngày <strong>${formattedDeadline}</strong> để không bị gián đoạn dịch vụ nhé!`;
                 } else if (sub.days_left === -2) {
@@ -97,7 +97,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     headerColor = '#EF4444'; // Red
                     messageHtml = `Gói dịch vụ <strong>${sub.plan_name}</strong> của bạn đã trễ hạn thanh toán 2 ngày (từ ngày ${formattedDate}).
                     <br/><br/>
-                    <strong>Số tiền cần đóng:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
+                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
                     <br/><br/>
                     Hạn chót để giữ lại dịch vụ là ngày <strong>${formattedDeadline}</strong>. Xin vui lòng thanh toán ngay để tránh bị hệ thống tự động khóa.`;
                 } else if (sub.days_left === -4) {

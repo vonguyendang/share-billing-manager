@@ -103,10 +103,24 @@ async function init() {
 
             let bankDisplayName = bankBin;
             try {
-                const banksRes = await fetch('/data/banks.json');
-                if (banksRes.ok) {
-                    const banksData = await banksRes.json();
-                    const bankInfo = banksData.data.find(b => b.bin === bankBin || b.shortName === bankBin || b.short_name === bankBin);
+                let banksData = null;
+                try {
+                    const apiRes = await fetch('https://api.vietqr.io/v2/banks');
+                    if (apiRes.ok) banksData = await apiRes.json();
+                } catch(e) {}
+                
+                if (!banksData) {
+                    const localRes = await fetch('/data/banks.json');
+                    if (localRes.ok) banksData = await localRes.json();
+                }
+                
+                if (banksData && banksData.data) {
+                    const normalizedBin = String(bankBin).trim().toLowerCase();
+                    const bankInfo = banksData.data.find(b => 
+                        String(b.bin).toLowerCase() === normalizedBin || 
+                        String(b.shortName).toLowerCase() === normalizedBin || 
+                        String(b.short_name).toLowerCase() === normalizedBin
+                    );
                     if (bankInfo) {
                         bankDisplayName = `${bankInfo.shortName} - ${bankInfo.name}`;
                     }

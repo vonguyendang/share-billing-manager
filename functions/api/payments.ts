@@ -5,7 +5,7 @@ import { sendTelegramNotification } from '../utils/telegram';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
-    
+
     try {
         const { results } = await context.env.DB.prepare(`
             SELECT pr.*, s.amount_due as expected_amount, m.full_name as member_name, p.name as plan_name 
@@ -49,11 +49,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         if (action === 'approve') {
             const totalPaid = total_paid || reqInfo.amount;
-            
+
             // Calculate monthly price and how many months they paid for
             const monthlyPrice = reqInfo.amount_due / reqInfo.billing_cycle_months;
             const addedMonths = totalPaid / monthlyPrice;
-            
+
             const wholeMonths = Math.floor(addedMonths);
             const fractionalMonth = addedMonths - wholeMonths;
             const addedDays = Math.round(fractionalMonth * 30); // Approximate 1 month = 30 days
@@ -73,7 +73,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             if (isNaN(oldDate.getTime())) {
                 throw new Error("Dữ liệu ngày tháng không hợp lệ trong database: " + reqInfo.next_due_date);
             }
-            
+
             oldDate.setMonth(oldDate.getMonth() + wholeMonths);
             oldDate.setDate(oldDate.getDate() + addedDays);
             const newDateStr = oldDate.toISOString().split('T')[0];
@@ -89,7 +89,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const formattedNewDate = newDateParts.length === 3 ? `${newDateParts[2]}-${newDateParts[1]}-${newDateParts[0]}` : newDateStr;
 
             const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${totalPaid.toLocaleString()} VNĐ cho gói ${reqInfo.plan_name}.\nHạn dùng tiếp theo của bạn là: ${formattedNewDate}.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
-            
+
             const htmlBody = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #10B981; padding: 20px; text-align: center;">
@@ -100,7 +100,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Admin đã nhận được khoản thanh toán của bạn cho gói dịch vụ <strong>${reqInfo.plan_name}</strong>.</p>
                     
                     <div style="background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #A7F3D0;">
-                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã đóng:</strong> ${totalPaid.toLocaleString()} VNĐ</p>
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã thanh toán:</strong> ${totalPaid.toLocaleString()} VNĐ</p>
                         <p style="margin: 5px 0; color: #065F46;"><strong>Ngày đến hạn tiếp theo:</strong> <span style="font-size: 18px; font-weight: bold;">${formattedNewDate}</span></p>
                     </div>
                     
@@ -138,7 +138,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             ]);
 
             const emailBody = `Chào ${reqInfo.full_name},\n\nAdmin đã TỪ CHỐI yêu cầu báo thanh toán của bạn cho gói ${reqInfo.plan_name}.\nLý do: ${rejectReason}\n\nVui lòng kiểm tra lại. Nếu có sai sót, bạn có thể gửi lại báo cáo thanh toán mới hoặc liên hệ Admin.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
-            
+
             const htmlBody = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #EF4444; padding: 20px; text-align: center;">

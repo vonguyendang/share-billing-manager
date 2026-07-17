@@ -7,22 +7,22 @@ const loginForm = document.getElementById('loginForm');
 const navItems = document.querySelectorAll('.nav-item');
 
 window.ui = {
-    showDialog: function(title, message, type = 'alert', defaultInputValue = '', options = []) {
+    showDialog: function (title, message, type = 'alert', defaultInputValue = '', options = []) {
         return new Promise((resolve) => {
             const modal = document.getElementById('modal-dialog');
             document.getElementById('dialog-title').innerText = title;
             document.getElementById('dialog-message').innerText = message;
-            
+
             const btnCancel = document.getElementById('dialog-btn-cancel');
             const btnOk = document.getElementById('dialog-btn-ok');
             const inputField = document.getElementById('dialog-input');
-            
+
             if (type === 'confirm' || type === 'prompt') {
                 btnCancel.classList.remove('hidden');
             } else {
                 btnCancel.classList.add('hidden');
             }
-            
+
             const optionsContainer = document.getElementById('dialog-options');
             if (options && options.length > 0) {
                 optionsContainer.classList.remove('hidden');
@@ -41,31 +41,31 @@ window.ui = {
             } else {
                 optionsContainer.classList.add('hidden');
             }
-            
+
             if (type === 'prompt') {
                 inputField.classList.remove('hidden');
                 inputField.value = defaultInputValue;
             } else {
                 inputField.classList.add('hidden');
             }
-            
+
             modal.classList.add('active');
-            
+
             if (type === 'prompt') inputField.focus();
             else btnOk.focus();
-            
+
             const cleanup = () => {
                 modal.classList.remove('active');
                 btnOk.onclick = null;
                 btnCancel.onclick = null;
             };
-            
+
             btnOk.onclick = () => {
                 cleanup();
                 if (type === 'prompt') resolve(inputField.value);
                 else resolve(true);
             };
-            
+
             btnCancel.onclick = () => {
                 cleanup();
                 resolve(false);
@@ -160,7 +160,7 @@ navItems.forEach(item => {
         item.classList.add('active');
         const view = item.getAttribute('data-view');
         loadView(view);
-        
+
         // Close sidebar on mobile after navigating
         if (sidebar && sidebar.classList.contains('open')) {
             toggleSidebar();
@@ -180,7 +180,7 @@ function formatDate(dateStr) {
 async function loadView(view) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
     document.getElementById(`view-${view}`).classList.remove('hidden');
-    
+
     try {
         if (view === 'dashboard') await loadDashboard();
         if (view === 'plans') await loadPlans();
@@ -202,12 +202,12 @@ async function loadDashboard() {
     document.getElementById('stat-members').innerText = res.data.activeMembers;
     document.getElementById('stat-due').innerText = res.data.dueSoonSubscriptions;
     document.getElementById('stat-pending').innerText = res.data.pendingPayments;
-    
+
     const budget = res.data.budget;
     document.getElementById('stat-cost').innerText = budget.monthlyCost.toLocaleString();
     document.getElementById('stat-actual-cost').innerText = budget.actualMonthlyCost.toLocaleString();
     document.getElementById('stat-revenue').innerText = budget.monthlyRevenue.toLocaleString();
-    
+
     const profitEl = document.getElementById('stat-profit');
     profitEl.innerText = budget.netProfit.toLocaleString();
     profitEl.style.color = budget.netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
@@ -275,7 +275,7 @@ async function loadDashboard() {
             const used = item.used_slots || 0;
             let progressHtml = '';
             let slotText = '';
-            
+
             if (max === 0) {
                 slotText = `${used} / ∞`;
                 progressHtml = `<div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -290,7 +290,7 @@ async function loadDashboard() {
                 let color = 'var(--success)';
                 if (percent >= 100) color = 'var(--danger)';
                 else if (percent >= 80) color = 'var(--warning)';
-                
+
                 progressHtml = `<div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <div style="flex-grow: 1; background: #2a2d3e; height: 8px; border-radius: 4px; overflow: hidden;">
                                         <div style="width: ${percent}%; background: ${color}; height: 100%;"></div>
@@ -301,7 +301,7 @@ async function loadDashboard() {
             if (max > 0) {
                 totalEmptySlots += Math.max(0, max - used);
             }
-            
+
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td><a href="#" onclick="window.adminApp.filterSubByPlan('${item.name.replace(/'/g, "\\'")}')">${item.name}</a></td>
@@ -373,7 +373,7 @@ async function loadDashboard() {
             return parts.length === 2 ? `${parts[1]}/${parts[0]}` : d.month;
         });
         const data = res.data.revenueChart.map(d => d.revenue);
-        
+
         window.revenueChartInstance = new Chart(chartCtx, {
             type: 'bar',
             data: {
@@ -395,7 +395,7 @@ async function loadDashboard() {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                                 return value.toLocaleString();
                             }
                         }
@@ -414,7 +414,7 @@ let subsData = [];
 async function loadSettings() {
     const res = await apiCall('/settings');
     if (res.data) settingsData = res.data;
-    
+
     document.getElementById('setting-reminders-enabled').checked = settingsData.reminders_enabled === 1;
     document.getElementById('setting-reminder-days').value = settingsData.reminder_days || '7,3,1,0,-2,-4';
     document.getElementById('setting-telegram-enabled').checked = settingsData.telegram_notifications_enabled === 1;
@@ -474,7 +474,7 @@ async function loadPlans() {
         const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused').length;
         const maxSlots = p.max_slots || 0;
         const slotsDisplay = maxSlots > 0 ? `${usedSlots}/${maxSlots}` : `${usedSlots}/∞`;
-        const slotsHtml = usedSlots > 0 
+        const slotsHtml = usedSlots > 0
             ? `<a href="#" onclick="window.adminApp.filterSubByPlan('${p.name.replace(/'/g, "\\'")}')">${slotsDisplay}</a>`
             : slotsDisplay;
 
@@ -497,7 +497,7 @@ async function loadPlans() {
         `;
         tbody.appendChild(tr);
     });
-    
+
     const searchInput = document.getElementById('search-plan');
     if (searchInput && searchInput.value) {
         searchInput.dispatchEvent(new Event('keyup'));
@@ -528,7 +528,7 @@ async function loadMembers() {
         `;
         tbody.appendChild(tr);
     });
-    
+
     const searchInput = document.getElementById('search-member');
     if (searchInput && searchInput.value) {
         searchInput.dispatchEvent(new Event('keyup'));
@@ -561,7 +561,7 @@ async function loadSubscriptions() {
         `;
         tbody.appendChild(tr);
     });
-    
+
     const searchInput = document.getElementById('search-sub');
     if (searchInput && searchInput.value) {
         searchInput.dispatchEvent(new Event('keyup'));
@@ -596,21 +596,21 @@ async function loadHistory() {
     const res = await apiCall('/history');
     const tbody = document.getElementById('history-list');
     tbody.innerHTML = '';
-    
+
     if (res.data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Không có giao dịch nào gần đây</td></tr>`;
         return;
     }
-    
+
     res.data.forEach(p => {
         const tr = document.createElement('tr');
         const dateObj = p.approved_at ? new Date(p.approved_at + 'Z') : new Date(p.created_at + 'Z');
         const dateStr = dateObj.toLocaleString('vi-VN');
-        
+
         let statusBadge = '';
         if (p.status === 'approved') statusBadge = `<span class="badge badge-success" style="background-color: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Đã duyệt</span>`;
         else if (p.status === 'rejected') statusBadge = `<span class="badge badge-danger" style="background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Từ chối</span>`;
-        
+
         tr.innerHTML = `
             <td>${dateStr}</td>
             <td><strong>${p.member_name}</strong></td>
@@ -635,7 +635,7 @@ async function populateSubSelects(currentSubId = null) {
         const res = await apiCall('/members');
         membersData = res.data;
     }
-    
+
     if (subsData.length === 0) {
         const resSubs = await apiCall('/subscriptions');
         subsData = resSubs.data || [];
@@ -660,7 +660,7 @@ async function populateSubSelects(currentSubId = null) {
             const maxSlots = p.max_slots || 0;
             const opt = document.createElement('option');
             opt.value = p.id;
-            
+
             if (maxSlots > 0) {
                 const remaining = maxSlots - usedSlots;
                 opt.innerText = `${p.name} (${p.total_price.toLocaleString()} VND) - Còn ${remaining} slot`;
@@ -722,14 +722,14 @@ window.adminApp = {
             window.ui.prompt('Copy thủ công link bên dưới:', link);
         }
     },
-    
+
     markPaid: async (subId, expectedAmount) => {
-        const amountInput = await window.ui.prompt('Đánh dấu đã đóng tiền. Nhập số tiền đã nhận (VNĐ):', expectedAmount || '');
+        const amountInput = await window.ui.prompt('Đánh dấu đã thanh toán tiền. Nhập số tiền đã nhận (VNĐ):', expectedAmount || '');
         if (amountInput === null || amountInput === false) return;
-        
+
         const totalPaid = parseFloat(amountInput);
         if (isNaN(totalPaid) || totalPaid <= 0) return;
-        
+
         try {
             await apiCall('/subscriptions', 'POST', { action: 'mark_paid', id: subId, total_paid: totalPaid });
             loadView('dashboard');
@@ -737,7 +737,7 @@ window.adminApp = {
             window.ui.alert(e.message);
         }
     },
-    
+
     navigate: (viewName) => {
         document.querySelector(`[data-view='${viewName}']`).click();
     },
@@ -754,7 +754,7 @@ window.adminApp = {
     approvePayment: async (id, expectedAmount) => {
         const amountInput = await window.ui.prompt('Khách đã chuyển khoản bao nhiêu tiền? (Ví dụ: Nhập 100000)', expectedAmount || '');
         if (amountInput === null || amountInput === false) return; // User cancelled
-        
+
         const totalPaid = parseFloat(amountInput);
         if (isNaN(totalPaid) || totalPaid <= 0) {
             await window.ui.alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0.');
@@ -766,7 +766,7 @@ window.adminApp = {
             loadView('payments');
         } catch (e) { await window.ui.alert(e.message); }
     },
-    
+
     rejectPayment: async (id) => {
         const templates = [
             'Admin chưa nhận được tiền trong tài khoản',
@@ -776,24 +776,24 @@ window.adminApp = {
         ];
         const reason = await window.ui.prompt('Nhập lý do TỪ CHỐI thanh toán:', '', templates);
         if (reason === null || reason === false) return; // Cancelled
-        
+
         try {
             await apiCall('/payments', 'POST', { request_id: id, action: 'reject', reject_reason: reason });
             loadView('payments');
         } catch (e) { await window.ui.alert(e.message); }
     },
-    
+
     filterSubByPlan: async (planName) => {
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         document.querySelector('.nav-item[data-view="subscriptions"]').classList.add('active');
-        
+
         await loadView('subscriptions');
-        
+
         const input = document.getElementById('search-sub');
         input.value = planName;
         input.dispatchEvent(new Event('keyup'));
     },
-    
+
     // Plans
     showAddPlanModal: () => {
         document.getElementById('plan-modal-title').innerText = 'Add Plan';
@@ -823,7 +823,7 @@ window.adminApp = {
             loadView('plans');
         } catch (e) { await window.ui.alert(e.message); }
     },
-    
+
     // Members
     showAddMemberModal: () => {
         document.getElementById('member-modal-title').innerText = 'Add Member';
@@ -853,7 +853,7 @@ window.adminApp = {
             loadView('members');
         } catch (e) { await window.ui.alert(e.message); }
     },
-    
+
     // Subscriptions
     showAddSubModal: async () => {
         await populateSubSelects(null);
@@ -889,7 +889,7 @@ window.adminApp = {
             loadView('subscriptions');
         } catch (e) { await window.ui.alert(e.message); }
     },
-    
+
     testTelegram: async () => {
         const token = document.getElementById('setting-telegram-bot-token').value;
         const chatId = document.getElementById('setting-telegram-chat-id').value;
@@ -1016,7 +1016,7 @@ document.getElementById('form-expense').addEventListener('submit', async (e) => 
 
 // Search/Filter logic
 function setupSearchFilter(inputId, listId) {
-    document.getElementById(inputId).addEventListener('keyup', function(e) {
+    document.getElementById(inputId).addEventListener('keyup', function (e) {
         const term = e.target.value.toLowerCase();
         const rows = document.getElementById(listId).getElementsByTagName('tr');
         for (let row of rows) {
@@ -1044,29 +1044,29 @@ async function initBankSelect() {
         const res = await fetch('https://api.vietqr.io/v2/banks');
         const json = await res.json();
         bankDataList = json.data;
-    } catch(e) {
+    } catch (e) {
         const res = await fetch('data/banks.json');
         const json = await res.json();
         bankDataList = json.data;
     }
 
     renderBankOptions();
-    
-    document.getElementById('bank-select-trigger').addEventListener('click', function(e) {
+
+    document.getElementById('bank-select-trigger').addEventListener('click', function (e) {
         document.getElementById('bank-select').classList.toggle('open');
         document.getElementById('bank-search-input').focus();
         e.stopPropagation();
     });
 
-    document.getElementById('bank-search-input').addEventListener('input', function(e) {
+    document.getElementById('bank-search-input').addEventListener('input', function (e) {
         renderBankOptions(e.target.value.toLowerCase());
     });
 
-    document.getElementById('bank-search-input').addEventListener('click', function(e) {
+    document.getElementById('bank-search-input').addEventListener('click', function (e) {
         e.stopPropagation();
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const wrapper = document.getElementById('bank-select-wrapper');
         if (wrapper && !wrapper.contains(e.target)) {
             document.getElementById('bank-select').classList.remove('open');
@@ -1087,8 +1087,8 @@ function renderBankOptions(filter = '') {
         opt.className = 'custom-option' + (currentVal === bank.bin || currentVal === bank.shortName ? ' selected' : '');
         opt.innerHTML = `<img src="${bank.logo}" onerror="this.style.display='none'">
                          <div class="custom-option-text">${text}</div>`;
-        
-        opt.addEventListener('click', function(e) {
+
+        opt.addEventListener('click', function (e) {
             document.getElementById('setting-bank-id').value = bank.bin;
             updateBankTriggerDisplay(bank);
             document.getElementById('bank-select').classList.remove('open');

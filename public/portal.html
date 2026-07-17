@@ -21,7 +21,9 @@
         </div>
 
         <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px; position: relative;">
-            <button id="btnToggleTheme" data-icon-only="true" class="btn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i class="ph ph-sun"></i></button>
+            <button id="btnToggleTheme" data-icon-only="true" class="btn"
+                style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i
+                    class="ph ph-sun"></i></button>
             <h2 style="margin-bottom: 1.5rem; text-align: center; margin-top: 1rem;">Thông Tin Gói Dịch Vụ</h2>
 
             <div style="background: var(--bg-main); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
@@ -30,11 +32,13 @@
                 <p><strong>Ngày bắt đầu:</strong> <span id="p-start"></span></p>
                 <p><strong>Hạn thanh toán:</strong> <span id="p-due"
                         style="color: var(--danger); font-weight: bold;"></span></p>
-                <p><strong>Số tiền cần đóng:</strong> <span id="p-amount" style="font-weight: bold;"></span> VNĐ</p>
+                <p><strong>Số tiền cần thanh toán:</strong> <span id="p-amount" style="font-weight: bold;"></span> VNĐ
+                </p>
                 <p><strong>Trạng thái:</strong> <span id="p-status"></span></p>
             </div>
 
-            <div id="bankInfoSection" class="hidden" style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; justify-content: space-between;">
+            <div id="bankInfoSection" class="hidden"
+                style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; justify-content: space-between;">
                 <div style="flex: 1 1 250px;">
                     <h4 style="margin-bottom: 0.5rem; color: var(--primary);">Thông tin chuyển khoản:</h4>
                     <p>Ngân hàng: <strong id="p-bank-name"></strong></p>
@@ -51,10 +55,13 @@
                             style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500; margin-left: 4px; vertical-align: middle;">Copy</button>
                     </p>
                 </div>
-                <div style="text-align: center; flex: 0 0 auto; margin: 0 auto; margin-top: -0.5rem; display: flex; flex-direction: column; align-items: center;">
+                <div
+                    style="text-align: center; flex: 0 0 auto; margin: 0 auto; margin-top: -0.5rem; display: flex; flex-direction: column; align-items: center;">
                     <img id="qr-code" src="" alt="Mã QR Chuyển Khoản"
                         style="max-width: 150px; border-radius: 0.5rem; display: none;">
-                    <div id="qr-instruction" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.5rem; display: none;">Quét QR để thanh toán</div>
+                    <div id="qr-instruction"
+                        style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.5rem; display: none;">
+                        Quét QR để thanh toán</div>
                 </div>
             </div>
 
@@ -74,15 +81,19 @@
                 style="text-align: center; color: var(--warning); margin-top: 1rem; padding: 1rem; border: 1px dashed var(--warning); border-radius: 0.5rem;">
                 Đã gửi báo cáo thanh toán. Vui lòng chờ admin duyệt.
             </div>
-            
+
             <div id="cancelPendingSection" class="hidden"
                 style="text-align: center; color: var(--warning); margin-top: 1rem; padding: 1rem; border: 1px dashed var(--warning); border-radius: 0.5rem;">
                 Bạn đã yêu cầu hủy gia hạn ở chu kỳ sau. Gói dịch vụ sẽ ngắt khi đến hạn.
             </div>
 
-            <div id="userCancelSection" class="hidden" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: center;">
-                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Nếu bạn không muốn tiếp tục sử dụng vào chu kỳ sau, hãy bấm nút dưới đây.</p>
-                <button id="btnCancelSub" class="btn" style="background-color: transparent; color: var(--danger); border: 1px solid var(--danger);">Hủy gia hạn chu kỳ sau</button>
+            <div id="userCancelSection" class="hidden"
+                style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: center;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Nếu bạn không muốn tiếp
+                    tục sử dụng vào chu kỳ sau, hãy bấm nút dưới đây.</p>
+                <button id="btnCancelSub" class="btn"
+                    style="background-color: transparent; color: var(--danger); border: 1px solid var(--danger);">Hủy
+                    gia hạn chu kỳ sau</button>
             </div>
         </div>
     </div>
@@ -91,9 +102,10 @@
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <h2 id="dialog-title">Thông báo</h2>
             <p id="dialog-message" style="margin: 1.5rem 0; font-size: 16px; color: #4b5563;"></p>
-            
-            <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1.5rem;" autocomplete="off">
-            
+
+            <input type="text" id="dialog-input" class="form-control hidden" style="margin-bottom: 1.5rem;"
+                autocomplete="off">
+
             <div style="display: flex; gap: 1rem; justify-content: center;">
                 <button id="dialog-btn-cancel" class="btn hidden">Hủy</button>
                 <button id="dialog-btn-ok" class="btn btn-primary">OK</button>
@@ -102,7 +114,7 @@
     </div>
 
     <script src="js/theme.js"></script>
-    <script type="module" src="js/portal.js?v=2"></script>
+    <script type="module" src="js/portal.js?v=3"></script>
 </body>
 
 </html>
