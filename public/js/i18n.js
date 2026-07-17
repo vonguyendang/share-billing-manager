@@ -31,6 +31,7 @@ const translations = {
         'nav_reminders': 'Nhắc nhở',
         'nav_settings': 'Cài đặt',
         'nav_logout': 'Đăng xuất',
+        'nav_run_reminders': 'Chạy nhắc nhở',
 
         // Navigation (Portal)
         'portal_title': 'Cổng Thông Tin Thành Viên',
@@ -45,6 +46,9 @@ const translations = {
         'dash_revenue_30d': 'Thực thu 30 ngày qua',
         'dash_expenses_30d': 'Chi tiêu 30 ngày qua',
         'dash_recent_activity': 'Hoạt động gần đây',
+        'dash_overdue': 'Quá hạn / Chưa thanh toán',
+        'dash_due_7_days': 'Đến hạn trong 7 ngày tới',
+        'dash_plan_util': 'Mức sử dụng Gói (Slots)',
 
         // Members
         'member_name': 'Tên thành viên',
