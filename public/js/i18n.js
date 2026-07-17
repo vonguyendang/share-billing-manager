@@ -19,7 +19,7 @@ const translations = {
         'status_paid': 'Đã thanh toán',
         'status_unpaid': 'Chưa thanh toán',
         'loading': 'Đang tải...',
-        
+
         // Navigation (Admin)
         'nav_dashboard': 'Tổng quan',
         'nav_members': 'Thành viên',
@@ -31,7 +31,7 @@ const translations = {
         'nav_reminders': 'Nhắc nhở',
         'nav_settings': 'Cài đặt',
         'nav_logout': 'Đăng xuất',
-        
+
         // Navigation (Portal)
         'portal_title': 'Cổng Thông Tin Thành Viên',
         'portal_welcome': 'Xin chào',
@@ -55,7 +55,7 @@ const translations = {
         'member_action': 'Thao tác',
         'member_add': 'Thêm thành viên',
         'member_edit': 'Sửa thành viên',
-        
+
         // Plans
         'plan_name': 'Tên gói',
         'plan_category': 'Danh mục',
@@ -80,7 +80,7 @@ const translations = {
         'sub_edit': 'Sửa phân bổ',
         'sub_portal_link': 'Link Portal',
         'sub_copy_link': 'Copy Link',
-        
+
         // Requests & History
         'req_date': 'Ngày tạo',
         'req_member': 'Thành viên',
@@ -99,7 +99,7 @@ const translations = {
         'lbl_amount': 'Số tiền',
         'lbl_cycle': 'Chu kỳ thanh toán',
         'lbl_next_date': 'Kỳ tới',
-        
+
         // JS Alerts & Prompts
         'msg_confirm_delete': 'Bạn có chắc muốn xóa?',
         'msg_delete_success': 'Đã xóa thành công',
@@ -140,7 +140,7 @@ const translations = {
         'reject_reason_1': 'Admin chưa nhận được tiền trong tài khoản',
         'reject_reason_2': 'Chuyển khoản thiếu tiền',
         'reject_reason_3': 'Chuyển khoản sai nội dung',
-        'reject_reason_4': 'Yêu cầu bị trùng lặp'
+        'reject_reason_4': 'Yêu cầu bị trùng lặp',
 
         // Extra
         'bank_code': 'Mã Ngân Hàng (BIN hoặc Tên viết tắt)',
@@ -248,7 +248,7 @@ const translations = {
         'nav_reminders': 'Reminders',
         'nav_settings': 'Settings',
         'nav_logout': 'Logout',
-        
+
         // Navigation (Portal)
         'portal_title': 'Member Portal',
         'portal_welcome': 'Welcome',
@@ -272,7 +272,7 @@ const translations = {
         'member_action': 'Action',
         'member_add': 'Add Member',
         'member_edit': 'Edit Member',
-        
+
         // Plans
         'plan_name': 'Plan Name',
         'plan_category': 'Category',
@@ -297,7 +297,7 @@ const translations = {
         'sub_edit': 'Edit Subscription',
         'sub_portal_link': 'Portal Link',
         'sub_copy_link': 'Copy Link',
-        
+
         // Requests & History
         'req_date': 'Date',
         'req_member': 'Member',
@@ -316,7 +316,7 @@ const translations = {
         'lbl_amount': 'Amount',
         'lbl_cycle': 'Billing Cycle',
         'lbl_next_date': 'Next Due Date',
-        
+
         // JS Alerts & Prompts
         'msg_confirm_delete': 'Are you sure you want to delete this?',
         'msg_delete_success': 'Deleted successfully',
@@ -357,7 +357,7 @@ const translations = {
         'reject_reason_1': 'Admin has not received the money',
         'reject_reason_2': 'Insufficient amount transferred',
         'reject_reason_3': 'Incorrect transfer note',
-        'reject_reason_4': 'Duplicate request'
+        'reject_reason_4': 'Duplicate request',
 
         // Extra
         'bank_code': 'Bank Code (BIN or Abbreviation)',
@@ -498,7 +498,7 @@ function formatDate(dateStr, options = {}) {
     // Fix timezone issues when parsing date
     const date = new Date(dateStr + (dateStr.includes('T') ? (dateStr.includes('Z') ? '' : 'Z') : 'T00:00:00Z'));
     const locale = currentLanguage === 'vi' ? 'vi-VN' : 'en-US';
-    
+
     // Default options if none provided and dateStr doesn't include time
     let finalOptions = { ...options };
     if (Object.keys(options).length === 0) {
