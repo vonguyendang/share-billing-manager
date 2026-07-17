@@ -326,6 +326,7 @@ const translations = {
         'nav_reminders': 'Reminders',
         'nav_settings': 'Settings',
         'nav_logout': 'Logout',
+        'nav_run_reminders': 'Run Reminders',
 
         // Navigation (Portal)
         'portal_title': 'Member Portal',
@@ -340,6 +341,9 @@ const translations = {
         'dash_revenue_30d': 'Revenue (30 days)',
         'dash_expenses_30d': 'Expenses (30 days)',
         'dash_recent_activity': 'Recent Activity',
+        'dash_overdue': 'Overdue / Unpaid',
+        'dash_due_7_days': 'Due in Next 7 Days',
+        'dash_plan_util': 'Plan Utilization (Slots)',
 
         // Members
         'member_name': 'Name',

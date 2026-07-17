@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateToggleBtn(btn, theme) {
         const iconOnly = btn.hasAttribute('data-icon-only');
         if (theme === 'light') {
-            btn.innerHTML = iconOnly ? '<i class="ph ph-moon"></i>' : '<i class="ph ph-moon"></i> Giao diện Tối';
+            btn.innerHTML = iconOnly ? '<i class="ph ph-moon"></i>' : `<i class="ph ph-moon"></i> <span data-i18n="theme_dark">${typeof t === 'function' ? t('theme_dark') : 'Dark Theme'}</span>`;
         } else {
-            btn.innerHTML = iconOnly ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-sun"></i> Giao diện Sáng';
+            btn.innerHTML = iconOnly ? '<i class="ph ph-sun"></i>' : `<i class="ph ph-sun"></i> <span data-i18n="theme_light">${typeof t === 'function' ? t('theme_light') : 'Light Theme'}</span>`;
         }
     }
 });

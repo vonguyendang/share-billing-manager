@@ -46,7 +46,7 @@
         <div style="flex-grow: 1;"></div>
         <button onclick="toggleLanguage()" class="btn" style="background: transparent; color: var(--text-muted); margin-bottom: 0.5rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"><i class="ph ph-translate"></i> <span data-i18n="lang_switch">Tiếng Việt (VI)</span></button>
         <button id="btnToggleTheme" class="btn" style="background: transparent; color: var(--text-muted); margin-bottom: 0.5rem;"><i class="ph ph-sun"></i> <span data-i18n="theme_light">Giao diện Sáng</span></button>
-        <button id="btnRunReminders" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="ph ph-bell-ringing"></i> Run Reminders</button>
+        <button id="btnRunReminders" class="btn btn-primary" style="margin-bottom: 1rem;"><i class="ph ph-bell-ringing"></i> <span data-i18n="nav_run_reminders">Run Reminders</span></button>
         <button id="btnLogout" class="btn" style="background: transparent; color: var(--danger);"><i class="ph ph-sign-out"></i> <span data-i18n="nav_logout">Logout</span></button>
     </aside>
 
@@ -146,7 +146,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <!-- Overdue -->
                 <div>
-                    <h3 style="margin-bottom: 1rem; color: var(--danger);">Overdue / Unpaid</h3>
+                    <h3 style="margin-bottom: 1rem; color: var(--danger);"><span data-i18n="dash_overdue">Overdue / Unpaid</span></h3>
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-overdue">
                             <thead>
@@ -159,7 +159,7 @@
                 
                 <!-- Due Soon -->
                 <div>
-                    <h3 style="margin-bottom: 1rem; color: var(--warning);">Due in Next 7 Days</h3>
+                    <h3 style="margin-bottom: 1rem; color: var(--warning);"><span data-i18n="dash_due_7_days">Due in Next 7 Days</span></h3>
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-duesoon">
                             <thead>
@@ -172,7 +172,7 @@
                 
                 <!-- Plan Utilization -->
                 <div style="grid-column: 1 / -1; margin-top: 1rem;">
-                    <h3 style="margin-bottom: 1rem;">Plan Utilization (Slots)</h3>
+                    <h3 style="margin-bottom: 1rem;"><span data-i18n="dash_plan_util">Plan Utilization (Slots)</span></h3>
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-utilization">
                             <thead>
