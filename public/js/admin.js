@@ -612,7 +612,7 @@ async function loadHistory() {
         return;
     }
 
-    res.data.forEach(p => {
+    res.data.forEach((p, index) => {
         const tr = document.createElement('tr');
         const dateObj = p.approved_at ? new Date(p.approved_at + 'Z') : new Date(p.created_at + 'Z');
         const dateStr = formatDate(dateObj);
@@ -622,6 +622,7 @@ async function loadHistory() {
         else if (p.status === 'rejected') statusBadge = `<span class="badge badge-danger" style="background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${t('status_rejected')}</span>`;
 
         tr.innerHTML = `
+            <td>${index + 1}</td>
             <td>${dateStr}</td>
             <td><strong>${p.member_name}</strong></td>
             <td>${p.plan_name}</td>
