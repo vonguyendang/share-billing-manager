@@ -76,11 +76,11 @@
                     <p id="stat-due" style="font-size: 2rem; font-weight: bold; color: var(--warning);">-</p>
                 </div>
                 <div class="card stat-card" onclick="document.querySelector('[data-view=\'payments\']').click()">
-                    <h3><i class="ph ph-clock-countdown"></i> Pending Approvals</h3>
+                    <h3><i class="ph ph-clock-countdown"></i> <span data-i18n="dash_pending_approvals">Pending Approvals</span></h3>
                     <p id="stat-pending" style="font-size: 2rem; font-weight: bold; color: var(--danger);">-</p>
                 </div>
                 <div class="card stat-card" onclick="document.querySelector('[data-view=\'plans\']').click()">
-                    <h3><i class="ph ph-armchair"></i> Empty Slots</h3>
+                    <h3><i class="ph ph-armchair"></i> <span data-i18n="dash_empty_slots">Empty Slots</span></h3>
                     <p id="stat-empty-slots" style="font-size: 2rem; font-weight: bold; color: var(--success);">-</p>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                 
                 <!-- Left Column: Budget & Chart -->
                 <div>
-                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-chart-bar"></i> Revenue Overview</h3>
+                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-chart-bar"></i> <span data-i18n="dash_revenue">Revenue Overview</span></h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
                             <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> <span data-i18n="dash_cost">Chi phí (Dự toán / Thực tế)</span></h4>
@@ -101,7 +101,7 @@
                             </p>
                         </div>
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
-                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-up"></i> Expected Rev</h4>
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-up"></i> <span data-i18n="dash_expected_rev">Expected Rev</span></h4>
                             <p id="stat-revenue" style="font-size: 1.25rem; font-weight: bold; color: var(--success);">-</p>
                         </div>
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
@@ -118,11 +118,11 @@
 
                 <!-- Right Column: Recent Payments -->
                 <div>
-                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-clock-counter-clockwise"></i> Recent Successful Payments</h3>
+                    <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-clock-counter-clockwise"></i> <span data-i18n="dash_recent_payments">Recent Successful Payments</span></h3>
                     <div class="card table-responsive" style="padding: 0; margin-bottom: 0;">
                         <table id="table-dashboard-recent">
                             <thead>
-                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Amount</th><th>Date</th></tr>
+                                <tr><th>#</th><th data-i18n="dash_col_member">Member</th><th data-i18n="dash_col_plan">Plan</th><th data-i18n="dash_col_amount">Amount</th><th data-i18n="dash_col_date">Date</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -136,7 +136,7 @@
                 <div class="card table-responsive" style="padding: 0; margin-bottom: 2rem;">
                     <table id="table-dashboard-pending">
                         <thead>
-                            <tr><th>#</th><th>Member</th><th>Plan</th><th>Amount</th><th>Date</th><th>Actions</th></tr>
+                            <tr><th>#</th><th data-i18n="dash_col_member">Member</th><th data-i18n="dash_col_plan">Plan</th><th data-i18n="dash_col_amount">Amount</th><th data-i18n="dash_col_date">Date</th><th data-i18n="dash_col_actions">Actions</th></tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -150,7 +150,7 @@
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-overdue">
                             <thead>
-                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Due Date</th><th>Actions</th></tr>
+                                <tr><th>#</th><th data-i18n="dash_col_member">Member</th><th data-i18n="dash_col_plan">Plan</th><th data-i18n="dash_col_due_date">Due Date</th><th data-i18n="dash_col_actions">Actions</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -163,7 +163,7 @@
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-duesoon">
                             <thead>
-                                <tr><th>#</th><th>Member</th><th>Plan</th><th>Due Date</th><th>Actions</th></tr>
+                                <tr><th>#</th><th data-i18n="dash_col_member">Member</th><th data-i18n="dash_col_plan">Plan</th><th data-i18n="dash_col_due_date">Due Date</th><th data-i18n="dash_col_actions">Actions</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -176,7 +176,7 @@
                     <div class="card table-responsive" style="padding: 0;">
                         <table id="table-dashboard-utilization">
                             <thead>
-                                <tr><th>#</th><th>Plan</th><th>Slots (Used / Max)</th><th>Fill Rate</th></tr>
+                                <tr><th>#</th><th data-i18n="dash_col_plan">Plan</th><th data-i18n="dash_col_slots">Slots (Used / Max)</th><th data-i18n="dash_col_fill_rate">Fill Rate</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -188,9 +188,9 @@
         <!-- Subscriptions View -->
         <div id="view-subscriptions" class="view-section hidden">
             <div class="card-header">
-                <h2>Subscriptions</h2>
+                <h2><span data-i18n="title_subs">Subscriptions</span></h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <input type="text" id="search-sub" class="form-control" placeholder="Search subscriptions..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <input type="text" id="search-sub" class="form-control" data-i18n-placeholder="search_subs" placeholder="Search subscriptions..." style="width: 220px; padding: 0.5rem 1rem;">
                     <button class="btn btn-primary" onclick="adminApp.showAddSubModal()" data-i18n="sub_add">+ Add Sub</button>
                 </div>
             </div>
@@ -199,14 +199,14 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Member</th>
-                            <th>Plan</th>
-                            <th>Due Date</th>
+                            <th data-i18n="dash_col_member">Member</th>
+                            <th data-i18n="dash_col_plan">Plan</th>
+                            <th data-i18n="dash_col_due_date">Due Date</th>
                             <th>Amount (VND)</th>
-                            <th>Cycle</th>
-                            <th>Status</th>
-                            <th>Link</th>
-                            <th>Actions</th>
+                            <th data-i18n="sub_col_cycle">Cycle</th>
+                            <th data-i18n="sub_col_status">Status</th>
+                            <th data-i18n="sub_col_link">Link</th>
+                            <th data-i18n="dash_col_actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="sub-list"></tbody>
@@ -217,9 +217,9 @@
         <!-- Plans View -->
         <div id="view-plans" class="view-section hidden">
             <div class="card-header">
-                <h2>Plans</h2>
+                <h2><span data-i18n="title_plans">Plans</span></h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <input type="text" id="search-plan" class="form-control" placeholder="Search plans..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <input type="text" id="search-plan" class="form-control" data-i18n-placeholder="search_plans" placeholder="Search plans..." style="width: 220px; padding: 0.5rem 1rem;">
                     <button class="btn btn-primary" onclick="adminApp.showAddPlanModal()" data-i18n="plan_add">+ Add Plan</button>
                 </div>
             </div>
@@ -228,14 +228,14 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
+                            <th data-i18n="plan_col_id">ID</th>
+                            <th data-i18n="plan_col_name">Name</th>
+                            <th data-i18n="plan_col_category">Category</th>
+                            <th data-i18n="plan_col_price">Price</th>
                             <th>Cycle (Months)</th>
-                            <th>Slots</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th data-i18n="plan_col_slots">Slots</th>
+                            <th data-i18n="sub_col_status">Status</th>
+                            <th data-i18n="dash_col_actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="plan-list"></tbody>
@@ -246,9 +246,9 @@
         <!-- Members View -->
         <div id="view-members" class="view-section hidden">
             <div class="card-header">
-                <h2>Members</h2>
+                <h2><span data-i18n="title_members">Members</span></h2>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <input type="text" id="search-member" class="form-control" placeholder="Search members..." style="width: 220px; padding: 0.5rem 1rem;">
+                    <input type="text" id="search-member" class="form-control" data-i18n-placeholder="search_members" placeholder="Search members..." style="width: 220px; padding: 0.5rem 1rem;">
                     <button class="btn btn-primary" onclick="adminApp.showAddMemberModal()" data-i18n="member_add">+ Add Member</button>
                 </div>
             </div>
@@ -257,13 +257,13 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>ID</th>
-                            <th>Name</th>
+                            <th data-i18n="plan_col_id">ID</th>
+                            <th data-i18n="plan_col_name">Name</th>
                             <th data-i18n="member_email">Email</th>
-                            <th>Phone</th>
+                            <th data-i18n="member_col_phone">Phone</th>
                             <th>Socials / Note</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th data-i18n="sub_col_status">Status</th>
+                            <th data-i18n="dash_col_actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="member-list"></tbody>
@@ -274,19 +274,19 @@
         <!-- Payments View -->
         <div id="view-payments" class="view-section hidden">
             <div class="card-header">
-                <h2>Pending Payments</h2>
+                <h2><span data-i18n="title_pending">Pending Payments</span></h2>
             </div>
             <div class="card table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Member</th>
-                            <th>Plan</th>
-                            <th>Amount</th>
-                            <th>Note</th>
-                            <th>Date</th>
-                            <th>Action</th>
+                            <th data-i18n="dash_col_member">Member</th>
+                            <th data-i18n="dash_col_plan">Plan</th>
+                            <th data-i18n="dash_col_amount">Amount</th>
+                            <th data-i18n="pending_col_note">Note</th>
+                            <th data-i18n="dash_col_date">Date</th>
+                            <th data-i18n="dash_col_actions">Action</th>
                         </tr>
                     </thead>
                     <tbody id="payment-list"></tbody>
@@ -325,7 +325,7 @@
                 <form id="form-settings">
                     <div class="form-group">
                         <label data-i18n="setting_reminder">Lịch gửi nhắc nhở (Các mốc ngày)</label>
-                        <input type="text" id="setting-reminder-days" class="form-control" placeholder="VD: 7, 3, 1, 0, -2, -4">
+                        <input type="text" id="setting-reminder-days" class="form-control" data-i18n-placeholder="setting_rem_ph" placeholder="VD: 7, 3, 1, 0, -2, -4">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
                             <span data-i18n="setting_reminder_desc1">Các con số cách nhau bởi dấu phẩy. Dương = Sắp đến hạn. 0 = Đến hạn. Âm = Quá hạn.</span> <br>
                             <span data-i18n="setting_reminder_desc2">Ví dụ: <code>7,3,1,0,-2,-4</code> hoặc <code>1,0,-2,-4</code></span>
@@ -346,18 +346,18 @@
                         </label>
                     </div>
                     <div class="form-group">
-                        <label>Bot Token</label>
-                        <input type="text" id="setting-telegram-bot-token" class="form-control" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">
+                        <label data-i18n="setting_bot_lbl">Bot Token</label>
+                        <input type="text" id="setting-telegram-bot-token" class="form-control" data-i18n-placeholder="setting_bot_ph" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" data-i18n="setting_bot_token">Lấy từ @BotFather</p>
                     </div>
                     <div class="form-group">
-                        <label>Chat ID</label>
-                        <input type="text" id="setting-telegram-chat-id" class="form-control" placeholder="-1001234567890">
+                        <label data-i18n="setting_chat_lbl">Chat ID</label>
+                        <input type="text" id="setting-telegram-chat-id" class="form-control" data-i18n-placeholder="setting_chat_ph" placeholder="-1001234567890">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;" data-i18n="setting_chat_id">ID của Group, Supergroup hoặc User</p>
                     </div>
                     <div class="form-group">
                         <label data-i18n="setting_topic_id">Topic ID (Tuỳ chọn)</label>
-                        <input type="text" id="setting-telegram-topic-id" class="form-control" placeholder="1234">
+                        <input type="text" id="setting-telegram-topic-id" class="form-control" data-i18n-placeholder="setting_topic_ph" placeholder="1234">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;"><span data-i18n="setting_topic_desc">Chỉ dùng nếu Chat ID là Supergroup và bạn muốn gửi vào một Topic cụ thể (Message Thread ID)</span></p>
                     </div>
                     <div class="form-group" style="margin-top: 1rem;">
@@ -392,7 +392,7 @@
                     </div>
                     <div class="form-group">
                         <label data-i18n="bank_owner">Tên Chủ Tài Khoản</label>
-                        <input type="text" id="setting-bank-account-name" class="form-control" placeholder="VD: NGUYEN VAN A">
+                        <input type="text" id="setting-bank-account-name" class="form-control" data-i18n-placeholder="setting_bank_name" placeholder="VD: NGUYEN VAN A">
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
@@ -413,10 +413,10 @@
                 <h3 style="margin-bottom: 1rem;" data-i18n="setting_export">Sao lưu Dữ liệu (Export CSV)</h3>
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;"><span data-i18n="setting_export_desc">Tải dữ liệu của bạn về máy để sao lưu hoặc làm báo cáo.</span></p>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="adminApp.exportData('members')">Export Members</button>
-                    <button class="btn btn-primary" onclick="adminApp.exportData('subscriptions')">Export Subscriptions</button>
-                    <button class="btn btn-primary" onclick="adminApp.exportData('payments')">Export Payments</button>
-                    <button class="btn btn-primary" onclick="adminApp.exportData('expenses')">Export Expenses</button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('members')"><span data-i18n="btn_export_members">Export Members</span></button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('subscriptions')"><span data-i18n="btn_export_subs">Export Subscriptions</span></button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('payments')"><span data-i18n="btn_export_payments">Export Payments</span></button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('expenses')"><span data-i18n="btn_export_expenses">Export Expenses</span></button>
                 </div>
             </div>
         </div>
@@ -458,8 +458,8 @@
             <div class="form-group"><label data-i18n="lbl_exp_desc">Nội dung chi</label><input id="expense-desc" class="form-control" data-i18n-placeholder="lbl_exp_desc_ph" placeholder="VD: Mua gói Netflix" required></div>
             <div class="form-group"><label data-i18n="lbl_exp_amount">Số tiền (VND)</label><input type="number" id="expense-amount" class="form-control" required></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button type="button" class="btn" onclick="adminApp.closeModal('modal-expense')">Cancel</button>
+                <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
+                <button type="button" class="btn" onclick="adminApp.closeModal('modal-expense')" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
     </div>
@@ -470,14 +470,14 @@
         <h2 id="plan-modal-title">Add Plan</h2>
         <form id="form-plan" style="margin-top: 1rem;">
             <input type="hidden" id="plan-id">
-            <div class="form-group"><label>Name</label><input id="plan-name" class="form-control" required></div>
-            <div class="form-group"><label>Category</label><input id="plan-category" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_name">Name</label><input id="plan-name" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_category">Category</label><input id="plan-category" class="form-control" required></div>
             <div class="form-group"><label>Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
             <div class="form-group"><label>Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
             <div class="form-group"><label data-i18n="lbl_plan_slots">Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button type="button" class="btn" onclick="adminApp.closeModal('modal-plan')">Cancel</button>
+                <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
+                <button type="button" class="btn" onclick="adminApp.closeModal('modal-plan')" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
     </div>
@@ -488,13 +488,13 @@
         <h2 id="member-modal-title">Add Member</h2>
         <form id="form-member" style="margin-top: 1rem;">
             <input type="hidden" id="member-id">
-            <div class="form-group"><label>Full Name</label><input id="member-name" class="form-control" required></div>
-            <div class="form-group"><label>Email</label><input type="email" id="member-email" class="form-control" required></div>
-            <div class="form-group"><label>Phone</label><input id="member-phone" class="form-control"></div>
-            <div class="form-group"><label>Socials / Note</label><input id="member-note" class="form-control" placeholder="FB/Zalo link or username"></div>
+            <div class="form-group"><label data-i18n="lbl_full_name">Full Name</label><input id="member-name" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_email">Email</label><input type="email" id="member-email" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_phone">Phone</label><input id="member-phone" class="form-control"></div>
+            <div class="form-group"><label data-i18n="lbl_social">Socials / Note</label><input id="member-note" class="form-control" data-i18n-placeholder="ph_social" placeholder="FB/Zalo link or username"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button type="button" class="btn" onclick="adminApp.closeModal('modal-member')">Cancel</button>
+                <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
+                <button type="button" class="btn" onclick="adminApp.closeModal('modal-member')" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
     </div>
@@ -505,22 +505,22 @@
         <h2 id="sub-modal-title">Add Subscription</h2>
         <form id="form-sub" style="margin-top: 1rem;">
             <input type="hidden" id="sub-id">
-            <div class="form-group"><label>Member</label><select id="sub-member" class="form-control" required></select></div>
-            <div class="form-group"><label>Plan</label><select id="sub-plan" class="form-control" required></select></div>
-            <div class="form-group"><label>Start Date</label><input type="date" id="sub-start" class="form-control" required></div>
-            <div class="form-group"><label>Next Due Date</label><input type="date" id="sub-due" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_member">Member</label><select id="sub-member" class="form-control" required></select></div>
+            <div class="form-group"><label data-i18n="lbl_plan">Plan</label><select id="sub-plan" class="form-control" required></select></div>
+            <div class="form-group"><label data-i18n="lbl_start_date">Start Date</label><input type="date" id="sub-start" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="lbl_due_date">Next Due Date</label><input type="date" id="sub-due" class="form-control" required></div>
             <div class="form-group"><label>Amount Due (VND)</label><input type="number" id="sub-amount" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_sub_cycle">Chu kỳ thanh toán (Tháng)</label><input type="number" id="sub-cycle" class="form-control" required value="1" min="1"></div>
-            <div class="form-group"><label>Status</label>
+            <div class="form-group"><label data-i18n="lbl_status">Status</label>
                 <select id="sub-status" class="form-control">
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="pending_payment">Pending Payment</option>
+                    <option value="active" data-i18n="opt_active">Active</option>
+                    <option value="paused" data-i18n="opt_paused">Paused</option>
+                    <option value="pending_payment" data-i18n="opt_pending">Pending Payment</option>
                 </select>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-success">Save</button>
-                <button type="button" class="btn" onclick="adminApp.closeModal('modal-sub')">Cancel</button>
+                <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
+                <button type="button" class="btn" onclick="adminApp.closeModal('modal-sub')" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
     </div>

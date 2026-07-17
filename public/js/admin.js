@@ -106,7 +106,7 @@ loginForm.addEventListener('submit', async (e) => {
         appView.classList.remove('hidden');
         loadView('dashboard');
     } catch (e) {
-        document.getElementById('loginError').innerText = 'Invalid password';
+        document.getElementById('loginError').innerText = t('msg_invalid_pwd');
     }
 });
 
@@ -127,9 +127,9 @@ document.getElementById('btnRunReminders').addEventListener('click', async () =>
     if (!(await window.ui.confirm(t('msg_run_reminders') + days + '?'))) return;
     try {
         const res = await apiCall('/reminders', 'POST');
-        await window.ui.alert(`Sent ${res.data.sent} emails. ${res.data.errors} errors.`);
+        await window.ui.alert(t('msg_sent_emails').replace('{0}', res.data.sent).replace('{1}', res.data.errors));
     } catch (e) {
-        await window.ui.alert('Error: ' + e.message);
+        await window.ui.alert(t('msg_error') + e.message);
     }
 });
 
@@ -186,7 +186,7 @@ async function loadView(view) {
         if (view === 'settings') await loadSettings();
     } catch (e) {
         console.error(e);
-        await window.ui.alert('Error loading ' + view);
+        await window.ui.alert(t('msg_err_loading') + t('nav_' + view));
     }
 }
 
@@ -214,7 +214,7 @@ async function loadDashboard() {
     const tbodyOverdue = document.querySelector('#table-dashboard-overdue tbody');
     tbodyOverdue.innerHTML = '';
     if (res.data.overdueList && res.data.overdueList.length === 0) {
-        tbodyOverdue.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No overdue subscriptions 🎉</td></tr>';
+        tbodyOverdue.innerHTML = `<tr><td colspan=\"4\" style=\"text-align:center; padding: 2rem;\">${t('msg_no_overdue')}</td></tr>`;
     } else if (res.data.overdueList) {
         res.data.overdueList.forEach((item, index) => {
             const tr = document.createElement('tr');
@@ -238,7 +238,7 @@ async function loadDashboard() {
     const tbodyDue = document.querySelector('#table-dashboard-duesoon tbody');
     tbodyDue.innerHTML = '';
     if (res.data.dueSoonList && res.data.dueSoonList.length === 0) {
-        tbodyDue.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No upcoming renewals</td></tr>';
+        tbodyDue.innerHTML = `<tr><td colspan=\"4\" style=\"text-align:center; padding: 2rem;\">${t('msg_no_upcoming')}</td></tr>`;
     } else if (res.data.dueSoonList) {
         res.data.dueSoonList.forEach((item, index) => {
             const tr = document.createElement('tr');
@@ -340,7 +340,7 @@ async function loadDashboard() {
     if (tbodyRecent) {
         tbodyRecent.innerHTML = '';
         if (res.data.recentPayments && res.data.recentPayments.length === 0) {
-            tbodyRecent.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No recent payments</td></tr>';
+            tbodyRecent.innerHTML = `<tr><td colspan=\"4\" style=\"text-align:center; padding: 2rem;\">${t('msg_no_recent')}</td></tr>`;
         } else if (res.data.recentPayments) {
             res.data.recentPayments.forEach((req, index) => {
                 const tr = document.createElement('tr');
@@ -636,7 +636,7 @@ async function populateSubSelects(currentSubId = null) {
     }
 
     const memberSelect = document.getElementById('sub-member');
-    memberSelect.innerHTML = '<option value="">-- Choose Member --</option>';
+    memberSelect.innerHTML = `<option value=\"\">${t('lbl_choose_member')}</option>`;
     membersData.forEach(m => {
         if (m.active) {
             const opt = document.createElement('option');
@@ -647,7 +647,7 @@ async function populateSubSelects(currentSubId = null) {
     });
 
     const planSelect = document.getElementById('sub-plan');
-    planSelect.innerHTML = '<option value="">-- Choose Plan --</option>';
+    planSelect.innerHTML = `<option value=\"\">${t('lbl_choose_plan')}</option>`;
     plansData.forEach(p => {
         if (p.active) {
             const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused' && s.id !== currentSubId).length;
@@ -790,7 +790,7 @@ window.adminApp = {
 
     // Plans
     showAddPlanModal: () => {
-        document.getElementById('plan-modal-title').innerText = 'Add Plan';
+        document.getElementById('plan-modal-title').innerText = t('modal_add_plan');
         document.getElementById('form-plan').reset();
         document.getElementById('plan-id').value = '';
         document.getElementById('modal-plan').classList.add('active');
@@ -798,7 +798,7 @@ window.adminApp = {
     editPlan: (id) => {
         const p = plansData.find(x => x.id === id);
         if (!p) return;
-        document.getElementById('plan-modal-title').innerText = 'Edit Plan';
+        document.getElementById('plan-modal-title').innerText = t('modal_edit_plan');
         document.getElementById('plan-id').value = p.id;
         document.getElementById('plan-name').value = p.name;
         document.getElementById('plan-category').value = p.category;
@@ -820,7 +820,7 @@ window.adminApp = {
 
     // Members
     showAddMemberModal: () => {
-        document.getElementById('member-modal-title').innerText = 'Add Member';
+        document.getElementById('member-modal-title').innerText = t('modal_add_member');
         document.getElementById('form-member').reset();
         document.getElementById('member-id').value = '';
         document.getElementById('member-note').value = '';
@@ -829,7 +829,7 @@ window.adminApp = {
     editMember: (id) => {
         const m = membersData.find(x => x.id === id);
         if (!m) return;
-        document.getElementById('member-modal-title').innerText = 'Edit Member';
+        document.getElementById('member-modal-title').innerText = t('modal_edit_member');
         document.getElementById('member-id').value = m.id;
         document.getElementById('member-name').value = m.full_name;
         document.getElementById('member-email').value = m.email;
@@ -851,7 +851,7 @@ window.adminApp = {
     // Subscriptions
     showAddSubModal: async () => {
         await populateSubSelects(null);
-        document.getElementById('sub-modal-title').innerText = 'Add Subscription';
+        document.getElementById('sub-modal-title').innerText = t('modal_add_sub');
         document.getElementById('form-sub').reset();
         document.getElementById('sub-id').value = '';
         document.getElementById('sub-cycle').value = '1';
@@ -862,7 +862,7 @@ window.adminApp = {
         await populateSubSelects(id);
         const s = subsData.find(x => x.id === id);
         if (!s) return;
-        document.getElementById('sub-modal-title').innerText = 'Edit Subscription';
+        document.getElementById('sub-modal-title').innerText = t('modal_edit_sub');
         document.getElementById('sub-id').value = s.id;
         document.getElementById('sub-member').value = s.member_id;
         document.getElementById('sub-plan').value = s.plan_id;

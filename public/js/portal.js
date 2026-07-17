@@ -146,7 +146,7 @@ async function init() {
                 btnCopyAcc.addEventListener('click', () => {
                     navigator.clipboard.writeText(accNo);
                     const originalText = btnCopyAcc.innerText;
-                    btnCopyAcc.innerText = 'Copied!';
+                    btnCopyAcc.innerText = t('btn_copied');
                     setTimeout(() => btnCopyAcc.innerText = originalText, 2000);
                 });
             }
@@ -156,7 +156,7 @@ async function init() {
                 btnCopyNote.addEventListener('click', () => {
                     navigator.clipboard.writeText(addInfo);
                     const originalText = btnCopyNote.innerText;
-                    btnCopyNote.innerText = 'Copied!';
+                    btnCopyNote.innerText = t('btn_copied');
                     setTimeout(() => btnCopyNote.innerText = originalText, 2000);
                 });
             }
