@@ -674,9 +674,19 @@ function formatDate(dateInput, options = {}) {
         date = dateInput;
         hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
     } else {
-        const dateStr = String(dateInput);
+        let dateStr = String(dateInput);
+        // Convert SQLite YYYY-MM-DD HH:MM:SS to YYYY-MM-DDTHH:MM:SS
+        if (dateStr.includes(' ') && !dateStr.includes('T')) {
+            dateStr = dateStr.replace(' ', 'T');
+        }
+        
         hasTime = dateStr.includes('T');
-        date = new Date(dateStr + (hasTime ? (dateStr.includes('Z') ? '' : 'Z') : 'T00:00:00Z'));
+        
+        if (hasTime) {
+            date = new Date(dateStr.includes('Z') ? dateStr : dateStr + 'Z');
+        } else {
+            date = new Date(dateStr + 'T00:00:00Z');
+        }
     }
     
     const locale = currentLanguage === 'vi' ? 'vi-VN' : 'en-US';
