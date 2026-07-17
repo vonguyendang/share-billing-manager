@@ -22,10 +22,7 @@
         </div>
 
         <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px; position: relative;">
-            <div class="lang-switcher" style="position: absolute; top: 1rem; left: 1rem; display: flex; gap: 0.25rem;">
-                <button class="btn lang-btn" data-lang="vi" onclick="setLanguage('vi')" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">VI</button>
-                <button class="btn lang-btn" data-lang="en" onclick="setLanguage('en')" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">EN</button>
-            </div>
+            <button onclick="toggleLanguage()" class="btn" style="position: absolute; top: 1rem; left: 1rem; background: transparent; color: var(--primary); padding: 0.25rem 0.5rem; border: 1px solid var(--primary); font-size: 0.8rem; border-radius: 4px;"><i class="ph ph-translate"></i> <span data-i18n="lang_switch">VI 🔄</span></button>
             <button id="btnToggleTheme" data-icon-only="true" class="btn"
                 style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i
                     class="ph ph-sun"></i></button>

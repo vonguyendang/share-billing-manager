@@ -109,6 +109,7 @@ const translations = {
         'msg_reject_success': 'Đã từ chối yêu cầu',
         'msg_report_success': 'Đã gửi yêu cầu xác nhận thanh toán',
         'msg_link_copied': 'Đã copy link portal!',
+        'lang_switch': 'Ngôn ngữ: Tiếng Việt 🔄',
         // Additional
         'theme_light': 'Giao diện Sáng',
         'theme_dark': 'Giao diện Tối',
@@ -326,6 +327,7 @@ const translations = {
         'msg_reject_success': 'Request rejected',
         'msg_report_success': 'Payment confirmation request sent',
         'msg_link_copied': 'Portal link copied!',
+        'lang_switch': 'Language: English 🔄',
         // Additional
         'theme_light': 'Light Theme',
         'theme_dark': 'Dark Theme',
@@ -438,12 +440,10 @@ const translations = {
 let currentLanguage = localStorage.getItem('appLanguage') || 'vi';
 
 function setLanguage(lang) {
-    if (translations[lang]) {
+    if (translations[lang] && lang !== currentLanguage) {
         currentLanguage = lang;
         localStorage.setItem('appLanguage', lang);
-        applyTranslations();
-        // Dispatch an event so other scripts can re-render if necessary
-        window.dispatchEvent(new Event('languageChanged'));
+        window.location.reload();
     }
 }
 
@@ -515,3 +515,15 @@ function formatDate(dateStr, options = {}) {
 document.addEventListener('DOMContentLoaded', () => {
     applyTranslations();
 });
+
+// Expose explicitly to window to fix ReferenceError in modules
+window.t = t;
+window.formatCurrency = formatCurrency;
+window.formatDate = formatDate;
+window.setLanguage = setLanguage;
+
+// Provide a toggle function
+window.toggleLanguage = function() {
+    const newLang = currentLanguage === 'vi' ? 'en' : 'vi';
+    setLanguage(newLang);
+};
