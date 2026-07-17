@@ -1,6 +1,7 @@
 import { Env } from '../utils/types';
 import { checkAuth, jsonResponse } from '../utils/auth';
 import { sendEmail } from '../utils/email';
+import { sendTelegramNotification } from '../utils/telegram';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
@@ -79,7 +80,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
             // Update in transaction-like manner using batch
             await DB.batch([
-                DB.prepare("UPDATE payment_requests SET status = 'approved', amount = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ?").bind(totalPaid, request_id),
+                DB.prepare("UPDATE payment_requests SET status = 'approved', amount = ?, previous_due_date = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ?").bind(totalPaid, reqInfo.next_due_date, request_id),
                 DB.prepare("UPDATE subscriptions SET next_due_date = ?, status = 'active' WHERE id = ?").bind(newDateStr, reqInfo.subscription_id)
             ]);
 
@@ -122,6 +123,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 body: emailBody,
                 htmlBody: htmlBody
             });
+
+            // Telegram Notification
+            const tgMessage = `✅ <b>Đã duyệt thanh toán</b>\n👤 Khách hàng: <b>${reqInfo.full_name}</b>\n📦 Gói: <b>${reqInfo.plan_name}</b>\n💰 Số tiền: <b>${totalPaid.toLocaleString()}đ</b>\n📅 Hạn mới: <b>${formattedNewDate}</b>`;
+            context.waitUntil(sendTelegramNotification(context.env, tgMessage));
 
         } else if (action === 'reject') {
             const rejectReason = body.reject_reason || 'Không rõ lý do';
@@ -167,6 +172,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 body: emailBody,
                 htmlBody: htmlBody
             });
+
+            // Telegram Notification
+            const tgMessage = `❌ <b>Đã từ chối thanh toán</b>\n👤 Khách hàng: <b>${reqInfo.full_name}</b>\n📦 Gói: <b>${reqInfo.plan_name}</b>\n💬 Lý do: <i>${rejectReason}</i>`;
+            context.waitUntil(sendTelegramNotification(context.env, tgMessage));
         }
 
         return jsonResponse({ success: true });

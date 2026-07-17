@@ -40,6 +40,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         
         const totalMonthlyCost = costQuery?.amount || 0;
 
+        // Actual expenses for current month
+        const actualCostQuery = await DB.prepare(`
+            SELECT SUM(amount) as amount
+            FROM expenses
+            WHERE strftime('%Y-%m', expense_date) = strftime('%Y-%m', 'now', 'localtime')
+        `).first<{amount: number}>();
+        
+        const actualMonthlyCost = actualCostQuery?.amount || 0;
+
         // 2. Expected Revenue per month from all active subscriptions
         const revenueQuery = await DB.prepare(`
             SELECT SUM(amount_due / billing_cycle_months) as amount
@@ -125,8 +134,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                 pendingPayments: pendingQuery?.count || 0,
                 budget: {
                     monthlyCost: Math.round(totalMonthlyCost),
+                    actualMonthlyCost: Math.round(actualMonthlyCost),
                     monthlyRevenue: Math.round(totalMonthlyRevenue),
-                    netProfit: Math.round(totalMonthlyRevenue - totalMonthlyCost)
+                    netProfit: Math.round(totalMonthlyRevenue - totalMonthlyCost),
+                    actualNetProfit: Math.round(totalMonthlyRevenue - actualMonthlyCost)
                 },
                 dueSoonList: dueSoonList.results || [],
                 overdueList: overdueList.results || [],

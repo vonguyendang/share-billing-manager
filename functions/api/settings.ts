@@ -19,7 +19,18 @@ export async function onRequest(context: any) {
         
         if (method === 'PUT') {
             const body = await request.json();
-            const { reminders_enabled, reminder_days } = body;
+            const { 
+                reminders_enabled, 
+                reminder_days,
+                telegram_bot_token,
+                telegram_chat_id,
+                telegram_topic_id,
+                telegram_notifications_enabled,
+                bank_id,
+                bank_account_number,
+                bank_account_name,
+                allow_user_cancel
+            } = body;
             
             // Validate reminder_days (e.g., must be a string like "7,3,1,0,-2,-4")
             let safeReminderDays = reminder_days;
@@ -32,12 +43,28 @@ export async function onRequest(context: any) {
                 UPDATE admin_settings 
                 SET reminders_enabled = ?, 
                     reminder_days = ?,
+                    telegram_bot_token = ?,
+                    telegram_chat_id = ?,
+                    telegram_topic_id = ?,
+                    telegram_notifications_enabled = ?,
+                    bank_id = ?,
+                    bank_account_number = ?,
+                    bank_account_name = ?,
+                    allow_user_cancel = ?,
                     updated_at = CURRENT_TIMESTAMP 
                 WHERE id = 'global'
             `;
             await DB.prepare(query).bind(
                 reminders_enabled !== undefined ? reminders_enabled : 1,
-                safeReminderDays !== undefined ? safeReminderDays : '7,3,1,0,-2,-4'
+                safeReminderDays !== undefined ? safeReminderDays : '7,3,1,0,-2,-4',
+                telegram_bot_token || null,
+                telegram_chat_id || null,
+                telegram_topic_id || null,
+                telegram_notifications_enabled !== undefined ? telegram_notifications_enabled : 0,
+                bank_id || null,
+                bank_account_number || null,
+                bank_account_name || null,
+                allow_user_cancel !== undefined ? allow_user_cancel : 0
             ).run();
 
             return new Response(JSON.stringify({ success: true, message: 'Settings updated' }), {
@@ -45,8 +72,8 @@ export async function onRequest(context: any) {
             });
         }
 
-        return new Response(JSON.stringify({ success: false, message: 'Method Not Allowed' }), { status: 405 });
+        return new Response(JSON.stringify({ success: false, error: 'Method Not Allowed' }), { status: 405 });
     } catch (e: any) {
-        return new Response(JSON.stringify({ success: false, message: e.message }), { status: 500 });
+        return new Response(JSON.stringify({ success: false, error: e.message }), { status: 500 });
     }
 }

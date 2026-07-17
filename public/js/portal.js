@@ -89,46 +89,61 @@ async function init() {
         let statusText = sub.status;
         if (sub.status === 'active') statusText = 'Đang hoạt động';
         if (sub.status === 'pending_payment') statusText = 'Chờ duyệt thanh toán';
+        if (sub.status === 'cancel_pending') statusText = 'Chờ huỷ gia hạn';
         document.getElementById('p-status').innerText = statusText;
 
-        // Generate VietQR
-        const bankBin = '963388'; // TIMO
-        const accNo = '0944353323';
-        const accName = 'VO NGUYEN DANG';
-        const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
+        const settings = res.data.settings;
 
-        // Hiển thị nội dung chuyển khoản ra màn hình cho người dùng copy nếu cần
-        const noteEl = document.getElementById('p-transfer-note');
-        if (noteEl) noteEl.innerText = addInfo;
+        // Generate VietQR if bank info is configured
+        if (settings.bank_id && settings.bank_account_number) {
+            const bankBin = settings.bank_id;
+            const accNo = settings.bank_account_number;
+            const accName = settings.bank_account_name || 'ADMIN';
+            const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
 
-        const qrUrl = `https://img.vietqr.io/image/${bankBin}-${accNo}-qr_only.png?amount=${sub.amount_due}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accName)}`;
-        const qrImg = document.getElementById('qr-code');
-        qrImg.src = qrUrl;
-        qrImg.style.display = 'block';
+            document.getElementById('p-bank-name').innerText = bankBin;
+            document.getElementById('p-bank-account').innerText = accNo;
+            document.getElementById('p-bank-owner').innerText = accName;
+            document.getElementById('p-transfer-note').innerText = addInfo;
 
-        const btnCopyAcc = document.getElementById('btnCopyAcc');
-        if (btnCopyAcc) {
-            btnCopyAcc.addEventListener('click', () => {
-                navigator.clipboard.writeText(accNo);
-                const originalText = btnCopyAcc.innerText;
-                btnCopyAcc.innerText = 'Copied!';
-                setTimeout(() => btnCopyAcc.innerText = originalText, 2000);
-            });
-        }
+            const qrUrl = `https://img.vietqr.io/image/${bankBin}-${accNo}-qr_only.png?amount=${sub.amount_due}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accName)}`;
+            const qrImg = document.getElementById('qr-code');
+            qrImg.src = qrUrl;
+            qrImg.style.display = 'block';
+            document.getElementById('qr-instruction').style.display = 'block';
+            document.getElementById('bankInfoSection').classList.remove('hidden');
 
-        const btnCopyNote = document.getElementById('btnCopyNote');
-        if (btnCopyNote) {
-            btnCopyNote.addEventListener('click', () => {
-                navigator.clipboard.writeText(addInfo);
-                const originalText = btnCopyNote.innerText;
-                btnCopyNote.innerText = 'Copied!';
-                setTimeout(() => btnCopyNote.innerText = originalText, 2000);
-            });
+            const btnCopyAcc = document.getElementById('btnCopyAcc');
+            if (btnCopyAcc) {
+                btnCopyAcc.addEventListener('click', () => {
+                    navigator.clipboard.writeText(accNo);
+                    const originalText = btnCopyAcc.innerText;
+                    btnCopyAcc.innerText = 'Copied!';
+                    setTimeout(() => btnCopyAcc.innerText = originalText, 2000);
+                });
+            }
+
+            const btnCopyNote = document.getElementById('btnCopyNote');
+            if (btnCopyNote) {
+                btnCopyNote.addEventListener('click', () => {
+                    navigator.clipboard.writeText(addInfo);
+                    const originalText = btnCopyNote.innerText;
+                    btnCopyNote.innerText = 'Copied!';
+                    setTimeout(() => btnCopyNote.innerText = originalText, 2000);
+                });
+            }
         }
 
         if (sub.status === 'pending_payment') {
             paymentForm.classList.add('hidden');
             paymentPending.classList.remove('hidden');
+        }
+
+        if (sub.status === 'cancel_pending') {
+            paymentForm.classList.add('hidden');
+            document.getElementById('cancelPendingSection').classList.remove('hidden');
+        } else if (settings.allow_user_cancel === 1 && sub.status !== 'pending_payment') {
+            document.getElementById('userCancelSection').classList.remove('hidden');
         }
 
         loading.classList.add('hidden');
@@ -158,6 +173,24 @@ document.getElementById('btnConfirmPay').addEventListener('click', async () => {
         await window.ui.alert(e.message);
         btn.disabled = false;
         btn.innerText = 'Tôi đã chuyển khoản';
+    }
+});
+
+document.getElementById('btnCancelSub')?.addEventListener('click', async () => {
+    if (!await window.ui.confirm('Bạn có chắc chắn muốn hủy gia hạn? Gói dịch vụ của bạn sẽ tự động kết thúc vào kỳ hạn tiếp theo.')) return;
+    
+    const btn = document.getElementById('btnCancelSub');
+    btn.disabled = true;
+    btn.innerText = 'Đang xử lý...';
+
+    try {
+        await apiCall(`/user/${token}`, 'POST', { action: 'cancel_pending' });
+        await window.ui.alert('Yêu cầu hủy gia hạn thành công.');
+        window.location.reload();
+    } catch (e) {
+        await window.ui.alert(e.message);
+        btn.disabled = false;
+        btn.innerText = 'Hủy gia hạn chu kỳ sau';
     }
 });
 

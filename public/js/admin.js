@@ -187,6 +187,8 @@ async function loadView(view) {
         if (view === 'members') await loadMembers();
         if (view === 'subscriptions') await loadSubscriptions();
         if (view === 'payments') await loadPayments();
+        if (view === 'history') await loadHistory();
+        if (view === 'expenses') await loadExpenses();
         if (view === 'settings') await loadSettings();
     } catch (e) {
         console.error(e);
@@ -203,10 +205,16 @@ async function loadDashboard() {
     
     const budget = res.data.budget;
     document.getElementById('stat-cost').innerText = budget.monthlyCost.toLocaleString();
+    document.getElementById('stat-actual-cost').innerText = budget.actualMonthlyCost.toLocaleString();
     document.getElementById('stat-revenue').innerText = budget.monthlyRevenue.toLocaleString();
+    
     const profitEl = document.getElementById('stat-profit');
     profitEl.innerText = budget.netProfit.toLocaleString();
     profitEl.style.color = budget.netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+
+    const actualProfitEl = document.getElementById('stat-actual-profit');
+    actualProfitEl.innerText = budget.actualNetProfit.toLocaleString();
+    actualProfitEl.style.color = budget.actualNetProfit >= 0 ? 'var(--success)' : 'var(--danger)';
 
     // Populate overdue list
     const tbodyOverdue = document.querySelector('#table-dashboard-overdue tbody');
@@ -409,6 +417,41 @@ async function loadSettings() {
     
     document.getElementById('setting-reminders-enabled').checked = settingsData.reminders_enabled === 1;
     document.getElementById('setting-reminder-days').value = settingsData.reminder_days || '7,3,1,0,-2,-4';
+    document.getElementById('setting-telegram-enabled').checked = settingsData.telegram_notifications_enabled === 1;
+    document.getElementById('setting-telegram-bot-token').value = settingsData.telegram_bot_token || '';
+    document.getElementById('setting-telegram-chat-id').value = settingsData.telegram_chat_id || '';
+    document.getElementById('setting-telegram-topic-id').value = settingsData.telegram_topic_id || '';
+
+    document.getElementById('setting-bank-id').value = settingsData.bank_id || '';
+    document.getElementById('setting-bank-account-number').value = settingsData.bank_account_number || '';
+    document.getElementById('setting-bank-account-name').value = settingsData.bank_account_name || '';
+    document.getElementById('setting-allow-user-cancel').checked = settingsData.allow_user_cancel === 1;
+}
+
+async function loadExpenses() {
+    const res = await apiCall('/expenses');
+    const tbody = document.getElementById('expense-list');
+    tbody.innerHTML = '';
+    if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">Chưa có dữ liệu chi phí</td></tr>';
+        return;
+    }
+    res.data.forEach((e, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formatDate(e.expense_date)}</td>
+            <td>${e.description}</td>
+            <td style="color: var(--danger); font-weight: bold;">-${e.amount.toLocaleString()}</td>
+            <td>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" onclick='adminApp.editExpense(${JSON.stringify(e).replace(/'/g, "&apos;")})' style="padding: 0.25rem 0.5rem;"><i class="ph ph-pencil-simple"></i></button>
+                    <button class="btn btn-danger" onclick="adminApp.deleteExpense('${e.id}')" style="padding: 0.25rem 0.5rem;"><i class="ph ph-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 async function loadPlans() {
@@ -542,6 +585,39 @@ async function loadPayments() {
     });
 }
 
+async function loadHistory() {
+    const res = await apiCall('/history');
+    const tbody = document.getElementById('history-list');
+    tbody.innerHTML = '';
+    
+    if (res.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Không có giao dịch nào gần đây</td></tr>`;
+        return;
+    }
+    
+    res.data.forEach(p => {
+        const tr = document.createElement('tr');
+        const dateObj = p.approved_at ? new Date(p.approved_at + 'Z') : new Date(p.created_at + 'Z');
+        const dateStr = dateObj.toLocaleString('vi-VN');
+        
+        let statusBadge = '';
+        if (p.status === 'approved') statusBadge = `<span class="badge badge-success" style="background-color: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Đã duyệt</span>`;
+        else if (p.status === 'rejected') statusBadge = `<span class="badge badge-danger" style="background-color: var(--danger); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Từ chối</span>`;
+        
+        tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td><strong>${p.member_name}</strong></td>
+            <td>${p.plan_name}</td>
+            <td><strong style="color: var(--success);">${p.amount.toLocaleString()} đ</strong></td>
+            <td>${statusBadge}</td>
+            <td>
+                <button class="btn btn-sm" style="background-color: var(--danger); color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;" onclick="window.adminApp.undoPayment('${p.id}')"><i class="ph ph-arrow-counter-clockwise"></i> Undo</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
 // Helper to populate select dropdowns for Subscriptions
 async function populateSubSelects(currentSubId = null) {
     if (plansData.length === 0) {
@@ -595,6 +671,41 @@ async function populateSubSelects(currentSubId = null) {
 
 // Global actions & modals
 window.adminApp = {
+    exportData: (type) => {
+        window.location.href = `/api/export?type=${type}`;
+    },
+    openExpenseModal: () => {
+        document.getElementById('form-expense').reset();
+        document.getElementById('expense-id').value = '';
+        document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('expense-modal-title').innerText = 'Thêm Chi Phí';
+        document.getElementById('modal-expense').classList.add('active');
+    },
+    editExpense: (e) => {
+        document.getElementById('expense-id').value = e.id;
+        document.getElementById('expense-date').value = e.expense_date;
+        document.getElementById('expense-desc').value = e.description;
+        document.getElementById('expense-amount').value = e.amount;
+        document.getElementById('expense-modal-title').innerText = 'Sửa Chi Phí';
+        document.getElementById('modal-expense').classList.add('active');
+    },
+    deleteExpense: async (id) => {
+        if (!await window.ui.confirm('Bạn có chắc chắn muốn xóa chi phí này?')) return;
+        try {
+            await apiCall('/expenses?id=' + id, 'DELETE');
+            await loadExpenses();
+        } catch (e) { await window.ui.alert(e.message); }
+    },
+    undoPayment: async (id) => {
+        if (!await window.ui.confirm('Bạn có chắc chắn muốn hoàn tác (Undo) giao dịch này không? Ngày đến hạn của khách hàng sẽ bị lùi lại.')) return;
+        try {
+            await apiCall('/history?id=' + id, 'DELETE');
+            await window.ui.alert('Hoàn tác thành công!');
+            await loadHistory();
+        } catch (e) {
+            await window.ui.alert(e.message);
+        }
+    },
     copyPortalLink: async (token) => {
         const link = `${window.location.origin}/portal.html?token=${token}`;
         try {
@@ -772,6 +883,23 @@ window.adminApp = {
         } catch (e) { await window.ui.alert(e.message); }
     },
     
+    testTelegram: async () => {
+        const token = document.getElementById('setting-telegram-bot-token').value;
+        const chatId = document.getElementById('setting-telegram-chat-id').value;
+        const topicId = document.getElementById('setting-telegram-topic-id').value;
+
+        if (!token || !chatId) {
+            return window.ui.alert('Vui lòng nhập Bot Token và Chat ID để test!');
+        }
+
+        try {
+            const res = await apiCall('/test-telegram', 'POST', { token, chatId, topicId });
+            window.ui.alert(res.message || 'Thành công!');
+        } catch (e) {
+            window.ui.alert(e.message);
+        }
+    },
+
     closeModal: (id) => document.getElementById(id).classList.remove('active')
 };
 
@@ -846,13 +974,37 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
     e.preventDefault();
     const data = {
         reminders_enabled: document.getElementById('setting-reminders-enabled').checked ? 1 : 0,
-        reminder_days: document.getElementById('setting-reminder-days').value
+        reminder_days: document.getElementById('setting-reminder-days').value,
+        telegram_notifications_enabled: document.getElementById('setting-telegram-enabled').checked ? 1 : 0,
+        telegram_bot_token: document.getElementById('setting-telegram-bot-token').value,
+        telegram_chat_id: document.getElementById('setting-telegram-chat-id').value,
+        telegram_topic_id: document.getElementById('setting-telegram-topic-id').value,
+        bank_id: document.getElementById('setting-bank-id').value,
+        bank_account_number: document.getElementById('setting-bank-account-number').value,
+        bank_account_name: document.getElementById('setting-bank-account-name').value,
+        allow_user_cancel: document.getElementById('setting-allow-user-cancel').checked ? 1 : 0
     };
     try {
         await apiCall('/settings', 'PUT', data);
         settingsData = data;
         await window.ui.alert('Lưu cài đặt thành công!');
     } catch (e) { await window.ui.alert(e.message); }
+});
+
+document.getElementById('form-expense').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        id: document.getElementById('expense-id').value,
+        expense_date: document.getElementById('expense-date').value,
+        description: document.getElementById('expense-desc').value,
+        amount: parseFloat(document.getElementById('expense-amount').value),
+    };
+    try {
+        await apiCall('/expenses', 'POST', data);
+        adminApp.closeModal('modal-expense');
+        await loadExpenses();
+        window.ui.alert('Lưu chi phí thành công');
+    } catch (e) { window.ui.alert(e.message); }
 });
 
 // Search/Filter logic

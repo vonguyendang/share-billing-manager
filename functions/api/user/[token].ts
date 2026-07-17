@@ -1,6 +1,7 @@
 import { Env } from '../../utils/types';
 import { jsonResponse } from '../../utils/auth';
 import { sendEmail } from '../../utils/email';
+import { sendTelegramNotification } from '../../utils/telegram';
 
 // GET subscription info for the portal
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -28,9 +29,19 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             ORDER BY created_at DESC LIMIT 5
         `).bind(sub.id).all();
 
+        // Fetch settings (bank info, user cancel)
+        const settings = await DB.prepare(`
+            SELECT bank_id, bank_account_number, bank_account_name, allow_user_cancel
+            FROM admin_settings WHERE id = 'global'
+        `).first<any>();
+
         return jsonResponse({
             success: true,
-            data: { subscription: sub, history: history.results }
+            data: { 
+                subscription: sub, 
+                history: history.results,
+                settings: settings || {}
+            }
         });
     } catch (e: any) {
         return jsonResponse({ success: false, error: e.message }, 500);
@@ -57,6 +68,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         if (!subInfo) return jsonResponse({ success: false, error: 'Invalid token' }, 404);
 
         const body = await context.request.json() as any;
+
+        // Check if action is cancel_pending
+        if (body.action === 'cancel_pending') {
+            const settings = await DB.prepare("SELECT allow_user_cancel FROM admin_settings WHERE id = 'global'").first<any>();
+            if (settings?.allow_user_cancel !== 1) {
+                return jsonResponse({ success: false, error: 'Tính năng tự hủy gia hạn chưa được bật.' }, 403);
+            }
+            
+            await DB.prepare("UPDATE subscriptions SET status = 'cancel_pending' WHERE id = ?").bind(subInfo.id).run();
+            
+            const tgMessage = `⚠️ <b>Khách hàng yêu cầu hủy gia hạn</b>\n👤 Khách hàng: <b>${subInfo.full_name}</b>\n📦 Gói: <b>${subInfo.plan_name}</b>\n\n👉 Khách hàng không muốn gia hạn chu kỳ sau. Hệ thống sẽ tự động hủy quyền khi đến hạn.`;
+            context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+            
+            return jsonResponse({ success: true, message: 'Đã gửi yêu cầu hủy gia hạn thành công.' });
+        }
+
         const reqId = 'req_' + Date.now();
 
         // 2. Insert payment request (Catch D1 UNIQUE constraint error if one is already pending)
@@ -108,6 +135,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             body: emailBody,
             htmlBody: htmlBody
         });
+
+        // 5. Send Telegram notification to admin
+        const amount = body.amount || subInfo.amount_due;
+        const note = body.user_note ? `\n📝 Ghi chú: <i>${body.user_note}</i>` : '';
+        const tgMessage = `🔔 <b>Yêu cầu thanh toán mới</b>\n👤 Khách hàng: <b>${subInfo.full_name}</b>\n📦 Gói: <b>${subInfo.plan_name}</b>\n💰 Số tiền: <b>${amount.toLocaleString()}đ</b>${note}\n\n👉 Vui lòng vào trang quản trị để kiểm tra và duyệt.`;
+        context.waitUntil(sendTelegramNotification(context.env, tgMessage));
 
         return jsonResponse({ success: true });
     } catch (e: any) {

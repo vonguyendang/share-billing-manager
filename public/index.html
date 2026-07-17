@@ -38,6 +38,8 @@
         <a href="#members" class="nav-item" data-view="members"><i class="ph ph-users"></i> Members</a>
         <a href="#subscriptions" class="nav-item" data-view="subscriptions"><i class="ph ph-calendar-check"></i> Subscriptions</a>
         <a href="#payments" class="nav-item" data-view="payments"><i class="ph ph-currency-circle-dollar"></i> Pending Payments</a>
+        <a href="#expenses" class="nav-item" data-view="expenses"><i class="ph ph-wallet"></i> Chi Phí</a>
+        <a href="#history" class="nav-item" data-view="history"><i class="ph ph-clock-counter-clockwise"></i> Lịch sử duyệt</a>
         <a href="#settings" class="nav-item" data-view="settings"><i class="ph ph-gear"></i> Settings</a>
         
         <div style="flex-grow: 1;"></div>
@@ -91,16 +93,20 @@
                     <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;"><i class="ph ph-chart-bar"></i> Revenue Overview</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
-                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> Total Cost</h4>
-                            <p id="stat-cost" style="font-size: 1.25rem; font-weight: bold; color: var(--danger);">-</p>
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-down"></i> Chi phí (Dự toán / Thực tế)</h4>
+                            <p style="font-size: 1.25rem; font-weight: bold; color: var(--danger);">
+                                <span id="stat-cost">-</span> / <span id="stat-actual-cost">-</span>
+                            </p>
                         </div>
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
                             <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-trend-up"></i> Expected Rev</h4>
                             <p id="stat-revenue" style="font-size: 1.25rem; font-weight: bold; color: var(--success);">-</p>
                         </div>
                         <div class="card" style="margin-bottom: 0; padding: 1rem;">
-                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-coins"></i> Net Profit</h4>
-                            <p id="stat-profit" style="font-size: 1.25rem; font-weight: bold;">-</p>
+                            <h4 style="font-size: 0.8rem; color: var(--text-muted);"><i class="ph ph-coins"></i> Lợi nhuận (Dự toán / Thực tế)</h4>
+                            <p style="font-size: 1.25rem; font-weight: bold;">
+                                <span id="stat-profit">-</span> / <span id="stat-actual-profit">-</span>
+                            </p>
                         </div>
                     </div>
                     <div class="card">
@@ -286,6 +292,28 @@
             </div>
         </div>
 
+        <!-- Expenses View -->
+        <div id="view-expenses" class="view-section hidden">
+            <div class="card-header">
+                <h2>Quản lý Chi Phí</h2>
+                <button class="btn btn-primary" onclick="adminApp.openExpenseModal()">+ Thêm chi phí mới</button>
+            </div>
+            <div class="card table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ngày chi</th>
+                            <th>Nội dung</th>
+                            <th>Số tiền</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-list"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Settings View -->
         <div id="view-settings" class="view-section hidden">
             <div class="card-header">
@@ -307,15 +335,119 @@
                             <strong>Bật tính năng gửi email</strong>
                         </label>
                     </div>
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;">Thông báo Telegram</h3>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="setting-telegram-enabled">
+                            <strong>Bật thông báo qua Telegram</strong>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Bot Token</label>
+                        <input type="text" id="setting-telegram-bot-token" class="form-control" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Lấy từ @BotFather</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Chat ID</label>
+                        <input type="text" id="setting-telegram-chat-id" class="form-control" placeholder="-1001234567890">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">ID của Group, Supergroup hoặc User</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Topic ID (Tuỳ chọn)</label>
+                        <input type="text" id="setting-telegram-topic-id" class="form-control" placeholder="1234">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Chỉ dùng nếu Chat ID là Supergroup và bạn muốn gửi vào một Topic cụ thể (Message Thread ID)</p>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="adminApp.testTelegram()">🚀 Gửi tin nhắn Test (Test Bot)</button>
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;">Cấu hình thanh toán VietQR</h3>
+                    <div class="form-group">
+                        <label>Mã Ngân Hàng (BIN hoặc Tên viết tắt)</label>
+                        <input type="text" id="setting-bank-id" class="form-control" placeholder="VD: VCB, MB, TPB, hoặc 970436">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Mã BIN (như 970436) hoặc tên ngân hàng viết tắt hỗ trợ VietQR.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Số Tài Khoản</label>
+                        <input type="text" id="setting-bank-account-number" class="form-control" placeholder="Nhập số tài khoản...">
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Chủ Tài Khoản</label>
+                        <input type="text" id="setting-bank-account-name" class="form-control" placeholder="VD: NGUYEN VAN A">
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;">Quyền của Khách hàng</h3>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="setting-allow-user-cancel">
+                            <strong>Cho phép Khách hàng tự thao tác "Huỷ gia hạn" (Cancel)</strong>
+                        </label>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Nếu bật, khách hàng có thể tự nhấn huỷ gia hạn trên Portal. Gói sẽ chuyển sang trạng thái chờ huỷ.</p>
+                    </div>
+
                     <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Lưu Cài Đặt</button>
                 </form>
+            </div>
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Sao lưu Dữ liệu (Export CSV)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Tải dữ liệu của bạn về máy để sao lưu hoặc làm báo cáo.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="adminApp.exportData('members')">Export Members</button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('subscriptions')">Export Subscriptions</button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('payments')">Export Payments</button>
+                    <button class="btn btn-primary" onclick="adminApp.exportData('expenses')">Export Expenses</button>
+                </div>
             </div>
         </div>
 
     </main>
 </div>
 
+<!-- History View -->
+<div id="view-history" class="view-section hidden" style="padding: 1.5rem;">
+    <div class="card-header" style="margin-bottom: 1rem;">
+        <h2>Lịch sử Giao dịch</h2>
+    </div>
+    <div class="card" style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ngày xử lý</th>
+                    <th>Khách hàng</th>
+                    <th>Gói dịch vụ</th>
+                    <th>Số tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="history-list">
+                <!-- Rendered via JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- Modals -->
+<div id="modal-expense" class="modal">
+    <div class="modal-content">
+        <h2 id="expense-modal-title">Thêm Chi Phí</h2>
+        <form id="form-expense" style="margin-top: 1rem;">
+            <input type="hidden" id="expense-id">
+            <div class="form-group"><label>Ngày chi</label><input type="date" id="expense-date" class="form-control" required></div>
+            <div class="form-group"><label>Nội dung chi</label><input id="expense-desc" class="form-control" placeholder="VD: Mua gói Netflix" required></div>
+            <div class="form-group"><label>Số tiền (VND)</label><input type="number" id="expense-amount" class="form-control" required></div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-success">Save</button>
+                <button type="button" class="btn" onclick="adminApp.closeModal('modal-expense')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="modal-plan" class="modal">
     <div class="modal-content">
         <h2 id="plan-modal-title">Add Plan</h2>

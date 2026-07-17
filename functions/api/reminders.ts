@@ -1,6 +1,7 @@
 import { Env } from '../utils/types';
 import { checkAuth, jsonResponse } from '../utils/auth';
 import { sendEmail } from '../utils/email';
+import { sendTelegramNotification } from '../utils/telegram';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
@@ -148,6 +149,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
                 if (success) {
                     sentCount++;
+                    
+                    // Telegram Notification for Admin
+                    let statusLabel = '';
+                    if (sub.days_left > 0) statusLabel = 'Sắp đến hạn';
+                    else if (sub.days_left === 0) statusLabel = 'Đến hạn hôm nay';
+                    else if (sub.days_left < 0 && sub.days_left > -4) statusLabel = `Trễ hạn ${Math.abs(sub.days_left)} ngày`;
+                    else statusLabel = 'Tạm ngưng dịch vụ';
+
+                    const tgMessage = `📧 <b>Đã gửi email nhắc nhở</b>\n👤 Khách hàng: <b>${sub.full_name}</b>\n📦 Gói: <b>${sub.plan_name}</b>\n🏷 Trạng thái: <b>${statusLabel}</b>\n📅 Ngày đến hạn: <b>${formattedDate}</b>`;
+                    context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+
                     // Auto pause if days_left is -4
                     if (sub.days_left === -4) {
                         await DB.prepare("UPDATE subscriptions SET status = 'paused' WHERE id = ?").bind(sub.id).run();

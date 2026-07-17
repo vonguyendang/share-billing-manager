@@ -39,6 +39,11 @@ Bạn cần đẩy cấu trúc bảng từ máy lên Cloudflare D1 bằng lệnh
 
 ```bash
 npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0001_initial.sql
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0003_add_reminder_days.sql
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0004_add_plan_slots.sql
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0005_add_telegram_settings.sql
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0006_add_previous_due_date.sql
+npx wrangler d1 execute billing-manager-db --remote --file=./migrations/0007_add_new_features.sql
 ```
 
 *(Lưu ý cờ `--remote` ở đây báo cho Cloudflare biết là bạn đang muốn can thiệp vào Database thật trên mạng).*
@@ -98,6 +103,26 @@ Vì bạn đã đưa mã nguồn lên GitHub, cách dễ và tự động nhất
 6. Bấm **Create** để lưu lại.
 
 Từ nay, cứ 8h sáng, hệ thống này sẽ tự động quét toàn bộ danh sách, gửi email báo sắp đến hạn, quá hạn và tự động khóa những người dùng trễ nợ!
+
+### 8. Cấu hình Telegram Bot (Tuỳ chọn)
+
+Hệ thống hỗ trợ gửi thông báo tự động qua Telegram cho Admin khi:
+- Có người gửi yêu cầu thanh toán mới.
+- Admin duyệt/từ chối/hoàn tác (undo) thanh toán.
+- Khách hàng bấm yêu cầu hủy gia hạn từ Portal.
+- Hệ thống gửi email nhắc nhở/cảnh báo thành công.
+
+### 9. Các tính năng nổi bật khác
+- **Thanh toán VietQR:** Hệ thống tự động tạo mã QR chính xác số tiền và nội dung chuyển khoản cho từng khách hàng trên Portal.
+- **Khách hàng tự thao tác:** Khách hàng có thể xem lịch sử, thông tin gói và có quyền (nếu Admin bật) bấm nút yêu cầu không gia hạn cho chu kỳ sau.
+- **Quản lý Thu - Chi (Expenses):** Ghi chép chi phí sinh hoạt/vận hành, tính toán lợi nhuận Thực tế so với Dự toán trên Dashboard.
+- **Xuất dữ liệu (Export CSV):** Tải toàn bộ dữ liệu ra file Excel/CSV để lưu trữ và báo cáo.
+
+Để cấu hình:
+1. Mở app Telegram, tìm `@BotFather` và tạo một bot mới (lấy **Bot Token**).
+2. Vào giao diện **Admin Dashboard -> Settings**, bật tính năng **Bật thông báo qua Telegram**.
+3. Nhập **Bot Token** và **Chat ID** (ID của bạn, hoặc ID của Group). Nếu bạn muốn gửi vào một Topic trong Supergroup, hãy nhập **Topic ID** (Message Thread ID).
+4. Nhấn **Lưu Cài Đặt**.
 ## Hướng dẫn chạy thử ở Local (Máy cá nhân)
 
 Để test hệ thống ngay trên máy của bạn trước khi deploy lên Cloudflare:
@@ -114,6 +139,11 @@ Từ nay, cứ 8h sáng, hệ thống này sẽ tự động quét toàn bộ da
    ```bash
    npx wrangler d1 execute billing-manager-db --local --file=./migrations/0001_initial.sql
    npx wrangler d1 execute billing-manager-db --local --file=./migrations/0002_seed.sql
+   npx wrangler d1 execute billing-manager-db --local --file=./migrations/0003_add_reminder_days.sql
+   npx wrangler d1 execute billing-manager-db --local --file=./migrations/0004_add_plan_slots.sql
+   npx wrangler d1 execute billing-manager-db --local --file=./migrations/0005_add_telegram_settings.sql
+   npx wrangler d1 execute billing-manager-db --local --file=./migrations/0006_add_previous_due_date.sql
+   npx wrangler d1 execute billing-manager-db --local --file=./migrations/0007_add_new_features.sql
    ```
 3. **Khởi động server:**
 
@@ -137,6 +167,11 @@ Từ nay, cứ 8h sáng, hệ thống này sẽ tự động quét toàn bộ da
    ```bash
    pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0001_initial.sql
    pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0002_seed.sql
+   pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0003_add_reminder_days.sql
+   pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0004_add_plan_slots.sql
+   pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0005_add_telegram_settings.sql
+   pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0006_add_previous_due_date.sql
+   pnpm exec wrangler d1 execute billing-manager-db --local --file=./migrations/0007_add_new_features.sql
    ```
 3. **Khởi động server:**
 
