@@ -524,7 +524,7 @@ tbody tr:hover {
 }
 
 /* Custom Bank Select */
-.custom-select-wrapper { position: relative; user-select: none; width: 100%; }
+.custom-select-wrapper { position: relative; user-select: none; width: 100%; z-index: 100; }
 .custom-select { position: relative; display: flex; flex-direction: column; }
 .custom-select-trigger {
     display: flex; align-items: center; justify-content: space-between;
