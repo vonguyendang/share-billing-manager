@@ -101,7 +101,21 @@ async function init() {
             const accName = settings.bank_account_name || 'ADMIN';
             const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
 
-            document.getElementById('p-bank-name').innerText = bankBin;
+            let bankDisplayName = bankBin;
+            try {
+                const banksRes = await fetch('/data/banks.json');
+                if (banksRes.ok) {
+                    const banksData = await banksRes.json();
+                    const bankInfo = banksData.data.find(b => b.bin === bankBin || b.shortName === bankBin || b.short_name === bankBin);
+                    if (bankInfo) {
+                        bankDisplayName = `${bankInfo.shortName} - ${bankInfo.name}`;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load banks data', e);
+            }
+
+            document.getElementById('p-bank-name').innerText = bankDisplayName;
             document.getElementById('p-bank-account').innerText = accNo;
             document.getElementById('p-bank-owner').innerText = accName;
             document.getElementById('p-transfer-note').innerText = addInfo;
