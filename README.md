@@ -118,11 +118,38 @@ Hệ thống hỗ trợ gửi thông báo tự động qua Telegram cho Admin kh
 - **Quản lý Thu - Chi (Expenses):** Ghi chép chi phí sinh hoạt/vận hành, tính toán lợi nhuận Thực tế so với Dự toán trên Dashboard.
 - **Xuất dữ liệu (Export CSV):** Tải toàn bộ dữ liệu ra file Excel/CSV để lưu trữ và báo cáo.
 
-Để cấu hình:
-1. Mở app Telegram, tìm `@BotFather` và tạo một bot mới (lấy **Bot Token**).
-2. Vào giao diện **Admin Dashboard -> Settings**, bật tính năng **Bật thông báo qua Telegram**.
-3. Nhập **Bot Token** và **Chat ID** (ID của bạn, hoặc ID của Group). Nếu bạn muốn gửi vào một Topic trong Supergroup, hãy nhập **Topic ID** (Message Thread ID).
-4. Nhấn **Lưu Cài Đặt**.
+Để nhận được thông báo, bạn cần phải có **Bot Token** và **Chat ID**. Dưới đây là các bước chi tiết:
+
+#### Bước 1: Tạo Bot và lấy Bot Token
+1. Mở ứng dụng Telegram, tìm kiếm tài khoản `@BotFather` (có dấu tích xanh) và bấm Start.
+2. Gõ lệnh `/newbot` để bắt đầu tạo Bot.
+3. Nhập **Tên hiển thị** cho Bot (ví dụ: `Share Billing Manager`).
+4. Nhập **Username** cho Bot (phải kết thúc bằng chữ `bot`, ví dụ: `my_billing_admin_bot`).
+5. Nếu thành công, BotFather sẽ gửi cho bạn một tin nhắn dài, trong đó có chứa **Bot Token** (một chuỗi có dạng `123456789:ABCdefGHIjklMNOpqrSTUvwxYZ`). Hãy copy đoạn mã này lại.
+
+*(Lưu ý: Để Bot trông chuyên nghiệp hơn, bạn có thể thiết lập thêm About, Description, và Avatar thông qua các lệnh của BotFather).*
+
+#### Bước 2: Bắt đầu trò chuyện với Bot
+Bạn phải là người nhắn tin cho Bot trước thì Bot mới có thể gửi thông báo lại cho bạn (Telegram chống spam).
+- Quay lại ô tìm kiếm của Telegram, gõ **Username** của Bot bạn vừa tạo.
+- Bấm **Start** hoặc gửi cho nó một tin nhắn bất kỳ (VD: `Hello`).
+
+#### Bước 3: Lấy Chat ID của bạn (hoặc Group)
+Bot cần biết chính xác ID của bạn (hoặc ID của Group) để gửi thông báo đến đúng nơi.
+1. Tìm kiếm tài khoản `@userinfobot` trên Telegram và bấm Start. Nó sẽ trả về cho bạn một dãy số (ví dụ: `123456789`). Đây chính là **Chat ID** cá nhân của bạn.
+2. *(Nâng cao)* Nếu bạn muốn Bot gửi thông báo vào một **Group/Supergroup**:
+   - Hãy thêm Bot của bạn vào Group đó.
+   - Truy cập trang web `https://api.telegram.org/bot<THAY_BẰNG_TOKEN_CỦA_BẠN>/getUpdates`
+   - Tìm đoạn `"chat":{"id": -100xxxxxxxxxx` để lấy ID của Group (thường bắt đầu bằng dấu trừ `-`).
+
+*(Nếu bạn dùng tính năng **Topics** trong Supergroup, Topic ID chính là số ID của URL khi bạn bấm vào Topic đó trên bản Telegram Web hoặc Desktop).*
+
+#### Bước 4: Cấu hình trên hệ thống
+1. Vào trang quản trị Admin, chuyển sang tab **Settings** (Cài đặt).
+2. Tích chọn **Bật thông báo qua Telegram**.
+3. Dán **Bot Token**, **Chat ID** (và **Topic ID** nếu có) vào các ô tương ứng.
+4. Bấm nút **"🚀 Gửi tin nhắn Test (Test Bot)"** để kiểm tra thử. Nếu Telegram của bạn nhận được tin nhắn mẫu thì có nghĩa là cấu hình đã chính xác!
+5. Bấm **Lưu cài đặt** để hoàn tất.
 ## Hướng dẫn chạy thử ở Local (Máy cá nhân)
 
 Để test hệ thống ngay trên máy của bạn trước khi deploy lên Cloudflare:
