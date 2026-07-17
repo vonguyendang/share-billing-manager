@@ -32,6 +32,10 @@ const translations = {
         'nav_settings': 'Cài đặt',
         'nav_logout': 'Đăng xuất',
         'nav_run_reminders': 'Chạy nhắc nhở',
+        'sub_amount': 'Số tiền',
+        'sub_amount_due': 'Cần thanh toán',
+        'sub_cycle': 'Chu kỳ (Tháng)',
+        'lbl_total_price': 'Tổng tiền',
 
         // Navigation (Portal)
         'portal_title': 'Cổng Thông Tin Thành Viên',
@@ -331,6 +335,10 @@ const translations = {
         'nav_settings': 'Settings',
         'nav_logout': 'Logout',
         'nav_run_reminders': 'Run Reminders',
+        'sub_amount': 'Amount',
+        'sub_amount_due': 'Amount Due',
+        'sub_cycle': 'Cycle (Months)',
+        'lbl_total_price': 'Total Price',
 
         // Navigation (Portal)
         'portal_title': 'Member Portal',

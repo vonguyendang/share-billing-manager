@@ -202,7 +202,7 @@
                             <th data-i18n="dash_col_member">Member</th>
                             <th data-i18n="dash_col_plan">Plan</th>
                             <th data-i18n="dash_col_due_date">Due Date</th>
-                            <th>Amount (VND)</th>
+                            <th data-i18n="sub_amount">Amount (VND)</th>
                             <th data-i18n="sub_col_cycle">Cycle</th>
                             <th data-i18n="sub_col_status">Status</th>
                             <th data-i18n="sub_col_link">Link</th>
@@ -232,7 +232,7 @@
                             <th data-i18n="plan_col_name">Name</th>
                             <th data-i18n="plan_col_category">Category</th>
                             <th data-i18n="plan_col_price">Price</th>
-                            <th>Cycle (Months)</th>
+                            <th data-i18n="sub_cycle">Cycle (Months)</th>
                             <th data-i18n="plan_col_slots">Slots</th>
                             <th data-i18n="sub_col_status">Status</th>
                             <th data-i18n="dash_col_actions">Actions</th>
@@ -472,8 +472,8 @@
             <input type="hidden" id="plan-id">
             <div class="form-group"><label data-i18n="lbl_name">Name</label><input id="plan-name" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_category">Category</label><input id="plan-category" class="form-control" required></div>
-            <div class="form-group"><label>Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
-            <div class="form-group"><label>Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
+            <div class="form-group"><label data-i18n="lbl_total_price">Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="sub_cycle">Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
             <div class="form-group"><label data-i18n="lbl_plan_slots">Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
@@ -509,7 +509,7 @@
             <div class="form-group"><label data-i18n="lbl_plan">Plan</label><select id="sub-plan" class="form-control" required></select></div>
             <div class="form-group"><label data-i18n="lbl_start_date">Start Date</label><input type="date" id="sub-start" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_due_date">Next Due Date</label><input type="date" id="sub-due" class="form-control" required></div>
-            <div class="form-group"><label>Amount Due (VND)</label><input type="number" id="sub-amount" class="form-control" required></div>
+            <div class="form-group"><label data-i18n="sub_amount_due">Amount Due (VND)</label><input type="number" id="sub-amount" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_sub_cycle">Chu kỳ thanh toán (Tháng)</label><input type="number" id="sub-cycle" class="form-control" required value="1" min="1"></div>
             <div class="form-group"><label data-i18n="lbl_status">Status</label>
                 <select id="sub-status" class="form-control">
