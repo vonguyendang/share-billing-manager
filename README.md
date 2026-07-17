@@ -143,7 +143,9 @@ Bot cần biết chính xác ID của bạn (hoặc ID của Group) để gửi 
    - Truy cập trang web `https://api.telegram.org/bot<THAY_BẰNG_TOKEN_CỦA_BẠN>/getUpdates`
    - Tìm đoạn `"chat":{"id": -100xxxxxxxxxx` để lấy ID của Group (thường bắt đầu bằng dấu trừ `-`).
 
-*(Nếu bạn dùng tính năng **Topics** trong Supergroup, Topic ID chính là số ID của URL khi bạn bấm vào Topic đó trên bản Telegram Web hoặc Desktop. Đảm bảo Bot có quyền gửi tin nhắn vào Topics).*
+*(Mẹo nhanh: Nếu bạn có link của một bài viết trong Topic, ví dụ `https://t.me/c/1922137058/1015`, thì:)*
+- *`1922137058` là ID của Group. Bạn phải thêm `-100` vào trước để thành **Chat ID** là `-1001922137058`.*
+- *`1015` (số cuối cùng) chính là **Topic ID**.*
 
 #### Bước 4: Cấu hình trên hệ thống
 1. Vào trang quản trị Admin, chuyển sang tab **Settings** (Cài đặt).
