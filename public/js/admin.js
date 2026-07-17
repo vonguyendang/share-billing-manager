@@ -464,6 +464,10 @@ async function loadPlans() {
     }
     const tbody = document.getElementById('plan-list');
     tbody.innerHTML = '';
+    if (!plansData || plansData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan=\"10\" style=\"text-align: center; padding: 2rem;\">${t('msg_no_data') || 'No data'}</td></tr>`;
+        return;
+    }
     plansData.forEach((p, index) => {
         const usedSlots = subsData.filter(s => s.plan_id === p.id && s.status !== 'paused').length;
         const maxSlots = p.max_slots || 0;
@@ -503,6 +507,10 @@ async function loadMembers() {
     membersData = res.data;
     const tbody = document.getElementById('member-list');
     tbody.innerHTML = '';
+    if (!membersData || membersData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan=\"10\" style=\"text-align: center; padding: 2rem;\">${t('msg_no_data') || 'No data'}</td></tr>`;
+        return;
+    }
     membersData.forEach((m, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -534,6 +542,10 @@ async function loadSubscriptions() {
     subsData = res.data;
     const tbody = document.getElementById('sub-list');
     tbody.innerHTML = '';
+    if (!subsData || subsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan=\"10\" style=\"text-align: center; padding: 2rem;\">${t('msg_no_data') || 'No data'}</td></tr>`;
+        return;
+    }
     subsData.forEach((sub, index) => {
         const link = `${window.location.origin}/portal.html?token=${sub.user_token}`;
         const tr = document.createElement('tr');
@@ -566,6 +578,10 @@ async function loadPayments() {
     const res = await apiCall('/payments');
     const tbody = document.getElementById('payment-list');
     tbody.innerHTML = '';
+    if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan=\"10\" style=\"text-align: center; padding: 2rem;\">${t('msg_no_data') || 'No data'}</td></tr>`;
+        return;
+    }
     res.data.forEach((req, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -591,8 +607,8 @@ async function loadHistory() {
     const tbody = document.getElementById('history-list');
     tbody.innerHTML = '';
 
-    if (res.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">${t('hist_empty')}</td></tr>`;
+    if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 2rem; color: var(--text-muted);">${t('hist_empty')}</td></tr>`;
         return;
     }
 
