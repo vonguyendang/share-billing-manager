@@ -1088,34 +1088,39 @@ async function initBankSelect() {
         bankDataList = json.data;
     }
 
-    renderBankOptions();
+    setupBankSelect('bank');
+    setupBankSelect('alt-bank');
+}
 
-    document.getElementById('bank-select-trigger').addEventListener('click', function (e) {
-        document.getElementById('bank-select').classList.toggle('open');
-        document.getElementById('bank-search-input').focus();
+function setupBankSelect(prefix) {
+    renderBankOptions(prefix, '');
+
+    document.getElementById(`${prefix}-select-trigger`).addEventListener('click', function (e) {
+        document.getElementById(`${prefix}-select`).classList.toggle('open');
+        document.getElementById(`${prefix}-search-input`).focus();
         e.stopPropagation();
     });
 
-    document.getElementById('bank-search-input').addEventListener('input', function (e) {
-        renderBankOptions(e.target.value.toLowerCase());
+    document.getElementById(`${prefix}-search-input`).addEventListener('input', function (e) {
+        renderBankOptions(prefix, e.target.value.toLowerCase());
     });
 
-    document.getElementById('bank-search-input').addEventListener('click', function (e) {
+    document.getElementById(`${prefix}-search-input`).addEventListener('click', function (e) {
         e.stopPropagation();
     });
 
     document.addEventListener('click', function (e) {
-        const wrapper = document.getElementById('bank-select-wrapper');
+        const wrapper = document.getElementById(`${prefix}-select-wrapper`);
         if (wrapper && !wrapper.contains(e.target)) {
-            document.getElementById('bank-select').classList.remove('open');
+            document.getElementById(`${prefix}-select`).classList.remove('open');
         }
     });
 }
 
-function renderBankOptions(filter = '') {
-    const list = document.getElementById('bank-options-list');
+function renderBankOptions(prefix, filter = '') {
+    const list = document.getElementById(`${prefix}-options-list`);
     list.innerHTML = '';
-    const currentVal = document.getElementById('setting-bank-id').value;
+    const currentVal = document.getElementById(`setting-${prefix}-id`).value;
 
     bankDataList.forEach(bank => {
         const text = `${bank.shortName} - ${bank.name}`;
@@ -1130,29 +1135,29 @@ function renderBankOptions(filter = '') {
                          <div class="custom-option-text">${text}</div>`;
 
         opt.addEventListener('click', function (e) {
-            document.getElementById('setting-bank-id').value = bank.bin;
-            updateBankTriggerDisplay(bank);
-            document.getElementById('bank-select').classList.remove('open');
-            renderBankOptions(); // re-render to update selected styling
+            document.getElementById(`setting-${prefix}-id`).value = bank.bin;
+            updateBankTriggerDisplay(prefix, bank);
+            document.getElementById(`${prefix}-select`).classList.remove('open');
+            renderBankOptions(prefix); // re-render to update selected styling
             e.stopPropagation();
         });
         list.appendChild(opt);
     });
 
-    updateBankTriggerDisplay();
+    updateBankTriggerDisplay(prefix);
 }
 
-function updateBankTriggerDisplay(bank = null) {
+function updateBankTriggerDisplay(prefix, bank = null) {
     if (!bank && bankDataList.length > 0) {
-        const currentVal = document.getElementById('setting-bank-id').value;
+        const currentVal = document.getElementById(`setting-${prefix}-id`).value;
         bank = bankDataList.find(b => b.bin === currentVal || b.shortName === currentVal || b.short_name === currentVal);
     }
-    const content = document.getElementById('bank-select-content');
+    const content = document.getElementById(`${prefix}-select-content`);
     if (bank) {
         content.innerHTML = `<img src="${bank.logo}" style="width: 40px; height: 20px; object-fit: contain; margin-right: 10px;" onerror="this.style.display='none'">
                              <span>${bank.shortName} - ${bank.name}</span>`;
     } else {
-        const val = document.getElementById('setting-bank-id').value;
+        const val = document.getElementById(`setting-${prefix}-id`).value;
         content.innerHTML = `<span>${val || t('lbl_select_bank')}</span>`;
     }
 }
