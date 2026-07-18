@@ -889,7 +889,7 @@ window.adminApp = {
         document.getElementById('sub-amount').value = s.amount_due;
         document.getElementById('sub-cycle').value = s.billing_cycle_months;
         document.getElementById('sub-status').value = s.status;
-        document.getElementById('sub-send-email').checked = (s.send_email !== 0);
+        document.getElementById('sub-send-email').checked = (s.send_email === undefined || s.send_email === null || s.send_email === 1);
         document.getElementById('modal-sub').classList.add('active');
     },
     deleteSub: async (id) => {
