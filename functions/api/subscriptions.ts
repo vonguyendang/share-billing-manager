@@ -1,5 +1,7 @@
 import { Env } from '../utils/types';
 import { checkAuth, jsonResponse, generateToken } from '../utils/auth';
+import { sendEmail } from '../utils/email';
+import { sendTelegramNotification } from '../utils/telegram';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
@@ -35,7 +37,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Direct mark paid from admin dashboard
         if (body.action === 'mark_paid' && body.id) {
-            const sub = await context.env.DB.prepare("SELECT * FROM subscriptions WHERE id = ?").bind(body.id).first<any>();
+            const sub = await context.env.DB.prepare(`
+                SELECT s.*, m.full_name as member_name, m.email as member_email, p.name as plan_name 
+                FROM subscriptions s
+                JOIN members m ON s.member_id = m.id
+                JOIN plans p ON s.plan_id = p.id
+                WHERE s.id = ?
+            `).bind(body.id).first<any>();
             if (!sub) return jsonResponse({ success: false, error: 'Sub not found' }, 404);
             
             const monthlyPrice = sub.amount_due / sub.billing_cycle_months;
@@ -66,6 +74,52 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 VALUES (?, ?, ?, 'approved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             `).bind(reqId, body.id, body.total_paid).run();
             
+            // Try sending email
+            const newDateParts = newDateStr.split('-');
+            const formattedNewDate = newDateParts.length === 3 ? `${newDateParts[2]}-${newDateParts[1]}-${newDateParts[0]}` : newDateStr;
+
+            const emailBody = `Chào ${sub.member_name},\n\nAdmin đã xác nhận thanh toán thành công số tiền ${body.total_paid.toLocaleString()} VNĐ cho gói ${sub.plan_name}.\nHạn dùng tiếp theo của bạn là: ${formattedNewDate}.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`;
+
+            const htmlBody = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #10B981; padding: 20px; text-align: center;">
+                    <h2 style="color: white; margin: 0;">Thanh Toán Thành Công 🎉</h2>
+                </div>
+                <div style="padding: 30px; background-color: #ffffff;">
+                    <h3 style="color: #111827; margin-top: 0;">Chào ${sub.member_name},</h3>
+                    <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Admin đã nhận được khoản thanh toán của bạn cho gói dịch vụ <strong>${sub.plan_name}</strong>.</p>
+                    
+                    <div style="background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #A7F3D0;">
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Số tiền đã thanh toán:</strong> ${body.total_paid.toLocaleString()} VNĐ</p>
+                        <p style="margin: 5px 0; color: #065F46;"><strong>Ngày đến hạn tiếp theo:</strong> <span style="font-size: 18px; font-weight: bold;">${formattedNewDate}</span></p>
+                    </div>
+                    
+                    <p style="color: #4b5563; font-size: 16px;">Chúc bạn có những trải nghiệm tuyệt vời cùng gia đình và bạn bè!</p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+                    <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
+                        <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin:</strong></p>
+                        <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
+                        <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
+                        <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            if (sub.send_email !== 0) {
+                await sendEmail(context.env, {
+                    to: sub.member_email,
+                    subject: `[Xác nhận] Thanh toán thành công - ${sub.plan_name}`,
+                    body: emailBody,
+                    htmlBody: htmlBody
+                });
+            }
+
+            // Telegram Notification
+            const tgMessage = `✅ <b>Đã gia hạn nhanh (Thanh toán thành công)</b>\n👤 Khách hàng: <b>${sub.member_name}</b>\n📦 Gói: <b>${sub.plan_name}</b>\n💰 Số tiền: <b>${body.total_paid.toLocaleString()}đ</b>\n📅 Hạn mới: <b>${formattedNewDate}</b>`;
+            context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+
             return jsonResponse({ success: true, data: { new_date: newDateStr } });
         }
 
@@ -92,12 +146,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
         
         await context.env.DB.prepare(`
-            INSERT INTO subscriptions (id, member_id, plan_id, start_date, end_date, next_due_date, amount_due, billing_cycle_months, status, user_token, personal_note)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO subscriptions (id, member_id, plan_id, start_date, end_date, next_due_date, amount_due, billing_cycle_months, status, user_token, personal_note, send_email)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             id, body.member_id, body.plan_id, body.start_date, body.end_date || null, 
             body.next_due_date, body.amount_due, body.billing_cycle_months || 1,
-            body.status || 'active', token, body.personal_note || null
+            body.status || 'active', token, body.personal_note || null,
+            body.send_email !== undefined ? body.send_email : 1
         ).run();
 
         return jsonResponse({ success: true, data: { id, token } });
@@ -147,11 +202,12 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
         await context.env.DB.prepare(`
             UPDATE subscriptions 
-            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?, member_id = ?
+            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?, member_id = ?, send_email = ?
             WHERE id = ?
         `).bind(
             body.start_date, body.next_due_date, body.amount_due, 
-            body.billing_cycle_months || 1, body.status, targetPlanId, targetMemberId, id
+            body.billing_cycle_months || 1, body.status, targetPlanId, targetMemberId,
+            body.send_email !== undefined ? body.send_email : 1, id
         ).run();
 
         return jsonResponse({ success: true });

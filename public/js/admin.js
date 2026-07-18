@@ -873,6 +873,7 @@ window.adminApp = {
         document.getElementById('sub-id').value = '';
         document.getElementById('sub-cycle').value = '1';
         document.getElementById('sub-status').value = 'active';
+        document.getElementById('sub-send-email').checked = true;
         document.getElementById('modal-sub').classList.add('active');
     },
     editSub: async (id) => {
@@ -888,6 +889,7 @@ window.adminApp = {
         document.getElementById('sub-amount').value = s.amount_due;
         document.getElementById('sub-cycle').value = s.billing_cycle_months;
         document.getElementById('sub-status').value = s.status;
+        document.getElementById('sub-send-email').checked = (s.send_email !== 0);
         document.getElementById('modal-sub').classList.add('active');
     },
     deleteSub: async (id) => {
@@ -975,7 +977,8 @@ document.getElementById('form-sub').addEventListener('submit', async (e) => {
         next_due_date: document.getElementById('sub-due').value,
         amount_due: parseFloat(document.getElementById('sub-amount').value),
         billing_cycle_months: parseInt(document.getElementById('sub-cycle').value) || 1,
-        status: document.getElementById('sub-status').value
+        status: document.getElementById('sub-status').value,
+        send_email: document.getElementById('sub-send-email').checked ? 1 : 0
     };
     try {
         if (id) {

@@ -22,7 +22,7 @@
         </div>
 
         <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px; position: relative;">
-            <button onclick="toggleLanguage()" class="btn" style="position: absolute; top: 1rem; left: 1rem; background: var(--bg-card); color: var(--text-main); padding: 0.4rem 0.75rem; border: 1px solid var(--border-color); font-size: 0.85rem; border-radius: 20px; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"><i class="ph ph-translate"></i> <span data-i18n="lang_switch">Tiếng Việt (VI)</span></button>
+            <button onclick="toggleLanguage()" data-icon-only="true" class="btn" style="position: absolute; top: 1rem; left: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i class="ph ph-translate"></i></button>
             <button id="btnToggleTheme" data-icon-only="true" class="btn"
                 style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i
                     class="ph ph-sun"></i></button>
@@ -72,6 +72,12 @@
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
                     <span data-i18n="portal_confirm_desc">Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên dưới.</span>
                 </p>
+                <div style="background-color: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <i class="ph ph-lightbulb" style="color: var(--primary); font-size: 1.25rem; flex-shrink: 0;"></i>
+                    <span style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4;" data-i18n="portal_tip_pay_more">
+                        <strong>Mẹo:</strong> Bạn có thể chuyển khoản số tiền lớn hơn (VD: chuyển gấp đôi hoặc gấp 3) để gia hạn nhiều chu kỳ cùng lúc. Hệ thống sẽ tự động tính toán thời gian gia hạn cộng thêm.
+                    </span>
+                </div>
                 <textarea id="p-note" class="form-control" rows="2" data-i18n-placeholder="portal_note_ph" placeholder="Ghi chú (VD: Đã CK Timo)"></textarea>
                 <button id="btnConfirmPay" class="btn btn-success"
                     style="width: 100%; margin-top: 1rem; padding: 1rem;">

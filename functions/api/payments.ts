@@ -35,7 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         const { DB } = context.env;
         const reqInfo = await DB.prepare(`
-            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, m.email, m.full_name, p.name as plan_name
+            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, s.send_email, m.email, m.full_name, p.name as plan_name
             FROM payment_requests pr
             JOIN subscriptions s ON pr.subscription_id = s.id
             JOIN members m ON s.member_id = m.id
@@ -117,12 +117,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             </div>
             `;
 
-            await sendEmail(context.env, {
-                to: reqInfo.email,
-                subject: `[Xác nhận] Thanh toán thành công - ${reqInfo.plan_name}`,
-                body: emailBody,
-                htmlBody: htmlBody
-            });
+            if (reqInfo.send_email !== 0) {
+                await sendEmail(context.env, {
+                    to: reqInfo.email,
+                    subject: `[Xác nhận] Thanh toán thành công - ${reqInfo.plan_name}`,
+                    body: emailBody,
+                    htmlBody: htmlBody
+                });
+            }
 
             // Telegram Notification
             const tgMessage = `✅ <b>Đã duyệt thanh toán</b>\n👤 Khách hàng: <b>${reqInfo.full_name}</b>\n📦 Gói: <b>${reqInfo.plan_name}</b>\n💰 Số tiền: <b>${totalPaid.toLocaleString()}đ</b>\n📅 Hạn mới: <b>${formattedNewDate}</b>`;
@@ -166,12 +168,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             </div>
             `;
 
-            await sendEmail(context.env, {
-                to: reqInfo.email,
-                subject: `[Từ chối] Yêu cầu thanh toán - ${reqInfo.plan_name}`,
-                body: emailBody,
-                htmlBody: htmlBody
-            });
+            if (reqInfo.send_email !== 0) {
+                await sendEmail(context.env, {
+                    to: reqInfo.email,
+                    subject: `[Từ chối] Yêu cầu thanh toán - ${reqInfo.plan_name}`,
+                    body: emailBody,
+                    htmlBody: htmlBody
+                });
+            }
 
             // Telegram Notification
             const tgMessage = `❌ <b>Đã từ chối thanh toán</b>\n👤 Khách hàng: <b>${reqInfo.full_name}</b>\n📦 Gói: <b>${reqInfo.plan_name}</b>\n💬 Lý do: <i>${rejectReason}</i>`;

@@ -30,6 +30,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             JOIN members m ON s.member_id = m.id
             JOIN plans p ON s.plan_id = p.id
             WHERE s.status = 'active'
+            AND (s.send_email = 1 OR s.send_email IS NULL)
             AND days_left IN (${reminderDaysArr.join(',')})
         `).all<any>();
 

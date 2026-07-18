@@ -519,6 +519,10 @@
                     <option value="pending_payment" data-i18n="opt_pending">Pending Payment</option>
                 </select>
             </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                <input type="checkbox" id="sub-send-email" checked style="width: auto;">
+                <label for="sub-send-email" data-i18n="lbl_sub_send_email" style="margin: 0; font-weight: normal;">Gửi email tự động cho thuê bao này</label>
+            </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-sub')" data-i18n="btn_cancel">Cancel</button>

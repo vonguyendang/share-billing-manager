@@ -58,7 +58,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         
         // 1. Verify token
         const subInfo = await DB.prepare(`
-            SELECT s.id, s.amount_due, m.email, m.full_name, p.name as plan_name
+            SELECT s.id, s.amount_due, s.send_email, m.email, m.full_name, p.name as plan_name
             FROM subscriptions s
             JOIN members m ON s.member_id = m.id
             JOIN plans p ON s.plan_id = p.id
@@ -129,12 +129,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         `;
 
         // 4. Send email confirmation to user (optional, can be disabled)
-        await sendEmail(context.env, {
-            to: subInfo.email,
-            subject: `[Đã ghi nhận] Yêu cầu thanh toán - ${subInfo.plan_name}`,
-            body: emailBody,
-            htmlBody: htmlBody
-        });
+        if (subInfo.send_email !== 0) {
+            await sendEmail(context.env, {
+                to: subInfo.email,
+                subject: `[Đã ghi nhận] Yêu cầu thanh toán - ${subInfo.plan_name}`,
+                body: emailBody,
+                htmlBody: htmlBody
+            });
+        }
 
         // 5. Send Telegram notification to admin
         const amount = body.amount || subInfo.amount_due;
