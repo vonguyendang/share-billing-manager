@@ -11,7 +11,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     try {
         const { DB } = context.env;
         const sub = await DB.prepare(`
-            SELECT s.id, s.start_date, s.next_due_date, s.amount_due, s.status, s.personal_note,
+            SELECT s.id, s.start_date, s.next_due_date, s.amount_due, s.status, s.personal_note, s.billing_cycle_months,
                    m.full_name as member_name, p.name as plan_name, p.note as plan_note
             FROM subscriptions s
             JOIN members m ON s.member_id = m.id
