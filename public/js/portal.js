@@ -96,68 +96,103 @@ async function init() {
 
         // Generate VietQR if bank info is configured
         if (settings.bank_id && settings.bank_account_number) {
-            const bankBin = settings.bank_id;
-            const accNo = settings.bank_account_number;
-            const accName = settings.bank_account_name || 'ADMIN';
-            const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
-
-            let bankDisplayName = bankBin;
-            try {
-                let banksData = null;
+            let currentBankIndex = 0;
+            const banks = [
+                {
+                    id: settings.bank_id,
+                    accNo: settings.bank_account_number,
+                    accName: settings.bank_account_name || 'ADMIN'
+                }
+            ];
+            
+            if (settings.alt_bank_id && settings.alt_bank_account_number) {
+                banks.push({
+                    id: settings.alt_bank_id,
+                    accNo: settings.alt_bank_account_number,
+                    accName: settings.alt_bank_account_name || 'ADMIN'
+                });
+                
+                const btnSwitch = document.getElementById('btnSwitchBank');
+                if (btnSwitch) {
+                    btnSwitch.classList.remove('hidden');
+                    btnSwitch.addEventListener('click', () => {
+                        currentBankIndex = currentBankIndex === 0 ? 1 : 0;
+                        renderBank(banks[currentBankIndex]);
+                    });
+                }
+            }
+            
+            let banksDataList = null;
+            async function fetchBanksData() {
                 try {
                     const apiRes = await fetch('https://api.vietqr.io/v2/banks');
-                    if (apiRes.ok) banksData = await apiRes.json();
+                    if (apiRes.ok) banksDataList = await apiRes.json();
                 } catch(e) {}
                 
-                if (!banksData) {
-                    const localRes = await fetch('/data/banks.json');
-                    if (localRes.ok) banksData = await localRes.json();
+                if (!banksDataList) {
+                    try {
+                        const localRes = await fetch('/data/banks.json');
+                        if (localRes.ok) banksDataList = await localRes.json();
+                    } catch(e) {}
                 }
+            }
+            
+            await fetchBanksData();
+            
+            const addInfo = `${sub.member_name} CT ${sub.plan_name}`;
+            
+            function renderBank(bankObj) {
+                let bankDisplayName = bankObj.id;
                 
-                if (banksData && banksData.data) {
-                    const normalizedBin = String(bankBin).trim().toLowerCase();
-                    const bankInfo = banksData.data.find(b => 
+                if (banksDataList && banksDataList.data) {
+                    const normalizedBin = String(bankObj.id).trim().toLowerCase();
+                    const bInfo = banksDataList.data.find(b => 
                         String(b.bin).toLowerCase() === normalizedBin || 
                         String(b.shortName).toLowerCase() === normalizedBin || 
                         String(b.short_name).toLowerCase() === normalizedBin
                     );
-                    if (bankInfo) {
-                        bankDisplayName = `${bankInfo.shortName} - ${bankInfo.name}`;
-                    }
+                    if (bInfo) bankDisplayName = `${bInfo.shortName} - ${bInfo.name}`;
                 }
-            } catch (e) {
-                console.error('Failed to load banks data', e);
+
+                document.getElementById('p-bank-name').innerText = bankDisplayName;
+                document.getElementById('p-bank-account').innerText = bankObj.accNo;
+                document.getElementById('p-bank-owner').innerText = bankObj.accName;
+                document.getElementById('p-transfer-note').innerText = addInfo;
+
+                const qrUrl = `https://img.vietqr.io/image/${bankObj.id}-${bankObj.accNo}-qr_only.png?amount=${sub.amount_due}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(bankObj.accName)}`;
+                const qrImg = document.getElementById('qr-code');
+                qrImg.src = qrUrl;
+                qrImg.style.display = 'block';
+                document.getElementById('qr-instruction').style.display = 'block';
+                document.getElementById('bankInfoSection').classList.remove('hidden');
             }
-
-            document.getElementById('p-bank-name').innerText = bankDisplayName;
-            document.getElementById('p-bank-account').innerText = accNo;
-            document.getElementById('p-bank-owner').innerText = accName;
-            document.getElementById('p-transfer-note').innerText = addInfo;
-
-            const qrUrl = `https://img.vietqr.io/image/${bankBin}-${accNo}-qr_only.png?amount=${sub.amount_due}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accName)}`;
-            const qrImg = document.getElementById('qr-code');
-            qrImg.src = qrUrl;
-            qrImg.style.display = 'block';
-            document.getElementById('qr-instruction').style.display = 'block';
-            document.getElementById('bankInfoSection').classList.remove('hidden');
+            
+            renderBank(banks[currentBankIndex]);
 
             const btnCopyAcc = document.getElementById('btnCopyAcc');
             if (btnCopyAcc) {
-                btnCopyAcc.addEventListener('click', () => {
-                    navigator.clipboard.writeText(accNo);
-                    const originalText = btnCopyAcc.innerText;
-                    btnCopyAcc.innerText = t('btn_copied');
-                    setTimeout(() => btnCopyAcc.innerText = originalText, 2000);
+                // Remove old event listener if we were to re-run this, but this block only runs once per init
+                // We use cloneNode to safely replace any existing listeners
+                const newBtnCopyAcc = btnCopyAcc.cloneNode(true);
+                btnCopyAcc.parentNode.replaceChild(newBtnCopyAcc, btnCopyAcc);
+                newBtnCopyAcc.addEventListener('click', () => {
+                    const currentAccNo = document.getElementById('p-bank-account').innerText;
+                    navigator.clipboard.writeText(currentAccNo);
+                    const originalText = newBtnCopyAcc.innerText;
+                    newBtnCopyAcc.innerText = t('btn_copied');
+                    setTimeout(() => newBtnCopyAcc.innerText = originalText, 2000);
                 });
             }
 
             const btnCopyNote = document.getElementById('btnCopyNote');
             if (btnCopyNote) {
-                btnCopyNote.addEventListener('click', () => {
+                const newBtnCopyNote = btnCopyNote.cloneNode(true);
+                btnCopyNote.parentNode.replaceChild(newBtnCopyNote, btnCopyNote);
+                newBtnCopyNote.addEventListener('click', () => {
                     navigator.clipboard.writeText(addInfo);
-                    const originalText = btnCopyNote.innerText;
-                    btnCopyNote.innerText = t('btn_copied');
-                    setTimeout(() => btnCopyNote.innerText = originalText, 2000);
+                    const originalText = newBtnCopyNote.innerText;
+                    newBtnCopyNote.innerText = t('btn_copied');
+                    setTimeout(() => newBtnCopyNote.innerText = originalText, 2000);
                 });
             }
         }

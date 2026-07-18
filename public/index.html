@@ -396,6 +396,37 @@
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_alt_bank">Ngân hàng dự phòng (Tùy chọn)</h3>
+                    <div class="form-group" style="position: relative; z-index: 99;">
+                        <label data-i18n="bank_code">Mã Ngân Hàng Dự Phòng</label>
+                        <div class="custom-select-wrapper" id="alt-bank-select-wrapper">
+                            <div class="custom-select" id="alt-bank-select">
+                                <div class="custom-select-trigger" id="alt-bank-select-trigger">
+                                    <div style="display: flex; align-items: center;" id="alt-bank-select-content">
+                                        <span data-i18n="bank_loading">Đang tải danh sách ngân hàng...</span>
+                                    </div>
+                                    <div class="arrow"></div>
+                                </div>
+                                <div class="custom-options" id="alt-bank-options">
+                                    <div class="custom-option-search">
+                                        <input type="text" id="alt-bank-search-input" data-i18n-placeholder="bank_search" placeholder="Tìm kiếm ngân hàng...">
+                                    </div>
+                                    <div id="alt-bank-options-list"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="setting-alt-bank-id">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="bank_acc">Số Tài Khoản (Dự Phòng)</label>
+                        <input type="text" id="setting-alt-bank-account-number" class="form-control" data-i18n-placeholder="bank_acc_ph" placeholder="Nhập số tài khoản...">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="bank_owner">Tên Chủ Tài Khoản (Dự Phòng)</label>
+                        <input type="text" id="setting-alt-bank-account-name" class="form-control" data-i18n-placeholder="setting_bank_name" placeholder="VD: NGUYEN VAN A">
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
                     <h3 style="margin-bottom: 1rem;" data-i18n="setting_client_rights">Quyền của Khách hàng</h3>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">

@@ -419,13 +419,19 @@ async function loadSettings() {
     document.getElementById('setting-bank-id').value = settingsData.bank_id || '';
     document.getElementById('setting-bank-account-number').value = settingsData.bank_account_number || '';
     document.getElementById('setting-bank-account-name').value = settingsData.bank_account_name || '';
+    
+    document.getElementById('setting-alt-bank-id').value = settingsData.alt_bank_id || '';
+    document.getElementById('setting-alt-bank-account-number').value = settingsData.alt_bank_account_number || '';
+    document.getElementById('setting-alt-bank-account-name').value = settingsData.alt_bank_account_name || '';
+    
     document.getElementById('setting-allow-user-cancel').checked = settingsData.allow_user_cancel === 1;
 
     if (!window.bankSelectInitialized) {
         initBankSelect();
         window.bankSelectInitialized = true;
     } else {
-        updateBankTriggerDisplay();
+        updateBankTriggerDisplay('bank');
+        updateBankTriggerDisplay('alt-bank');
     }
 }
 
@@ -1018,6 +1024,9 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         bank_id: document.getElementById('setting-bank-id').value,
         bank_account_number: document.getElementById('setting-bank-account-number').value,
         bank_account_name: document.getElementById('setting-bank-account-name').value,
+        alt_bank_id: document.getElementById('setting-alt-bank-id').value,
+        alt_bank_account_number: document.getElementById('setting-alt-bank-account-number').value,
+        alt_bank_account_name: document.getElementById('setting-alt-bank-account-name').value,
         allow_user_cancel: document.getElementById('setting-allow-user-cancel').checked ? 1 : 0
     };
     try {
