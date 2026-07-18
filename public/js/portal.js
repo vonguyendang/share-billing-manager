@@ -82,6 +82,7 @@ async function init() {
 
         document.getElementById('p-plan').innerText = sub.plan_name;
         document.getElementById('p-member').innerText = sub.member_name;
+        document.getElementById('p-start').innerText = formatDate(sub.start_date);
         document.getElementById('p-cycle').innerText = `${sub.billing_cycle_months} ${t('portal_cycle_month_unit')}`;
         document.getElementById('p-due').innerText = formatDate(sub.next_due_date);
         document.getElementById('p-amount').innerText = formatCurrency(sub.amount_due);
