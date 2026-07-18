@@ -31,7 +31,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
         // Fetch settings (bank info, user cancel)
         const settings = await DB.prepare(`
-            SELECT bank_id, bank_account_number, bank_account_name, allow_user_cancel
+            SELECT bank_id, bank_account_number, bank_account_name, 
+                   alt_bank_id, alt_bank_account_number, alt_bank_account_name, 
+                   allow_user_cancel
             FROM admin_settings WHERE id = 'global'
         `).first<any>();
 
