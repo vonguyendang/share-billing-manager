@@ -114,9 +114,11 @@ async function init() {
                 
                 const btnSwitch = document.getElementById('btnSwitchBank');
                 const btnHint = document.getElementById('switchBankHint');
+                const tipSwitch = document.getElementById('switchBankTip');
                 if (btnSwitch) {
                     btnSwitch.classList.remove('hidden');
                     if (btnHint) btnHint.classList.remove('hidden');
+                    if (tipSwitch) tipSwitch.classList.remove('hidden');
                     btnSwitch.addEventListener('click', () => {
                         currentBankIndex = currentBankIndex === 0 ? 1 : 0;
                         renderBank(banks[currentBankIndex]);

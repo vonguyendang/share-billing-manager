@@ -22,11 +22,14 @@
         </div>
 
         <div id="portalView" class="card hidden" style="width: 100%; max-width: 500px; position: relative;">
-            <button onclick="toggleLanguage()" data-icon-only="true" class="btn" style="position: absolute; top: 1rem; left: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i class="ph ph-translate"></i></button>
+            <button onclick="toggleLanguage()" data-icon-only="true" class="btn"
+                style="position: absolute; top: 1rem; left: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i
+                    class="ph ph-translate"></i></button>
             <button id="btnToggleTheme" data-icon-only="true" class="btn"
                 style="position: absolute; top: 1rem; right: 1rem; background: transparent; color: var(--text-muted); padding: 0.5rem;"><i
                     class="ph ph-sun"></i></button>
-            <h2 style="margin-bottom: 1.5rem; text-align: center; margin-top: 1rem;"><span data-i18n="portal_title">Cổng Thông Tin Thành Viên</span></h2>
+            <h2 style="margin-bottom: 1.5rem; text-align: center; margin-top: 1rem;"><span data-i18n="portal_title">Cổng
+                    Thông Tin Thành Viên</span></h2>
 
             <div style="background: var(--bg-main); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
                 <p><strong data-i18n="portal_lbl_plan">Gói:</strong> <span id="p-plan"></span></p>
@@ -34,7 +37,8 @@
                 <p><strong data-i18n="portal_lbl_start">Ngày bắt đầu:</strong> <span id="p-start"></span></p>
                 <p><strong data-i18n="portal_lbl_due">Hạn thanh toán:</strong> <span id="p-due"
                         style="color: var(--danger); font-weight: bold;"></span></p>
-                <p><strong data-i18n="portal_lbl_amount">Số tiền cần thanh toán:</strong> <span id="p-amount" style="font-weight: bold;"></span>
+                <p><strong data-i18n="portal_lbl_amount">Số tiền cần thanh toán:</strong> <span id="p-amount"
+                        style="font-weight: bold;"></span>
                 </p>
                 <p><strong data-i18n="portal_lbl_status">Trạng thái:</strong> <span id="p-status"></span></p>
             </div>
@@ -42,17 +46,20 @@
             <div id="bankInfoSection" class="hidden"
                 style="background: var(--bg-main); border: 1px dashed var(--primary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; justify-content: space-between;">
                 <div style="flex: 1 1 250px;">
-                    <h4 style="margin-bottom: 0.5rem; color: var(--primary);" data-i18n="portal_lbl_transfer">Thông tin chuyển khoản:</h4>
+                    <h4 style="margin-bottom: 0.5rem; color: var(--primary);" data-i18n="portal_lbl_transfer">Thông tin
+                        chuyển khoản:</h4>
                     <p><span data-i18n="portal_lbl_bank">Ngân hàng:</span> <strong id="p-bank-name"></strong></p>
                     <p style="margin: 0.5rem 0; line-height: 1.5;">
-                        <span><span data-i18n="portal_lbl_acc">Số tài khoản:</span> <strong id="p-bank-account"></strong></span>
+                        <span><span data-i18n="portal_lbl_acc">Số tài khoản:</span> <strong
+                                id="p-bank-account"></strong></span>
                         <button id="btnCopyAcc" class="btn"
                             style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500; margin-left: 4px; vertical-align: middle;">Copy</button>
                     </p>
                     <p><span data-i18n="portal_lbl_owner">Chủ tài khoản:</span> <strong id="p-bank-owner"></strong></p>
                     <p
                         style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0; line-height: 1.5;">
-                        <span><span data-i18n="portal_lbl_note">Nội dung CK:</span> <strong id="p-transfer-note"></strong></span>
+                        <span><span data-i18n="portal_lbl_note">Nội dung CK:</span> <strong
+                                id="p-transfer-note"></strong></span>
                         <button id="btnCopyNote" class="btn"
                             style="padding: 2px 10px; font-size: 0.75rem; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: 500; margin-left: 4px; vertical-align: middle;">Copy</button>
                     </p>
@@ -64,25 +71,37 @@
                     <div id="qr-instruction"
                         style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.5rem; display: none;">
                         <span data-i18n="portal_lbl_qr">Quét QR để thanh toán</span></div>
-                    <button id="btnSwitchBank" class="btn hidden" style="margin-top: 0.25rem; padding: 4px 10px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed rgba(59, 130, 246, 0.5); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; justify-content: center; width: 100%; max-width: 150px; font-weight: 500; transition: all 0.2s;" title="Nếu ngân hàng hiện tại bị lỗi bảo trì không thể chuyển khoản, hãy bấm vào đây để chuyển sang ngân hàng dự phòng.">
-                        <i class="ph ph-arrows-left-right" style="font-size: 1rem;"></i> Đổi ngân hàng
+                    <button id="btnSwitchBank" class="btn hidden" style="margin-top: 0.25rem; padding: 4px 10px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed rgba(59, 130, 246, 0.5); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; justify-content: center; width: 100%; max-width: 150px; font-weight: 500; transition: all 0.2s;">
+                        <i class="ph ph-arrows-left-right" style="font-size: 1rem;"></i> <span data-i18n="portal_btn_switch_bank">Đổi ngân hàng</span>
                     </button>
-                    <span id="switchBankHint" class="hidden" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.35rem; text-align: center; max-width: 150px; line-height: 1.3;">(Bấm để đổi nếu NH bị lỗi)</span>
+                    <span id="switchBankHint" class="hidden" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.35rem; text-align: center; max-width: 150px; line-height: 1.3;" data-i18n="portal_hint_switch_bank">(Bấm để đổi nếu NH bị lỗi)</span>
                 </div>
             </div>
 
             <div id="paymentFormSection">
+                <div id="switchBankTip" class="hidden" style="background-color: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 6px; padding: 0.75rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: flex-start;">
+                    <i class="ph ph-info" style="color: var(--primary); font-size: 1.25rem; margin-top: 0.1rem;"></i>
+                    <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.5; margin: 0;">
+                        <strong data-i18n="portal_tip_title">Mẹo:</strong> <span data-i18n="portal_tip_switch_bank">Nếu ngân hàng hiện tại bị lỗi bảo trì không thể chuyển khoản, hãy bấm vào nút Đổi ngân hàng bên dưới mã QR để chuyển sang ngân hàng dự phòng.</span>
+                    </p>
+                </div>
+                
                 <h3 data-i18n="portal_confirm_title">Xác nhận đã thanh toán</h3>
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
-                    <span data-i18n="portal_confirm_desc">Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên dưới.</span>
+                    <span data-i18n="portal_confirm_desc">Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên
+                        dưới.</span>
                 </p>
-                <div style="background-color: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: flex-start;">
+                <div
+                    style="background-color: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: flex-start;">
                     <i class="ph ph-lightbulb" style="color: var(--primary); font-size: 1.25rem; flex-shrink: 0;"></i>
-                    <span style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4;" data-i18n="portal_tip_pay_more">
-                        <strong>Mẹo:</strong> Bạn có thể chuyển khoản số tiền lớn hơn (VD: chuyển gấp đôi hoặc gấp 3) để gia hạn nhiều chu kỳ cùng lúc. Hệ thống sẽ tự động tính toán thời gian gia hạn cộng thêm.
+                    <span style="font-size: 0.85rem; color: var(--text-main); line-height: 1.4;"
+                        data-i18n="portal_tip_pay_more">
+                        <strong>Mẹo:</strong> Bạn có thể chuyển khoản số tiền lớn hơn (VD: chuyển gấp đôi hoặc gấp 3) để
+                        gia hạn nhiều chu kỳ cùng lúc. Hệ thống sẽ tự động tính toán thời gian gia hạn cộng thêm.
                     </span>
                 </div>
-                <textarea id="p-note" class="form-control" rows="2" data-i18n-placeholder="portal_note_ph" placeholder="Ghi chú (VD: Đã CK Timo)"></textarea>
+                <textarea id="p-note" class="form-control" rows="2" data-i18n-placeholder="portal_note_ph"
+                    placeholder="Ghi chú (VD: Đã CK Timo)"></textarea>
                 <button id="btnConfirmPay" class="btn btn-success"
                     style="width: 100%; margin-top: 1rem; padding: 1rem;">
                     <span data-i18n="portal_btn_confirm">Tôi đã chuyển khoản</span>
@@ -96,14 +115,18 @@
 
             <div id="cancelPendingSection" class="hidden"
                 style="text-align: center; color: var(--warning); margin-top: 1rem; padding: 1rem; border: 1px dashed var(--warning); border-radius: 0.5rem;">
-                <span data-i18n="portal_msg_cancel">Bạn đã yêu cầu hủy gia hạn ở chu kỳ sau. Gói dịch vụ sẽ ngắt khi đến hạn.</span>
+                <span data-i18n="portal_msg_cancel">Bạn đã yêu cầu hủy gia hạn ở chu kỳ sau. Gói dịch vụ sẽ ngắt khi đến
+                    hạn.</span>
             </div>
 
             <div id="userCancelSection" class="hidden"
                 style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: center;">
-                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;"><span data-i18n="portal_cancel_desc1">Nếu bạn không muốn tiếp tục sử dụng vào chu kỳ sau, hãy bấm nút dưới đây.</span></p>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;"><span
+                        data-i18n="portal_cancel_desc1">Nếu bạn không muốn tiếp tục sử dụng vào chu kỳ sau, hãy bấm nút
+                        dưới đây.</span></p>
                 <button id="btnCancelSub" class="btn"
-                    style="background-color: transparent; color: var(--danger); border: 1px solid var(--danger);" data-i18n="portal_btn_cancel">Hủy gia hạn chu kỳ sau</button>
+                    style="background-color: transparent; color: var(--danger); border: 1px solid var(--danger);"
+                    data-i18n="portal_btn_cancel">Hủy gia hạn chu kỳ sau</button>
             </div>
         </div>
     </div>
