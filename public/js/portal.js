@@ -261,4 +261,23 @@ document.getElementById('btnCancelSub')?.addEventListener('click', async () => {
     }
 });
 
+// QR Zoom Logic
+const qrImg = document.getElementById('qr-code');
+const qrOverlay = document.getElementById('qrOverlay');
+const qrOverlayImg = document.getElementById('qrOverlayImg');
+
+if (qrImg && qrOverlay && qrOverlayImg) {
+    qrImg.style.cursor = 'zoom-in';
+    qrImg.title = t('portal_qr_zoom') || 'Click to zoom';
+    
+    qrImg.addEventListener('click', () => {
+        qrOverlayImg.src = qrImg.src;
+        qrOverlay.style.display = 'flex';
+    });
+
+    qrOverlay.addEventListener('click', () => {
+        qrOverlay.style.display = 'none';
+    });
+}
+
 init();

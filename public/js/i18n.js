@@ -101,6 +101,7 @@ const translations = {
         'hist_empty': 'Không có giao dịch nào gần đây',
 
         // Portal
+        'portal_qr_zoom': 'Bấm để phóng to',
         'my_subs_title': 'Gói cước đang sử dụng',
         'payment_hist_title': 'Lịch sử thanh toán của bạn',
         'btn_report_payment': 'Báo đã thanh toán',
@@ -411,7 +412,8 @@ const translations = {
         'hist_empty': 'No recent transactions',
 
         // Portal
-        'my_subs_title': 'Active Subscriptions',
+        'portal_qr_zoom': 'Click to zoom',
+        'my_subs_title': 'My Subscriptions',
         'payment_hist_title': 'Your Payment History',
         'btn_report_payment': 'Report Payment',
         'lbl_amount': 'Amount',
