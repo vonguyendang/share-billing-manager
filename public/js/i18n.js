@@ -639,7 +639,7 @@ function applyTranslations() {
             if (el.tagName === 'INPUT' && (el.type === 'button' || el.type === 'submit')) {
                 el.value = t(key);
             } else {
-                el.textContent = t(key);
+                el.innerHTML = t(key);
             }
         }
     });
