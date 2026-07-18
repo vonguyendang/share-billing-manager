@@ -269,7 +269,7 @@ const translations = {
         'portal_lbl_note': 'Nội dung CK:',
         'portal_lbl_qr': 'Quét QR để thanh toán',
         'portal_btn_switch_bank': 'Đổi ngân hàng',
-        'portal_hint_switch_bank': '(Bấm để đổi nếu NH bị lỗi)',
+        'portal_hint_switch_bank': '(Bấm để đổi nếu Ngân hàng bị lỗi)',
         'portal_tip_switch_bank': 'Nếu ngân hàng hiện tại bị lỗi bảo trì không thể chuyển khoản, hãy bấm vào nút Đổi ngân hàng bên dưới mã QR để chuyển sang ngân hàng dự phòng.',
         'portal_confirm_title': 'Xác nhận đã thanh toán',
         'portal_confirm_desc': 'Vui lòng chuyển khoản cho Admin và bấm nút xác nhận bên dưới.',
