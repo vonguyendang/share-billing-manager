@@ -476,6 +476,12 @@
             <div class="form-group"><label data-i18n="lbl_total_price">Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
             <div class="form-group"><label data-i18n="sub_cycle">Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
             <div class="form-group"><label data-i18n="lbl_plan_slots">Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
+            <div class="form-group"><label data-i18n="lbl_status">Status</label>
+                <select id="plan-status" class="form-control">
+                    <option value="1" data-i18n="opt_active">Active</option>
+                    <option value="0" data-i18n="opt_inactive">Inactive</option>
+                </select>
+            </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-plan')" data-i18n="btn_cancel">Cancel</button>
@@ -493,6 +499,12 @@
             <div class="form-group"><label data-i18n="lbl_email">Email</label><input type="email" id="member-email" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_phone">Phone</label><input id="member-phone" class="form-control"></div>
             <div class="form-group"><label data-i18n="lbl_social">Socials / Note</label><input id="member-note" class="form-control" data-i18n-placeholder="ph_social" placeholder="FB/Zalo link or username"></div>
+            <div class="form-group"><label data-i18n="lbl_status">Status</label>
+                <select id="member-status" class="form-control">
+                    <option value="1" data-i18n="opt_active">Active</option>
+                    <option value="0" data-i18n="opt_inactive">Inactive</option>
+                </select>
+            </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-success" data-i18n="btn_save">Save</button>
                 <button type="button" class="btn" onclick="adminApp.closeModal('modal-member')" data-i18n="btn_cancel">Cancel</button>

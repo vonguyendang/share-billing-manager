@@ -810,6 +810,7 @@ window.adminApp = {
         document.getElementById('plan-modal-title').innerText = t('modal_add_plan');
         document.getElementById('form-plan').reset();
         document.getElementById('plan-id').value = '';
+        document.getElementById('plan-status').value = '1';
         document.getElementById('modal-plan').classList.add('active');
     },
     editPlan: (id) => {
@@ -822,6 +823,7 @@ window.adminApp = {
         document.getElementById('plan-price').value = p.total_price;
         document.getElementById('plan-cycle').value = p.renewal_cycle_months;
         document.getElementById('plan-slots').value = p.max_slots || 0;
+        document.getElementById('plan-status').value = p.active ? '1' : '0';
         document.getElementById('modal-plan').classList.add('active');
     },
     deletePlan: async (id) => {
@@ -841,6 +843,7 @@ window.adminApp = {
         document.getElementById('form-member').reset();
         document.getElementById('member-id').value = '';
         document.getElementById('member-note').value = '';
+        document.getElementById('member-status').value = '1';
         document.getElementById('modal-member').classList.add('active');
     },
     editMember: (id) => {
@@ -852,6 +855,7 @@ window.adminApp = {
         document.getElementById('member-email').value = m.email;
         document.getElementById('member-phone').value = m.phone || '';
         document.getElementById('member-note').value = m.note || '';
+        document.getElementById('member-status').value = m.active ? '1' : '0';
         document.getElementById('modal-member').classList.add('active');
     },
     deleteMember: async (id) => {
@@ -933,7 +937,7 @@ document.getElementById('form-plan').addEventListener('submit', async (e) => {
         total_price: parseFloat(document.getElementById('plan-price').value),
         renewal_cycle_months: parseInt(document.getElementById('plan-cycle').value),
         max_slots: parseInt(document.getElementById('plan-slots').value) || 0,
-        active: true
+        active: document.getElementById('plan-status').value === '1'
     };
     try {
         if (id) {
@@ -954,7 +958,7 @@ document.getElementById('form-member').addEventListener('submit', async (e) => {
         email: document.getElementById('member-email').value,
         phone: document.getElementById('member-phone').value,
         note: document.getElementById('member-note').value,
-        active: true
+        active: document.getElementById('member-status').value === '1'
     };
     try {
         if (id) {
