@@ -202,12 +202,12 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
         await context.env.DB.prepare(`
             UPDATE subscriptions 
-            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?, member_id = ?, send_email = ?
+            SET start_date = ?, next_due_date = ?, amount_due = ?, billing_cycle_months = ?, status = ?, plan_id = ?, member_id = ?, send_email = ?, personal_note = ?
             WHERE id = ?
         `).bind(
             body.start_date, body.next_due_date, body.amount_due, 
             body.billing_cycle_months || 1, body.status, targetPlanId, targetMemberId,
-            body.send_email !== undefined ? body.send_email : 1, id
+            body.send_email !== undefined ? body.send_email : 1, body.personal_note || null, id
         ).run();
 
         return jsonResponse({ success: true });

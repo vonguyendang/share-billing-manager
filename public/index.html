@@ -475,7 +475,9 @@
             <div class="form-group"><label data-i18n="lbl_category">Category</label><input id="plan-category" class="form-control" required></div>
             <div class="form-group"><label data-i18n="lbl_total_price">Total Price (VND)</label><input type="number" id="plan-price" class="form-control" required></div>
             <div class="form-group"><label data-i18n="sub_cycle">Cycle (Months)</label><input type="number" id="plan-cycle" class="form-control" value="1" required></div>
+            <div class="form-group"><label data-i18n="lbl_plan_anchor_date">Ngày bắt đầu chu kỳ gốc</label><input type="date" id="plan-anchor-date" class="form-control"></div>
             <div class="form-group"><label data-i18n="lbl_plan_slots">Max Slots (0 = Không giới hạn)</label><input type="number" id="plan-slots" class="form-control" value="0" required min="0"></div>
+            <div class="form-group"><label data-i18n="lbl_plan_note">Ghi chú gói cước</label><input type="text" id="plan-note" class="form-control" placeholder="Tài khoản: abc@gmail.com, Pass: 123"></div>
             <div class="form-group"><label data-i18n="lbl_status">Status</label>
                 <select id="plan-status" class="form-control">
                     <option value="1" data-i18n="opt_active">Active</option>
@@ -531,6 +533,7 @@
                     <option value="pending_payment" data-i18n="opt_pending">Pending Payment</option>
                 </select>
             </div>
+            <div class="form-group"><label data-i18n="lbl_sub_note">Ghi chú cá nhân (Admin thấy)</label><input type="text" id="sub-note" class="form-control" placeholder="Ví dụ: Cần nhắc nhở qua Zalo"></div>
             <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
                 <input type="checkbox" id="sub-send-email" checked style="width: auto;">
                 <label for="sub-send-email" data-i18n="lbl_sub_send_email" style="margin: 0; font-weight: normal;">Gửi email tự động cho thuê bao này</label>

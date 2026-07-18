@@ -810,6 +810,8 @@ window.adminApp = {
         document.getElementById('plan-modal-title').innerText = t('modal_add_plan');
         document.getElementById('form-plan').reset();
         document.getElementById('plan-id').value = '';
+        document.getElementById('plan-anchor-date').value = '';
+        document.getElementById('plan-note').value = '';
         document.getElementById('plan-status').value = '1';
         document.getElementById('modal-plan').classList.add('active');
     },
@@ -822,6 +824,8 @@ window.adminApp = {
         document.getElementById('plan-category').value = p.category;
         document.getElementById('plan-price').value = p.total_price;
         document.getElementById('plan-cycle').value = p.renewal_cycle_months;
+        document.getElementById('plan-anchor-date').value = p.renewal_anchor_date || '';
+        document.getElementById('plan-note').value = p.note || '';
         document.getElementById('plan-slots').value = p.max_slots || 0;
         document.getElementById('plan-status').value = p.active ? '1' : '0';
         document.getElementById('modal-plan').classList.add('active');
@@ -875,8 +879,11 @@ window.adminApp = {
         document.getElementById('sub-modal-title').innerText = t('modal_add_sub');
         document.getElementById('form-sub').reset();
         document.getElementById('sub-id').value = '';
+        document.getElementById('sub-due').value = '';
+        document.getElementById('sub-amount').value = '';
         document.getElementById('sub-cycle').value = '1';
         document.getElementById('sub-status').value = 'active';
+        document.getElementById('sub-note').value = '';
         document.getElementById('sub-send-email').checked = true;
         document.getElementById('modal-sub').classList.add('active');
     },
@@ -893,6 +900,7 @@ window.adminApp = {
         document.getElementById('sub-amount').value = s.amount_due;
         document.getElementById('sub-cycle').value = s.billing_cycle_months;
         document.getElementById('sub-status').value = s.status;
+        document.getElementById('sub-note').value = s.personal_note || '';
         document.getElementById('sub-send-email').checked = (s.send_email === undefined || s.send_email === null || s.send_email === 1);
         document.getElementById('modal-sub').classList.add('active');
     },
@@ -936,6 +944,8 @@ document.getElementById('form-plan').addEventListener('submit', async (e) => {
         category: document.getElementById('plan-category').value,
         total_price: parseFloat(document.getElementById('plan-price').value),
         renewal_cycle_months: parseInt(document.getElementById('plan-cycle').value),
+        renewal_anchor_date: document.getElementById('plan-anchor-date').value || null,
+        note: document.getElementById('plan-note').value || null,
         max_slots: parseInt(document.getElementById('plan-slots').value) || 0,
         active: document.getElementById('plan-status').value === '1'
     };
@@ -982,6 +992,7 @@ document.getElementById('form-sub').addEventListener('submit', async (e) => {
         amount_due: parseFloat(document.getElementById('sub-amount').value),
         billing_cycle_months: parseInt(document.getElementById('sub-cycle').value) || 1,
         status: document.getElementById('sub-status').value,
+        personal_note: document.getElementById('sub-note').value || null,
         send_email: document.getElementById('sub-send-email').checked ? 1 : 0
     };
     try {
