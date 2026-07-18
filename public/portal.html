@@ -64,9 +64,10 @@
                     <div id="qr-instruction"
                         style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.5rem; display: none;">
                         <span data-i18n="portal_lbl_qr">Quét QR để thanh toán</span></div>
-                    <button id="btnSwitchBank" class="btn hidden" style="margin-top: 0.25rem; padding: 4px 10px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed rgba(59, 130, 246, 0.5); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; justify-content: center; width: 100%; max-width: 150px; font-weight: 500; transition: all 0.2s;">
+                    <button id="btnSwitchBank" class="btn hidden" style="margin-top: 0.25rem; padding: 4px 10px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed rgba(59, 130, 246, 0.5); border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; justify-content: center; width: 100%; max-width: 150px; font-weight: 500; transition: all 0.2s;" title="Nếu ngân hàng hiện tại bị lỗi bảo trì không thể chuyển khoản, hãy bấm vào đây để chuyển sang ngân hàng dự phòng.">
                         <i class="ph ph-arrows-left-right" style="font-size: 1rem;"></i> Đổi ngân hàng
                     </button>
+                    <span id="switchBankHint" class="hidden" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.35rem; text-align: center; max-width: 150px; line-height: 1.3;">(Bấm để đổi nếu NH bị lỗi)</span>
                 </div>
             </div>
 
