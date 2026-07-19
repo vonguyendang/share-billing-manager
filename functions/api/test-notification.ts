@@ -43,6 +43,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             totalPaid: '500,000',
             formattedDate: formattedDate,
             formattedNewDate: formattedNewDate,
+            formattedDeadline: formattedDate, // Just mock it same as formattedDate or tomorrow
+            days_left: 3,
             actualLink: 'https://share-billing-manager.pages.dev/user/test_token_123',
             admin_note: 'Khách chuyển khoản đúng hẹn, cảm ơn!',
             rejectReason: 'Không tìm thấy thông tin chuyển khoản tương ứng.',
