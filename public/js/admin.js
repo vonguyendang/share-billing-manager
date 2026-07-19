@@ -737,6 +737,7 @@ window.adminApp = {
                 <option value="other" ${contact.type === 'other' ? 'selected' : ''}>📝 Khác</option>
             </select>
             <input type="text" class="form-control contact-label" placeholder="Tên nền tảng..." value="${contact.label || ''}" style="width: 120px; flex-shrink: 0; display: ${contact.type === 'other' ? 'block' : 'none'};">
+            <input type="text" class="form-control contact-display-name" placeholder="Tên hiển thị (Tùy chọn)..." value="${contact.display_name || ''}" style="width: 150px; flex-shrink: 0;">
             <input type="text" class="form-control contact-value" placeholder="Nhập thông tin liên hệ..." value="${contact.value}" style="flex: 1;">
             <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()" style="padding: 0.5rem; flex-shrink: 0;"><i class="ph ph-trash"></i></button>
         `;
@@ -1110,6 +1111,7 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         admin_contacts: Array.from(document.querySelectorAll('#admin-contacts-container .contact-row')).map(row => ({
             type: row.querySelector('.contact-type').value,
             label: row.querySelector('.contact-label').value,
+            display_name: row.querySelector('.contact-display-name').value,
             value: row.querySelector('.contact-value').value
         })).filter(c => c.value.trim() !== '')
     };

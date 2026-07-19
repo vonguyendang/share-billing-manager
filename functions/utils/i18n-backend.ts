@@ -89,43 +89,44 @@ export function formatAdminContacts(contactsJson: string | null): { html: string
     contacts.forEach((c: any) => {
         let iconHtml = '';
         let iconText = '';
-        let valueHtml = c.value;
+        const displayText = (c.display_name && c.display_name.trim() !== '') ? c.display_name.trim() : c.value;
+        let valueHtml = displayText;
         
         switch (c.type) {
             case 'phone':
                 iconHtml = '📞 Zalo/SĐT: '; iconText = '📞 Zalo/SĐT: ';
-                valueHtml = `<strong>${c.value}</strong>`;
+                valueHtml = `<strong>${displayText}</strong>`;
                 break;
             case 'email':
                 iconHtml = '📧 Email: '; iconText = '📧 Email: ';
-                valueHtml = `<a href="mailto:${c.value}" style="color: #1a73e8;">${c.value}</a>`;
+                valueHtml = `<a href="mailto:${c.value}" style="color: #1a73e8;">${displayText}</a>`;
                 break;
             case 'facebook':
                 iconHtml = '🌐 Facebook: '; iconText = '🌐 Facebook: ';
-                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://' + c.value}" style="color: #1a73e8;" target="_blank">${c.value}</a>`;
+                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://' + c.value}" style="color: #1a73e8;" target="_blank">${displayText}</a>`;
                 break;
             case 'telegram':
                 iconHtml = '💬 Telegram: '; iconText = '💬 Telegram: ';
-                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://t.me/' + c.value.replace('@', '')}" style="color: #1a73e8;" target="_blank">${c.value}</a>`;
+                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://t.me/' + c.value.replace('@', '')}" style="color: #1a73e8;" target="_blank">${displayText}</a>`;
                 break;
             case 'website':
                 iconHtml = '🌍 Website: '; iconText = '🌍 Website: ';
-                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://' + c.value}" style="color: #1a73e8;" target="_blank">${c.value}</a>`;
+                valueHtml = `<a href="${c.value.startsWith('http') ? c.value : 'https://' + c.value}" style="color: #1a73e8;" target="_blank">${displayText}</a>`;
                 break;
             case 'other':
             default:
                 const label = (c.label && c.label.trim() !== '') ? c.label : 'Khác';
                 iconHtml = `📝 ${label}: `; iconText = `📝 ${label}: `;
                 if (c.value.startsWith('http')) {
-                    valueHtml = `<a href="${c.value}" style="color: #1a73e8;" target="_blank">${c.value}</a>`;
+                    valueHtml = `<a href="${c.value}" style="color: #1a73e8;" target="_blank">${displayText}</a>`;
                 } else {
-                    valueHtml = `<strong>${c.value}</strong>`;
+                    valueHtml = `<strong>${displayText}</strong>`;
                 }
                 break;
         }
 
         html += `<p style="margin: 5px 0;">${iconHtml}${valueHtml}</p>\n`;
-        text += `${iconText}${c.value}\n`;
+        text += `${iconText}${(c.display_name && c.display_name.trim() !== '') ? c.display_name.trim() + ' (' + c.value + ')' : c.value}\n`;
     });
 
     return { html: html.trim(), text: text.trim() };
