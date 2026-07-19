@@ -246,6 +246,7 @@ document.getElementById('btnConfirmPay').addEventListener('click', async () => {
 
 document.getElementById('btnCancelSub')?.addEventListener('click', async () => {
     if (!await window.ui.confirm(t('msg_portal_confirm_cancel'))) return;
+    if (!await window.ui.confirm(t('msg_portal_confirm_cancel_final'))) return;
     
     const btn = document.getElementById('btnCancelSub');
     btn.disabled = true;
