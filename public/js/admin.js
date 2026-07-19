@@ -431,6 +431,9 @@ async function loadSettings() {
     
     document.getElementById('setting-allow-user-cancel').checked = settingsData.allow_user_cancel === 1;
 
+    document.getElementById('setting-customer-language').value = settingsData.customer_language || 'vi';
+    document.getElementById('setting-admin-language').value = settingsData.admin_language || 'vi';
+
     if (!window.bankSelectInitialized) {
         initBankSelect();
         window.bankSelectInitialized = true;
@@ -1036,7 +1039,9 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         alt_bank_id: document.getElementById('setting-alt-bank-id').value,
         alt_bank_account_number: document.getElementById('setting-alt-bank-account-number').value,
         alt_bank_account_name: document.getElementById('setting-alt-bank-account-name').value,
-        allow_user_cancel: document.getElementById('setting-allow-user-cancel').checked ? 1 : 0
+        allow_user_cancel: document.getElementById('setting-allow-user-cancel').checked ? 1 : 0,
+        customer_language: document.getElementById('setting-customer-language').value,
+        admin_language: document.getElementById('setting-admin-language').value
     };
     try {
         await apiCall('/settings', 'PUT', data);

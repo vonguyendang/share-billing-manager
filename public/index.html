@@ -457,6 +457,25 @@
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;"><span data-i18n="setting_client_cancel_desc">Nếu bật, khách hàng có thể tự nhấn huỷ gia hạn trên Portal. Gói sẽ chuyển sang trạng thái chờ huỷ.</span></p>
                     </div>
 
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_language">Ngôn ngữ Thông báo (Email / Telegram)</h3>
+                    <div class="form-group">
+                        <label data-i18n="setting_customer_lang">Ngôn ngữ gửi cho Khách hàng (Email)</label>
+                        <select id="setting-customer-language" class="form-control">
+                            <option value="vi" data-i18n="lang_vi">Tiếng Việt</option>
+                            <option value="en" data-i18n="lang_en">Tiếng Anh</option>
+                            <option value="bilingual" data-i18n="lang_bilingual">Song ngữ (Việt - Anh)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="setting_admin_lang">Ngôn ngữ gửi cho Admin (Telegram & Email Admin)</label>
+                        <select id="setting-admin-language" class="form-control">
+                            <option value="vi" data-i18n="lang_vi">Tiếng Việt</option>
+                            <option value="en" data-i18n="lang_en">Tiếng Anh</option>
+                            <option value="bilingual" data-i18n="lang_bilingual">Song ngữ (Việt - Anh)</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" data-i18n="btn_save_setting">Lưu Cài Đặt</button>
                 </form>
             </div>

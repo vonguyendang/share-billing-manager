@@ -1,12 +1,12 @@
 -- Migration: 0001_initial.sql
 -- Description: Create initial tables for Share Billing Manager
 
-DROP TABLE IF EXISTS email_logs;
-DROP TABLE IF EXISTS payment_requests;
-DROP TABLE IF EXISTS subscriptions;
-DROP TABLE IF EXISTS members;
-DROP TABLE IF EXISTS plans;
-DROP TABLE IF EXISTS admin_settings;
+-- DROP TABLE IF EXISTS email_logs;
+-- DROP TABLE IF EXISTS payment_requests;
+-- DROP TABLE IF EXISTS subscriptions;
+-- DROP TABLE IF EXISTS members;
+-- DROP TABLE IF EXISTS plans;
+-- DROP TABLE IF EXISTS admin_settings;
 
 CREATE TABLE admin_settings (
     id TEXT PRIMARY KEY, -- e.g., 'global'

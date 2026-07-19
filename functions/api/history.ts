@@ -1,6 +1,7 @@
 import { Env } from '../utils/types';
 import { checkAuth, jsonResponse } from '../utils/auth';
 import { sendTelegramNotification } from '../utils/telegram';
+import { getNotificationContent } from '../utils/i18n-backend';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
@@ -77,8 +78,15 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
             ]);
 
             // Notify via Telegram about undo
-            const tgMessage = `⚠️ <b>Hoàn tác giao dịch duyệt nhầm</b>\n👤 Khách hàng: <b>${reqInfo.member_name}</b>\n💰 Số tiền bị hủy: <b>${reqInfo.amount.toLocaleString()}đ</b>\n📅 Ngày tới hạn trả về: <b>${newDateStr}</b>`;
-            context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+            const adminSettings = await DB.prepare(`SELECT admin_language FROM admin_settings WHERE id = 'global'`).first<any>();
+            const adminLang = adminSettings?.admin_language || 'vi';
+            
+            const adminNotif = getNotificationContent(adminLang, 'payment_undo', {
+                full_name: reqInfo.member_name,
+                amount: reqInfo.amount,
+                newDateStr
+            });
+            context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
 
         } else {
             // Just delete rejected requests

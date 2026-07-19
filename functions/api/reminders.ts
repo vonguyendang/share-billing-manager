@@ -2,6 +2,7 @@ import { Env } from '../utils/types';
 import { checkAuth, jsonResponse } from '../utils/auth';
 import { sendEmail } from '../utils/email';
 import { sendTelegramNotification } from '../utils/telegram';
+import { getNotificationContent } from '../utils/i18n-backend';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (!checkAuth(context.request, context.env)) return jsonResponse({ success: false, error: 'Unauthorized' }, 401);
@@ -10,13 +11,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const { DB } = context.env;
         
         // 1. Check if reminders are globally enabled
-        const settings = await DB.prepare("SELECT reminders_enabled, reminder_days FROM admin_settings WHERE id = 'global'").first<{reminders_enabled: number, reminder_days: string}>();
+        const settings = await DB.prepare("SELECT reminders_enabled, reminder_days, customer_language, admin_language FROM admin_settings WHERE id = 'global'").first<any>();
         if (settings && settings.reminders_enabled === 0) {
             return jsonResponse({ success: false, error: 'Reminders are disabled in settings' }, 400);
         }
 
+        const customerLang = settings?.customer_language || 'vi';
+        const adminLang = settings?.admin_language || 'vi';
+
         const reminderDaysStr = settings?.reminder_days || '7,3,1,0,-2,-4';
-        const reminderDaysArr = reminderDaysStr.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+        const reminderDaysArr = reminderDaysStr.split(',').map((d: string) => parseInt(d.trim())).filter((d: number) => !isNaN(d));
         
         if (reminderDaysArr.length === 0) {
             return jsonResponse({ success: true, data: { sent: 0, errors: 0, message: "No reminder days configured" } });
@@ -69,97 +73,31 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     formattedDeadline = `${dd}-${mm}-${yyyy}`;
                 }
 
-                let emailSubject = '';
-                let titleHtml = '';
-                let headerColor = '#4F46E5';
-                let messageHtml = '';
+                const dataForNotification = {
+                    plan_name: sub.plan_name,
+                    full_name: sub.full_name,
+                    days_left: sub.days_left,
+                    formattedDate: formattedDate,
+                    formattedDeadline: formattedDeadline,
+                    amount_due: sub.amount_due.toLocaleString(),
+                    actualLink: actualLink
+                };
 
-                if (sub.days_left > 0) {
-                    emailSubject = `[Nhắc nhở] Sắp đến hạn thanh toán - ${sub.plan_name}`;
-                    titleHtml = `Sắp đến hạn thanh toán`;
-                    messageHtml = `Gói dịch vụ <strong>${sub.plan_name}</strong> của bạn sắp đến hạn thanh toán.
-                    <br/><br/>
-                    <strong>Ngày đến hạn:</strong> <span style="color: #EF4444;">${formattedDate}</span> (còn ${sub.days_left} ngày)<br/>
-                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
-                    <br/><br/>
-                    Vui lòng thanh toán trước ngày hạn chót <strong>${formattedDeadline}</strong> để đảm bảo dịch vụ được duy trì liên tục.`;
-                } else if (sub.days_left === 0) {
-                    emailSubject = `[Thông báo] Hôm nay là ngày đến hạn thanh toán - ${sub.plan_name}`;
-                    titleHtml = `Đến hạn thanh toán`;
-                    headerColor = '#F59E0B'; // Amber
-                    messageHtml = `Hôm nay (<strong>${formattedDate}</strong>) là ngày đến hạn thanh toán gói dịch vụ <strong>${sub.plan_name}</strong> của bạn.
-                    <br/><br/>
-                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
-                    <br/><br/>
-                    Vui lòng thanh toán sớm trước ngày <strong>${formattedDeadline}</strong> để không bị gián đoạn dịch vụ nhé!`;
-                } else if (sub.days_left === -2) {
-                    emailSubject = `[Quan trọng] Đã trễ hạn thanh toán 2 ngày - ${sub.plan_name}`;
-                    titleHtml = `Trễ hạn thanh toán`;
-                    headerColor = '#EF4444'; // Red
-                    messageHtml = `Gói dịch vụ <strong>${sub.plan_name}</strong> của bạn đã trễ hạn thanh toán 2 ngày (từ ngày ${formattedDate}).
-                    <br/><br/>
-                    <strong>Số tiền cần thanh toán:</strong> <span style="font-size: 18px; font-weight: bold; color: #10B981;">${sub.amount_due.toLocaleString()} VNĐ</span>
-                    <br/><br/>
-                    Hạn chót để giữ lại dịch vụ là ngày <strong>${formattedDeadline}</strong>. Xin vui lòng thanh toán ngay để tránh bị hệ thống tự động khóa.`;
-                } else if (sub.days_left === -4) {
-                    emailSubject = `[Ngưng dịch vụ] Tài khoản của bạn đã bị khóa do trễ hạn - ${sub.plan_name}`;
-                    titleHtml = `Dịch vụ bị tạm ngưng`;
-                    headerColor = '#111827'; // Dark gray/black
-                    messageHtml = `Rất tiếc, do đã trễ hạn thanh toán 4 ngày, hệ thống đã <strong>tự động tạm ngưng</strong> dịch vụ của bạn đối với gói <strong>${sub.plan_name}</strong>.
-                    <br/><br/>
-                    <strong>Số tiền còn nợ:</strong> <span style="font-size: 18px; font-weight: bold; color: #EF4444;">${sub.amount_due.toLocaleString()} VNĐ</span>
-                    <br/><br/>
-                    Vui lòng thanh toán khoản nợ và báo cho Admin để được kích hoạt lại dịch vụ. Cảm ơn bạn.`;
-                }
-
-                // Plain text body mapping (simplified)
-                const emailBody = messageHtml.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
-                
-                const htmlBody = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                    <div style="background-color: ${headerColor}; padding: 20px; text-align: center;">
-                        <h2 style="color: white; margin: 0;">${titleHtml}</h2>
-                    </div>
-                    <div style="padding: 30px; background-color: #ffffff;">
-                        <h3 style="color: #111827; margin-top: 0;">Chào ${sub.full_name},</h3>
-                        <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">${messageHtml}</p>
-                        
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="${actualLink}" style="background-color: #4F46E5; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">Xem Chi Tiết & Thanh Toán</a>
-                        </div>
-                        
-                        <p style="color: #6B7280; font-size: 14px; text-align: center;">Nếu bạn đã thanh toán, vui lòng nhấn vào nút bên trên để báo cáo cho Admin.</p>
-                        
-                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
-                        <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
-                            <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin:</strong></p>
-                            <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
-                            <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
-                            <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
-                        </div>
-                    </div>
-                </div>
-                `;
+                const userNotif = getNotificationContent(customerLang, 'reminder', dataForNotification);
 
                 const success = await sendEmail(context.env, {
                     to: sub.email,
-                    subject: emailSubject,
-                    body: emailBody,
-                    htmlBody: htmlBody
+                    subject: userNotif.subject!,
+                    body: userNotif.body!,
+                    htmlBody: userNotif.htmlBody!
                 });
 
                 if (success) {
                     sentCount++;
                     
                     // Telegram Notification for Admin
-                    let statusLabel = '';
-                    if (sub.days_left > 0) statusLabel = 'Sắp đến hạn';
-                    else if (sub.days_left === 0) statusLabel = 'Đến hạn hôm nay';
-                    else if (sub.days_left < 0 && sub.days_left > -4) statusLabel = `Trễ hạn ${Math.abs(sub.days_left)} ngày`;
-                    else statusLabel = 'Tạm ngưng dịch vụ';
-
-                    const tgMessage = `📧 <b>Đã gửi email nhắc nhở</b>\n👤 Khách hàng: <b>${sub.full_name}</b>\n📦 Gói: <b>${sub.plan_name}</b>\n🏷 Trạng thái: <b>${statusLabel}</b>\n📅 Ngày đến hạn: <b>${formattedDate}</b>`;
-                    context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+                    const adminNotif = getNotificationContent(adminLang, 'reminder_admin', dataForNotification);
+                    context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
 
                     // Auto pause if days_left is -4
                     if (sub.days_left === -4) {
