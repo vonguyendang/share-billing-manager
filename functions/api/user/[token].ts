@@ -108,6 +108,43 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 }));
             }
             
+            if (subInfo.send_email !== 0) {
+                const userEmailBody = `Chào ${subInfo.full_name},\n\nHệ thống đã ghi nhận yêu cầu Hủy gia hạn gói dịch vụ ${subInfo.plan_name} của bạn.\nBạn vẫn có thể tiếp tục sử dụng dịch vụ cho đến ngày đến hạn tiếp theo. Sau ngày đó, hệ thống sẽ tự động ngắt quyền truy cập của bạn.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn đã sử dụng dịch vụ!`;
+                
+                const userHtmlBody = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div style="background-color: #EF4444; padding: 20px; text-align: center;">
+                        <h2 style="color: white; margin: 0;">Đã ghi nhận yêu cầu Hủy gia hạn</h2>
+                    </div>
+                    <div style="padding: 30px; background-color: #ffffff;">
+                        <h3 style="color: #111827; margin-top: 0;">Chào ${subInfo.full_name},</h3>
+                        <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Hệ thống đã ghi nhận yêu cầu <strong>Hủy gia hạn</strong> của bạn cho gói dịch vụ <strong>${subInfo.plan_name}</strong>.</p>
+                        
+                        <div style="background-color: #FEF2F2; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #FECACA;">
+                            <p style="margin: 0; color: #991B1B; text-align: center;">Bạn vẫn có thể sử dụng dịch vụ đến hết chu kỳ hiện tại.</p>
+                        </div>
+                        
+                        <p style="color: #4b5563; font-size: 16px;">Tới ngày đến hạn, hệ thống sẽ tự động ngắt quyền truy cập của bạn vào dịch vụ này.</p>
+                        
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+                        <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
+                            <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin (Nếu cần hỗ trợ thêm):</strong></p>
+                            <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
+                            <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
+                            <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                context.waitUntil(sendEmail(context.env, {
+                    to: subInfo.email,
+                    subject: `[Xác nhận] Đã ghi nhận yêu cầu Hủy gia hạn - ${subInfo.plan_name}`,
+                    body: userEmailBody,
+                    htmlBody: userHtmlBody
+                }));
+            }
+            
             return jsonResponse({ success: true, message: 'Đã gửi yêu cầu hủy gia hạn thành công.' });
         }
 
