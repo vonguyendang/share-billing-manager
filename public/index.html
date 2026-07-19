@@ -514,11 +514,19 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Ngôn ngữ Test:</label>
+                    <select id="test-notification-lang" class="form-control">
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="en">Tiếng Anh</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label>Email nhận Test:</label>
                     <input type="email" id="test-notification-email" class="form-control" placeholder="Nhập email cá nhân của bạn...">
                 </div>
 
-                <button class="btn btn-primary" onclick="adminApp.sendTestNotification()" id="btn-test-notification">Gửi Test ngay</button>
+                <button class="btn btn-primary" type="button" onclick="adminApp.sendTestNotification()" id="btn-test-notification">Gửi Test ngay</button>
             </div>
         </div>
 
@@ -662,6 +670,6 @@
 
 <!-- Scripts -->
 <script src="js/theme.js"></script>
-<script type="module" src="js/admin.js?v=17"></script>
+<script type="module" src="js/admin.js?v=3"></script>
 </body>
 </html>

@@ -10,8 +10,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     try {
-        const body = await context.request.json() as { template: string, test_email: string };
-        const { template, test_email } = body;
+        const body = await context.request.json() as { template: string, test_email: string, lang: string };
+        const { template, test_email, lang } = body;
 
         if (!template || !test_email) {
             return jsonResponse({ success: false, error: 'Missing template or test_email' }, 400);
@@ -23,8 +23,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             FROM admin_settings WHERE id = 'global'
         `).first<any>();
 
-        const customerLang = adminSettings?.customer_language || 'vi';
-        const adminLang = adminSettings?.admin_language || 'vi';
+        const testLang = lang || 'vi';
 
         // Dummy data for testing
         const tomorrow = new Date();
@@ -75,7 +74,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Send Email to User
         if (userTemplateType) {
-            const userNotif = getNotificationContent(customerLang, userTemplateType, mockData);
+            const userNotif = getNotificationContent(testLang, userTemplateType, mockData);
             await sendEmail(context.env, {
                 to: test_email,
                 subject: '[TEST] ' + userNotif.subject!,
@@ -86,7 +85,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Send Telegram to Admin
         if (adminTemplateType) {
-            const adminNotif = getNotificationContent(adminLang, adminTemplateType, mockData);
+            const adminNotif = getNotificationContent(testLang, adminTemplateType, mockData);
             if (adminNotif.tgMessage) {
                 // Send Telegram
                 context.waitUntil(sendTelegramNotification(context.env, `[TEST] ${adminNotif.tgMessage}`));

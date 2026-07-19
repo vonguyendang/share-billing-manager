@@ -744,6 +744,7 @@ window.adminApp = {
     },
     sendTestNotification: async () => {
         const type = document.getElementById('test-notification-type').value;
+        const lang = document.getElementById('test-notification-lang').value;
         const email = document.getElementById('test-notification-email').value;
         
         if (!email) {
@@ -759,6 +760,7 @@ window.adminApp = {
         try {
             await apiCall('/test-notification', 'POST', {
                 template: type,
+                lang: lang,
                 test_email: email
             });
             window.ui.alert("Đã gửi thông báo test thành công! Hãy kiểm tra Email (và Telegram nếu có cấu hình).");
