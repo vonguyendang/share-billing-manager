@@ -748,13 +748,13 @@ window.adminApp = {
         const email = document.getElementById('test-notification-email').value;
         
         if (!email) {
-            window.ui.alert("Vui lòng nhập email nhận test!");
+            window.ui.alert(t('msg_test_email_req') || "Vui lòng nhập email nhận test!");
             return;
         }
 
         const btn = document.getElementById('btn-test-notification');
         const oldText = btn.innerText;
-        btn.innerText = "Đang gửi...";
+        btn.innerText = t('btn_sending') || "Đang gửi...";
         btn.disabled = true;
 
         try {
@@ -763,9 +763,9 @@ window.adminApp = {
                 lang: lang,
                 test_email: email
             });
-            window.ui.alert("Đã gửi thông báo test thành công! Hãy kiểm tra Email (và Telegram nếu có cấu hình).");
+            window.ui.alert(t('msg_test_success') || "Đã gửi thông báo test thành công! Hãy kiểm tra Email (và Telegram nếu có cấu hình).");
         } catch (e) {
-            window.ui.alert("Lỗi gửi test: " + e.message);
+            window.ui.alert((t('msg_test_err') || "Lỗi gửi test: ") + e.message);
         } finally {
             btn.innerText = oldText;
             btn.disabled = false;

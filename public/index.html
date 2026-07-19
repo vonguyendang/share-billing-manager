@@ -499,34 +499,34 @@
             </div>
 
             <div class="card" style="margin-top: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Kiểm tra Thông báo (Test)</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Gửi thử thông báo mẫu để xem trước hiển thị trên Email và Telegram. Đảm bảo bạn đã lưu cấu hình Liên hệ và Telegram trước khi test.</p>
+                <h3 style="margin-bottom: 1rem;" data-i18n="setting_test_title">Kiểm tra Thông báo (Test)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;" data-i18n="setting_test_desc">Gửi thử thông báo mẫu để xem trước hiển thị trên Email và Telegram. Đảm bảo bạn đã lưu cấu hình Liên hệ và Telegram trước khi test.</p>
                 
                 <div class="form-group">
-                    <label>Chọn Loại thông báo để Test:</label>
+                    <label data-i18n="lbl_test_type">Chọn Loại thông báo để Test:</label>
                     <select id="test-notification-type" class="form-control">
-                        <option value="reminder">Nhắc hạn thanh toán</option>
-                        <option value="payment_user">Khách báo thanh toán (User Notification)</option>
-                        <option value="payment_approve">Duyệt thanh toán thành công</option>
-                        <option value="payment_reject">Từ chối thanh toán</option>
-                        <option value="cancel_user">Khách Hủy gia hạn</option>
+                        <option value="reminder" data-i18n="test_opt_reminder">Nhắc hạn thanh toán</option>
+                        <option value="payment_user" data-i18n="test_opt_payment_user">Khách báo thanh toán (User Notification)</option>
+                        <option value="payment_approve" data-i18n="test_opt_payment_approve">Duyệt thanh toán thành công</option>
+                        <option value="payment_reject" data-i18n="test_opt_payment_reject">Từ chối thanh toán</option>
+                        <option value="cancel_user" data-i18n="test_opt_cancel_user">Khách Hủy gia hạn</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Ngôn ngữ Test:</label>
+                    <label data-i18n="lbl_test_lang">Ngôn ngữ Test:</label>
                     <select id="test-notification-lang" class="form-control">
-                        <option value="vi">Tiếng Việt</option>
-                        <option value="en">Tiếng Anh</option>
+                        <option value="vi" data-i18n="lang_vi">Tiếng Việt</option>
+                        <option value="en" data-i18n="lang_en">Tiếng Anh</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Email nhận Test:</label>
-                    <input type="email" id="test-notification-email" class="form-control" placeholder="Nhập email cá nhân của bạn...">
+                    <label data-i18n="lbl_test_email">Email nhận Test:</label>
+                    <input type="email" id="test-notification-email" class="form-control" data-i18n-placeholder="ph_test_email" placeholder="Nhập email cá nhân của bạn...">
                 </div>
 
-                <button class="btn btn-primary" type="button" onclick="adminApp.sendTestNotification()" id="btn-test-notification">Gửi Test ngay</button>
+                <button class="btn btn-primary" type="button" onclick="adminApp.sendTestNotification()" id="btn-test-notification" data-i18n="btn_send_test">Gửi Test ngay</button>
             </div>
         </div>
 
