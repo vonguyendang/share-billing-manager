@@ -19,11 +19,11 @@ export default function reminderAdminTemplate(data: any) {
     return {
         vi: {
             subject: '', body: '', htmlBody: '',
-            tgMessage: `📧 <b>Đã gửi email nhắc nhở</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n🏷 Trạng thái: <b>${statusLabelVi}</b>\n📅 Ngày đến hạn: <b>${data.formattedDate}</b>`
+            tgMessage: `📧 <b>Đã gửi email nhắc nhở</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n🏷 Trạng thái: <b>${statusLabelVi}</b>\n📅 Ngày đến hạn: <b>${data.formattedDate}</b>\n👉 Chi tiết: <a href="${data.actualLink}">Hóa đơn</a>`
         },
         en: {
             subject: '', body: '', htmlBody: '',
-            tgMessage: `📧 <b>Reminder Email Sent</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n🏷 Status: <b>${statusLabelEn}</b>\n📅 Due Date: <b>${data.formattedDate}</b>`
+            tgMessage: `📧 <b>Reminder Email Sent</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n🏷 Status: <b>${statusLabelEn}</b>\n📅 Due Date: <b>${data.formattedDate}</b>\n👉 Details: <a href="${data.actualLink}">Invoice</a>`
         }
     };
 }

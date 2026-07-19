@@ -27,7 +27,7 @@ export default function paymentApproveTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `✅ <b>Đã duyệt thanh toán</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💰 Số tiền: <b>${data.totalPaid}đ</b>\n📅 Hạn mới: <b>${data.formattedNewDate}</b>`
+            tgMessage: `✅ <b>Đã duyệt thanh toán</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💰 Số tiền: <b>${data.totalPaid}đ</b>\n📅 Hạn mới: <b>${data.formattedNewDate}</b>\n👉 Chi tiết: <a href="${data.actualLink}">Hóa đơn</a>`
         },
         en: {
             subject: `[Confirmed] Payment Successful - ${data.plan_name}`,
@@ -56,7 +56,7 @@ export default function paymentApproveTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `✅ <b>Payment Approved</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💰 Amount: <b>${data.totalPaid} VND</b>\n📅 New Due Date: <b>${data.formattedNewDate}</b>`
+            tgMessage: `✅ <b>Payment Approved</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💰 Amount: <b>${data.totalPaid} VND</b>\n📅 New Due Date: <b>${data.formattedNewDate}</b>\n👉 Details: <a href="${data.actualLink}">Invoice</a>`
         }
     };
 }

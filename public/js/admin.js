@@ -258,6 +258,32 @@ async function loadDashboard() {
         });
     }
 
+    // Cancel Pending List
+    const tbodyCancelPending = document.querySelector('#table-dashboard-cancel-pending tbody');
+    if (tbodyCancelPending) {
+        tbodyCancelPending.innerHTML = '';
+        if (res.data.cancelPendingList && res.data.cancelPendingList.length === 0) {
+            tbodyCancelPending.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">${t('msg_no_data') || 'No data'}</td></tr>`;
+        } else if (res.data.cancelPendingList) {
+            res.data.cancelPendingList.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.member_name}</td>
+                    <td>${item.plan_name}</td>
+                    <td style="color: var(--secondary); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.25rem;">
+                            <button class="btn btn-primary" onclick="adminApp.copyPortalLink('${item.user_token}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Copy Link"><i class="ph ph-link"></i></button>
+                            <button class="btn btn-primary" onclick="adminApp.editSub('${item.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbodyCancelPending.appendChild(tr);
+            });
+        }
+    }
+
     // Populate plan utilization
     let totalEmptySlots = 0;
     const tbodyUtil = document.querySelector('#table-dashboard-utilization tbody');
@@ -576,6 +602,7 @@ async function loadSubscriptions() {
     subsData.forEach((sub, index) => {
         const link = `${window.location.origin}/portal.html?token=${sub.user_token}`;
         const tr = document.createElement('tr');
+        tr.setAttribute('data-status', sub.status);
         tr.innerHTML = `
             <td>${index + 1}</td>
             <td>${sub.member_name}</td>
@@ -596,8 +623,17 @@ async function loadSubscriptions() {
     });
 
     const searchInput = document.getElementById('search-sub');
+    const filterStatus = document.getElementById('filter-sub-status');
+    const applyFilter = () => {
+        if (searchInput) searchInput.dispatchEvent(new Event('keyup'));
+    };
     if (searchInput && searchInput.value) {
-        searchInput.dispatchEvent(new Event('keyup'));
+        applyFilter();
+    }
+    if (filterStatus) {
+        // Prevent multiple listeners if re-rendered
+        filterStatus.removeEventListener('change', applyFilter);
+        filterStatus.addEventListener('change', applyFilter);
     }
 }
 
@@ -1143,9 +1179,17 @@ function setupSearchFilter(inputId, listId) {
     document.getElementById(inputId).addEventListener('keyup', function (e) {
         const term = e.target.value.toLowerCase();
         const rows = document.getElementById(listId).getElementsByTagName('tr');
+        const filterStatusEl = inputId === 'search-sub' ? document.getElementById('filter-sub-status') : null;
+        const filterStatus = filterStatusEl ? filterStatusEl.value : 'all';
+
         for (let row of rows) {
             const text = row.innerText.toLowerCase();
-            if (text.includes(term)) {
+            const rowStatus = row.getAttribute('data-status') || '';
+            
+            const matchText = text.includes(term);
+            const matchStatus = filterStatus === 'all' || rowStatus === filterStatus;
+
+            if (matchText && matchStatus) {
                 row.classList.remove('hidden');
             } else {
                 row.classList.add('hidden');

@@ -52,6 +52,8 @@ const translations = {
         'dash_recent_activity': 'Hoạt động gần đây',
         'dash_overdue': 'Quá hạn / Chưa thanh toán',
         'dash_due_7_days': 'Đến hạn trong 7 ngày tới',
+        'dash_cancel_pending': 'Chờ huỷ gia hạn',
+        'filter_all_status': 'Tất cả trạng thái',
         'dash_plan_util': 'Mức sử dụng Gói (Slots)',
 
         // Members
@@ -391,6 +393,8 @@ const translations = {
         'dash_recent_activity': 'Recent Activity',
         'dash_overdue': 'Overdue / Unpaid',
         'dash_due_7_days': 'Due in Next 7 Days',
+        'dash_cancel_pending': 'Cancel Pending',
+        'filter_all_status': 'All Statuses',
         'dash_plan_util': 'Plan Utilization (Slots)',
 
         // Members

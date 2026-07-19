@@ -16,7 +16,7 @@ export default function cancelAdminTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `⚠️ <b>Khách hàng yêu cầu hủy gia hạn</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n\n👉 Khách hàng không muốn gia hạn chu kỳ sau. Hệ thống sẽ tự động hủy quyền khi đến hạn.`
+            tgMessage: `⚠️ <b>Khách hàng yêu cầu hủy gia hạn</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n👉 Chi tiết: <a href="${data.actualLink}">Hóa đơn</a>\n\n👉 Khách hàng không muốn gia hạn chu kỳ sau. Hệ thống sẽ tự động hủy quyền khi đến hạn.`
         },
         en: {
             subject: `[Notice] Customer ${data.full_name} cancelled renewal for ${data.plan_name}`,
@@ -34,7 +34,7 @@ export default function cancelAdminTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `⚠️ <b>Cancellation Request</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n\n👉 Customer doesn't want to renew. Auto-revoke will happen on due date.`
+            tgMessage: `⚠️ <b>Cancellation Request</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n👉 Details: <a href="${data.actualLink}">Invoice</a>\n\n👉 Customer doesn't want to renew. Auto-revoke will happen on due date.`
         }
     };
 }

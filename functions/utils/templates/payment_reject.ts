@@ -27,7 +27,7 @@ export default function paymentRejectTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `❌ <b>Đã từ chối thanh toán</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💬 Lý do: <i>${data.admin_note || 'Không có ghi chú'}</i>`
+            tgMessage: `❌ <b>Đã từ chối thanh toán</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💬 Lý do: <i>${data.admin_note || 'Không có ghi chú'}</i>\n👉 Chi tiết: <a href="${data.actualLink}">Hóa đơn</a>`
         },
         en: {
             subject: `[Rejected] Payment Request - ${data.plan_name}`,
@@ -56,7 +56,7 @@ export default function paymentRejectTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `❌ <b>Payment Rejected</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💬 Reason: <i>${data.rejectReason}</i>`
+            tgMessage: `❌ <b>Payment Rejected</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💬 Reason: <i>${data.rejectReason}</i>\n👉 Details: <a href="${data.actualLink}">Invoice</a>`
         }
     };
 }

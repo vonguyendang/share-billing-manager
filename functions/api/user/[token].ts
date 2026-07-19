@@ -11,24 +11,50 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
     try {
         const { DB } = context.env;
-        const sub = await DB.prepare(`
-            SELECT s.id, s.start_date, s.next_due_date, s.amount_due, s.status, s.personal_note, s.billing_cycle_months,
-                   m.full_name as member_name, p.name as plan_name, p.note as plan_note
-            FROM subscriptions s
-            JOIN members m ON s.member_id = m.id
-            JOIN plans p ON s.plan_id = p.id
-            WHERE s.user_token = ?
-        `).bind(token).first<any>();
+        
+        let sub: any = null;
+        let historyResults: any[] = [];
+        
+        if (token === 'test_token_123') {
+            const now = new Date();
+            const dueDate = new Date(now);
+            dueDate.setDate(now.getDate() + 3);
+            
+            sub = {
+                id: 999999,
+                start_date: new Date(now.setMonth(now.getMonth() - 1)).toISOString().split('T')[0],
+                next_due_date: dueDate.toISOString().split('T')[0],
+                amount_due: '500000',
+                status: 'active',
+                personal_note: 'Đây là giao diện mô phỏng (Test Portal).',
+                billing_cycle_months: 1,
+                member_name: 'Nguyễn Văn Test',
+                plan_name: 'Gói VIP (Mock)',
+                plan_note: 'Gói thử nghiệm dành cho tính năng gửi Email/Telegram.'
+            };
+            historyResults = [];
+        } else {
+            sub = await DB.prepare(`
+                SELECT s.id, s.start_date, s.next_due_date, s.amount_due, s.status, s.personal_note, s.billing_cycle_months,
+                       m.full_name as member_name, p.name as plan_name, p.note as plan_note
+                FROM subscriptions s
+                JOIN members m ON s.member_id = m.id
+                JOIN plans p ON s.plan_id = p.id
+                WHERE s.user_token = ?
+            `).bind(token).first<any>();
 
-        if (!sub) return jsonResponse({ success: false, error: 'Invalid token' }, 404);
+            if (!sub) return jsonResponse({ success: false, error: 'Invalid token' }, 404);
 
-        // Fetch recent payment history
-        const history = await DB.prepare(`
-            SELECT amount, status, created_at, user_note, approved_at 
-            FROM payment_requests 
-            WHERE subscription_id = ? 
-            ORDER BY created_at DESC LIMIT 5
-        `).bind(sub.id).all();
+            // Fetch recent payment history
+            const history = await DB.prepare(`
+                SELECT amount, status, created_at, user_note, approved_at 
+                FROM payment_requests 
+                WHERE subscription_id = ? 
+                ORDER BY created_at DESC LIMIT 5
+            `).bind(sub.id).all();
+            historyResults = history.results;
+        }
+
 
         // Fetch settings (bank info, user cancel)
         const settings = await DB.prepare(`
@@ -42,7 +68,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             success: true,
             data: { 
                 subscription: sub, 
-                history: history.results,
+                history: historyResults,
                 settings: settings || {}
             }
         });
@@ -59,16 +85,28 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     try {
         const { DB } = context.env;
         
-        // 1. Verify token
-        const subInfo = await DB.prepare(`
-            SELECT s.id, s.amount_due, s.send_email, m.email, m.full_name, p.name as plan_name
-            FROM subscriptions s
-            JOIN members m ON s.member_id = m.id
-            JOIN plans p ON s.plan_id = p.id
-            WHERE s.user_token = ?
-        `).bind(token).first<any>();
-
-        if (!subInfo) return jsonResponse({ success: false, error: 'Invalid token' }, 404);
+        let subInfo: any = null;
+        if (token === 'test_token_123') {
+            subInfo = {
+                id: 999999,
+                amount_due: '500000',
+                send_email: 1,
+                email: 'test@example.com',
+                full_name: 'Nguyễn Văn Test',
+                plan_name: 'Gói VIP (Mock)',
+                user_token: 'test_token_123'
+            };
+        } else {
+            subInfo = await DB.prepare(`
+                SELECT s.id, s.amount_due, s.send_email, s.user_token, m.email, m.full_name, p.name as plan_name
+                FROM subscriptions s
+                JOIN members m ON s.member_id = m.id
+                JOIN plans p ON s.plan_id = p.id
+                WHERE s.user_token = ?
+            `).bind(token).first<any>();
+            
+            if (!subInfo) return jsonResponse({ success: false, error: 'Invalid token' }, 404);
+        }
 
         const body = await context.request.json() as any;
 
@@ -79,11 +117,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 return jsonResponse({ success: false, error: 'Tính năng tự hủy gia hạn chưa được bật.' }, 403);
             }
             
-            await DB.prepare("UPDATE subscriptions SET status = 'cancel_pending' WHERE id = ?").bind(subInfo.id).run();
+            if (token !== 'test_token_123') {
+                await DB.prepare("UPDATE subscriptions SET status = 'cancel_pending' WHERE id = ?").bind(subInfo.id).run();
+            }
             
             const dataForNotification = {
                 ...subInfo,
                 formattedDate: subInfo.next_due_date,
+                actualLink: `${context.env.APP_URL}/portal.html?token=${subInfo.user_token}`,
                 admin_contacts: settings?.admin_contacts
             };
 
@@ -118,21 +159,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             return jsonResponse({ success: true, message: 'Đã gửi yêu cầu hủy gia hạn thành công.' });
         }
 
-        const reqId = 'req_' + Date.now();
-
         // 2. Insert payment request (Catch D1 UNIQUE constraint error if one is already pending)
         try {
-            await DB.prepare(`
-                INSERT INTO payment_requests (id, subscription_id, amount, status, user_note)
-                VALUES (?, ?, ?, 'pending', ?)
-            `).bind(reqId, subInfo.id, body.amount || subInfo.amount_due, body.user_note || '').run();
+            // 3. Insert payment request
+            const amount = body.amount || subInfo.amount_due;
+            if (token !== 'test_token_123') {
+                await DB.prepare(`
+                    INSERT INTO payment_requests (subscription_id, amount, status, user_note) 
+                    VALUES (?, ?, 'pending', ?)
+                `).bind(subInfo.id, amount, body.user_note || '').run();
+            }
         } catch (dbErr: any) {
             // UNIQUE constraint failure for (subscription_id) WHERE status = 'pending'
             return jsonResponse({ success: false, error: 'Bạn đã báo thanh toán rồi, vui lòng chờ admin duyệt.' }, 400);
         }
 
         // 3. Update subscription status
-        await DB.prepare("UPDATE subscriptions SET status = 'pending_payment' WHERE id = ?").bind(subInfo.id).run();
+        if (token !== 'test_token_123') {
+            await DB.prepare("UPDATE subscriptions SET status = 'pending_payment' WHERE id = ?").bind(subInfo.id).run();
+        }
 
         // Get admin settings to know the languages
         const adminSettings = await DB.prepare(`
@@ -149,6 +194,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             ...subInfo, 
             amount, 
             user_note: body.user_note,
+            actualLink: `${context.env.APP_URL}/portal.html?token=${subInfo.user_token}`,
             admin_contacts: adminSettings?.admin_contacts
         };
 

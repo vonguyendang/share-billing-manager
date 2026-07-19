@@ -51,7 +51,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             formattedNewDate: formattedNewDate,
             formattedDeadline: formattedDeadline,
             days_left: 3,
-            actualLink: 'https://share-billing-manager.pages.dev/user/test_token_123',
+            actualLink: `${context.env.APP_URL || 'https://share-billing-manager.pages.dev'}/portal.html?token=test_token_123`,
             admin_note: 'Khách chuyển khoản đúng hẹn, cảm ơn!',
             rejectReason: 'Không tìm thấy thông tin chuyển khoản tương ứng.',
             admin_contacts: adminSettings?.admin_contacts

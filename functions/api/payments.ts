@@ -36,7 +36,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         const { DB } = context.env;
         const reqInfo = await DB.prepare(`
-            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, s.send_email, m.email, m.full_name, p.name as plan_name
+            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, s.send_email, s.user_token, m.email, m.full_name, p.name as plan_name
             FROM payment_requests pr
             JOIN subscriptions s ON pr.subscription_id = s.id
             JOIN members m ON s.member_id = m.id
@@ -100,6 +100,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 ...reqInfo, 
                 totalPaid: Number(totalPaid).toLocaleString(), 
                 formattedNewDate,
+                actualLink: `${context.env.APP_URL}/portal.html?token=${reqInfo.user_token}`,
                 admin_contacts: adminSettings?.admin_contacts
             };
 
@@ -129,6 +130,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const dataForNotification = { 
                 ...reqInfo, 
                 admin_note: rejectReason,
+                actualLink: `${context.env.APP_URL}/portal.html?token=${reqInfo.user_token}`,
                 admin_contacts: adminSettings?.admin_contacts
             };
 

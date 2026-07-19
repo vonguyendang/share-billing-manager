@@ -83,6 +83,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             LIMIT 5
         `).all();
 
+        // Cancel Pending List
+        const cancelPendingList = await DB.prepare(`
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due, s.user_token
+            FROM subscriptions s
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.status = 'cancel_pending'
+            ORDER BY s.next_due_date ASC
+            LIMIT 5
+        `).all();
+
         // 5. Plan Utilization
         const planUtilList = await DB.prepare(`
             SELECT p.id, p.name, p.max_slots, 
@@ -141,6 +152,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                 },
                 dueSoonList: dueSoonList.results || [],
                 overdueList: overdueList.results || [],
+                cancelPendingList: cancelPendingList.results || [],
                 planUtilList: planUtilList.results || [],
                 pendingList: pendingList.results || [],
                 recentPayments: recentPayments.results || [],

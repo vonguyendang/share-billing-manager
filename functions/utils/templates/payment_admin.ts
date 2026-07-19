@@ -22,7 +22,7 @@ export default function paymentAdminTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `🔔 <b>Yêu cầu thanh toán mới</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💰 Số tiền: <b>${amountStr}đ</b>${noteVi}\n\n👉 Vui lòng vào trang quản trị để kiểm tra và duyệt.`
+            tgMessage: `🔔 <b>Yêu cầu thanh toán mới</b>\n👤 Khách hàng: <b>${data.full_name}</b>\n📦 Gói: <b>${data.plan_name}</b>\n💰 Số tiền: <b>${amountStr}đ</b>${noteVi}\n👉 Chi tiết: <a href="${data.actualLink}">Hóa đơn</a>\n\n👉 Vui lòng vào trang quản trị để kiểm tra và duyệt.`
         },
         en: {
             subject: `[Payment] New request from ${data.full_name} - ${data.plan_name}`,
@@ -42,7 +42,7 @@ export default function paymentAdminTemplate(data: any) {
                 </div>
             </div>
             `,
-            tgMessage: `🔔 <b>New Payment Request</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💰 Amount: <b>${amountStr} VND</b>${noteEn}\n\n👉 Please verify on the admin dashboard.`
+            tgMessage: `🔔 <b>New Payment Request</b>\n👤 Customer: <b>${data.full_name}</b>\n📦 Plan: <b>${data.plan_name}</b>\n💰 Amount: <b>${amountStr} VND</b>${noteEn}\n👉 Details: <a href="${data.actualLink}">Invoice</a>\n\n👉 Please verify on the admin dashboard.`
         }
     };
 }

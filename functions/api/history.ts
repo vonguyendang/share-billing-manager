@@ -33,7 +33,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
 
         const { DB } = context.env;
         const reqInfo = await DB.prepare(`
-            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, m.full_name as member_name
+            SELECT pr.*, s.amount_due, s.billing_cycle_months, s.next_due_date, s.user_token, m.full_name as member_name
             FROM payment_requests pr
             JOIN subscriptions s ON pr.subscription_id = s.id
             JOIN members m ON s.member_id = m.id
@@ -84,6 +84,7 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
             const adminNotif = getNotificationContent(adminLang, 'payment_undo', {
                 full_name: reqInfo.member_name,
                 amount: reqInfo.amount,
+                actualLink: `${context.env.APP_URL}/portal.html?token=${reqInfo.user_token}`,
                 newDateStr
             });
             context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
