@@ -2,7 +2,7 @@ export default function paymentUserTemplate(data: any) {
     return {
         vi: {
             subject: `[Đã ghi nhận] Yêu cầu thanh toán - ${data.plan_name}`,
-            body: `Chào ${data.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nThông tin liên hệ Admin:\n- Zalo/SĐT: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nCảm ơn bạn!`,
+            body: `Chào ${data.full_name},\n\nHệ thống đã ghi nhận yêu cầu báo thanh toán của bạn.\nVui lòng chờ admin kiểm tra và duyệt nhé.\n\nThông tin liên hệ Admin:\n${data.adminContactsText}\n\nCảm ơn bạn!`,
             htmlBody: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #3B82F6; padding: 20px; text-align: center;">
@@ -21,9 +21,7 @@ export default function paymentUserTemplate(data: any) {
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                     <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
                         <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin:</strong></p>
-                        <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
-                        <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
-                        <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                        ${data.adminContactsHtml}
                     </div>
                 </div>
             </div>
@@ -32,7 +30,7 @@ export default function paymentUserTemplate(data: any) {
         },
         en: {
             subject: `[Received] Payment Request - ${data.plan_name}`,
-            body: `Hi ${data.full_name},\n\nWe have received your payment request.\nPlease wait while the admin reviews and approves it.\n\nAdmin Contact:\n- Zalo/Phone: 0944353323\n- Email: vndang96@gmail.com\n- FB: https://www.facebook.com/iamnguyendang\n\nThank you!`,
+            body: `Hello ${data.full_name},\n\nWe have received your payment request.\nPlease wait for the admin to verify and approve it.\n\nAdmin Contact Info:\n${data.adminContactsText}\n\nThank you!`,
             htmlBody: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: #3B82F6; padding: 20px; text-align: center;">
@@ -50,10 +48,8 @@ export default function paymentUserTemplate(data: any) {
                     
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                     <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
-                        <p style="margin: 0 0 10px 0;"><strong>Admin Contact:</strong></p>
-                        <p style="margin: 5px 0;">📞 Zalo/Phone: <strong>0944353323</strong></p>
-                        <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
-                        <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                        <p style="margin: 0 0 10px 0;"><strong>Admin Contact Info:</strong></p>
+                        ${data.adminContactsHtml}
                     </div>
                 </div>
             </div>

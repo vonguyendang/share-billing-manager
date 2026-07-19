@@ -11,7 +11,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const { DB } = context.env;
         
         // 1. Check if reminders are globally enabled
-        const settings = await DB.prepare("SELECT reminders_enabled, reminder_days, customer_language, admin_language FROM admin_settings WHERE id = 'global'").first<any>();
+        const settings = await DB.prepare("SELECT reminders_enabled, reminder_days, customer_language, admin_language, admin_contacts FROM admin_settings WHERE id = 'global'").first<any>();
         if (settings && settings.reminders_enabled === 0) {
             return jsonResponse({ success: false, error: 'Reminders are disabled in settings' }, 400);
         }
@@ -84,7 +84,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     formattedDeadline: formattedDeadline,
                     amount_due: sub.amount_due.toLocaleString(),
                     actualLink: actualLink,
-                    isAutoPauseDay: sub.days_left === autoPauseDay && autoPauseDay < 0
+                    isAutoPauseDay: sub.days_left === autoPauseDay && autoPauseDay < 0,
+                    admin_contacts: settings?.admin_contacts
                 };
 
                 const userNotif = getNotificationContent(customerLang, 'reminder', dataForNotification);

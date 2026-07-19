@@ -448,6 +448,13 @@
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_admin_contacts">Thông tin Liên hệ Admin (Hiển thị trong Email)</h3>
+                    <div id="admin-contacts-container" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                        <!-- Dynamic rows injected here -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="adminApp.addAdminContactRow()" data-i18n="btn_add_contact">+ Thêm liên hệ</button>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
                     <h3 style="margin-bottom: 1rem;" data-i18n="setting_client_rights">Quyền của Khách hàng</h3>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">

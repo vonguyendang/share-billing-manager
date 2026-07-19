@@ -84,13 +84,10 @@ export default function reminderUserTemplate(data: any) {
         The absolute deadline to keep your service active is <strong>${data.formattedDeadline}</strong>. Please pay immediately to prevent automatic suspension.`;
     }
 
-    const emailBodyVi = messageHtmlVi.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
-    const emailBodyEn = messageHtmlEn.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
-
     return {
         vi: {
             subject: emailSubjectVi,
-            body: emailBodyVi,
+            body: `Chào ${data.full_name},\n\n${messageHtmlVi.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')}\n\nVui lòng truy cập đường link sau để xem hướng dẫn chuyển khoản và báo cáo thanh toán:\n${data.actualLink}\n\nNếu có thắc mắc, vui lòng liên hệ Admin:\n${data.adminContactsText}\n\nCảm ơn bạn!`,
             htmlBody: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: ${headerColor}; padding: 20px; text-align: center;">
@@ -108,10 +105,8 @@ export default function reminderUserTemplate(data: any) {
                     
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                     <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
-                        <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin:</strong></p>
-                        <p style="margin: 5px 0;">📞 Zalo/SĐT: <strong>0944353323</strong></p>
-                        <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
-                        <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                        <p style="margin: 0 0 10px 0;"><strong>Thông tin liên hệ Admin (Nếu cần hỗ trợ):</strong></p>
+                        ${data.adminContactsHtml}
                     </div>
                 </div>
             </div>
@@ -120,7 +115,7 @@ export default function reminderUserTemplate(data: any) {
         },
         en: {
             subject: emailSubjectEn,
-            body: emailBodyEn,
+            body: `Hello ${data.full_name},\n\n${messageHtmlEn.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')}\n\nPlease click the link below to view payment instructions and submit your payment:\n${data.actualLink}\n\nIf you have any questions, please contact the Admin:\n${data.adminContactsText}\n\nThank you!`,
             htmlBody: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                 <div style="background-color: ${headerColor}; padding: 20px; text-align: center;">
@@ -138,10 +133,8 @@ export default function reminderUserTemplate(data: any) {
                     
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                     <div style="font-size: 14px; color: #4b5563; background-color: #f9fafb; padding: 15px; border-radius: 6px;">
-                        <p style="margin: 0 0 10px 0;"><strong>Admin Contact:</strong></p>
-                        <p style="margin: 5px 0;">📞 Zalo/Phone: <strong>0944353323</strong></p>
-                        <p style="margin: 5px 0;">📧 Email: <a href="mailto:vndang96@gmail.com" style="color: #1a73e8;">vndang96@gmail.com</a></p>
-                        <p style="margin: 5px 0;">🌐 Facebook: <a href="https://www.facebook.com/iamnguyendang" style="color: #1a73e8;" target="_blank">iamnguyendang</a></p>
+                        <p style="margin: 0 0 10px 0;"><strong>Admin Contact Info:</strong></p>
+                        ${data.adminContactsHtml}
                     </div>
                 </div>
             </div>

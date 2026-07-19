@@ -38,7 +38,8 @@ export async function onRequest(context: any) {
                 admin_email_notification_cc,
                 admin_email_notification_bcc,
                 customer_language,
-                admin_language
+                admin_language,
+                admin_contacts
             } = body;
             
             // Validate reminder_days (e.g., must be a string like "7,3,1,0,-2,-4")
@@ -69,6 +70,7 @@ export async function onRequest(context: any) {
                     admin_email_notification_bcc = ?,
                     customer_language = ?,
                     admin_language = ?,
+                    admin_contacts = ?,
                     updated_at = CURRENT_TIMESTAMP 
                 WHERE id = 'global'
             `;
@@ -91,7 +93,8 @@ export async function onRequest(context: any) {
                 admin_email_notification_cc || null,
                 admin_email_notification_bcc || null,
                 customer_language || 'vi',
-                admin_language || 'vi'
+                admin_language || 'vi',
+                admin_contacts ? JSON.stringify(admin_contacts) : '[]'
             ).run();
 
             return new Response(JSON.stringify({ success: true, message: 'Settings updated' }), {

@@ -74,15 +74,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Check if action is cancel_pending
         if (body.action === 'cancel_pending') {
-            const settings = await DB.prepare("SELECT allow_user_cancel, admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc, customer_language, admin_language FROM admin_settings WHERE id = 'global'").first<any>();
+            const settings = await DB.prepare("SELECT allow_user_cancel, admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc, customer_language, admin_language, admin_contacts FROM admin_settings WHERE id = 'global'").first<any>();
             if (settings?.allow_user_cancel !== 1) {
                 return jsonResponse({ success: false, error: 'Tính năng tự hủy gia hạn chưa được bật.' }, 403);
             }
             
             await DB.prepare("UPDATE subscriptions SET status = 'cancel_pending' WHERE id = ?").bind(subInfo.id).run();
             
+            const dataForNotification = {
+                ...subInfo,
+                formattedDate: subInfo.next_due_date,
+                admin_contacts: settings?.admin_contacts
+            };
+
             const adminLang = settings.admin_language || 'vi';
-            const adminNotif = getNotificationContent(adminLang, 'cancel_admin', subInfo);
+            const adminNotif = getNotificationContent(adminLang, 'cancel_admin', dataForNotification);
 
             context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
             
@@ -99,7 +105,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             
             if (subInfo.send_email !== 0) {
                 const customerLang = settings.customer_language || 'vi';
-                const userNotif = getNotificationContent(customerLang, 'cancel_user', subInfo);
+                const userNotif = getNotificationContent(customerLang, 'cancel_user', dataForNotification);
 
                 context.waitUntil(sendEmail(context.env, {
                     to: subInfo.email,
@@ -130,7 +136,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Get admin settings to know the languages
         const adminSettings = await DB.prepare(`
-            SELECT admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc, customer_language, admin_language
+            SELECT admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc, customer_language, admin_language, admin_contacts
             FROM admin_settings WHERE id = 'global'
         `).first<any>();
 
@@ -138,8 +144,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const adminLang = adminSettings?.admin_language || 'vi';
 
         // 4. Send email confirmation to user (optional, can be disabled)
+        const amount = body.amount || subInfo.amount_due;
+        const dataForNotification = { 
+            ...subInfo, 
+            amount, 
+            user_note: body.user_note,
+            admin_contacts: adminSettings?.admin_contacts
+        };
+
         if (subInfo.send_email !== 0) {
-            const userNotif = getNotificationContent(customerLang, 'payment_user', subInfo);
+            const userNotif = getNotificationContent(customerLang, 'payment_user', dataForNotification);
             await sendEmail(context.env, {
                 to: subInfo.email,
                 subject: userNotif.subject!,
@@ -149,9 +163,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         }
 
         // 5. Send Telegram notification to admin
-        const amount = body.amount || subInfo.amount_due;
-        const dataForAdmin = { ...subInfo, amount, user_note: body.user_note };
-        const adminNotif = getNotificationContent(adminLang, 'payment_admin', dataForAdmin);
+        const adminNotif = getNotificationContent(adminLang, 'payment_admin', dataForNotification);
         
         context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
 

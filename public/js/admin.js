@@ -434,6 +434,19 @@ async function loadSettings() {
     document.getElementById('setting-customer-language').value = settingsData.customer_language || 'vi';
     document.getElementById('setting-admin-language').value = settingsData.admin_language || 'vi';
 
+    document.getElementById('admin-contacts-container').innerHTML = '';
+    let contacts = [];
+    try {
+        if (settingsData.admin_contacts) {
+            contacts = typeof settingsData.admin_contacts === 'string' ? JSON.parse(settingsData.admin_contacts) : settingsData.admin_contacts;
+        }
+    } catch (e) {}
+    if (!contacts || contacts.length === 0) {
+        adminApp.addAdminContactRow();
+    } else {
+        contacts.forEach(c => adminApp.addAdminContactRow(c));
+    }
+
     if (!window.bankSelectInitialized) {
         initBankSelect();
         window.bankSelectInitialized = true;
@@ -696,7 +709,7 @@ async function populateSubSelects(currentSubId = null) {
             } else {
                 opt.innerText = `${p.name} (${formatCurrency(p.total_price)})${t('txt_plan_unlimited')}`;
             }
-            planSelect.appendChild(opt);
+                planSelect.appendChild(opt);
         }
     });
 }
@@ -705,6 +718,28 @@ async function populateSubSelects(currentSubId = null) {
 window.adminApp = {
     exportData: (type) => {
         window.location.href = `/api/export?type=${type}`;
+    },
+    addAdminContactRow: (contact = { type: 'phone', value: '' }) => {
+        const container = document.getElementById('admin-contacts-container');
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '0.5rem';
+        row.style.alignItems = 'center';
+        row.className = 'contact-row';
+        
+        row.innerHTML = `
+            <select class="form-control contact-type" style="width: 150px; flex-shrink: 0;">
+                <option value="phone" ${contact.type === 'phone' ? 'selected' : ''}>📞 SĐT/Zalo</option>
+                <option value="email" ${contact.type === 'email' ? 'selected' : ''}>📧 Email</option>
+                <option value="facebook" ${contact.type === 'facebook' ? 'selected' : ''}>🌐 Facebook</option>
+                <option value="telegram" ${contact.type === 'telegram' ? 'selected' : ''}>💬 Telegram</option>
+                <option value="website" ${contact.type === 'website' ? 'selected' : ''}>🌍 Website</option>
+                <option value="other" ${contact.type === 'other' ? 'selected' : ''}>📝 Khác</option>
+            </select>
+            <input type="text" class="form-control contact-value" placeholder="Nhập thông tin liên hệ..." value="${contact.value}" style="flex: 1;">
+            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()" style="padding: 0.5rem; flex-shrink: 0;"><i class="ph ph-trash"></i></button>
+        `;
+        container.appendChild(row);
     },
     openExpenseModal: () => {
         document.getElementById('form-expense').reset();
@@ -1041,7 +1076,11 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         alt_bank_account_name: document.getElementById('setting-alt-bank-account-name').value,
         allow_user_cancel: document.getElementById('setting-allow-user-cancel').checked ? 1 : 0,
         customer_language: document.getElementById('setting-customer-language').value,
-        admin_language: document.getElementById('setting-admin-language').value
+        admin_language: document.getElementById('setting-admin-language').value,
+        admin_contacts: Array.from(document.querySelectorAll('#admin-contacts-container .contact-row')).map(row => ({
+            type: row.querySelector('.contact-type').value,
+            value: row.querySelector('.contact-value').value
+        })).filter(c => c.value.trim() !== '')
     };
     try {
         await apiCall('/settings', 'PUT', data);

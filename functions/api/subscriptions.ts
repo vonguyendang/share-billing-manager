@@ -80,7 +80,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const formattedNewDate = newDateParts.length === 3 ? `${newDateParts[2]}-${newDateParts[1]}-${newDateParts[0]}` : newDateStr;
 
             const adminSettings = await context.env.DB.prepare(`
-                SELECT customer_language, admin_language FROM admin_settings WHERE id = 'global'
+                SELECT customer_language, admin_language, admin_contacts FROM admin_settings WHERE id = 'global'
             `).first<any>();
 
             const customerLang = adminSettings?.customer_language || 'vi';
@@ -89,8 +89,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const dataForNotification = {
                 plan_name: sub.plan_name,
                 full_name: sub.member_name,
-                totalPaid: body.total_paid.toLocaleString(),
-                formattedNewDate: formattedNewDate
+                totalPaid: Number(body.total_paid).toLocaleString(),
+                formattedNewDate: formattedNewDate,
+                admin_contacts: adminSettings?.admin_contacts
             };
 
             const userNotif = getNotificationContent(customerLang, 'payment_approve', dataForNotification);

@@ -45,7 +45,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         `).bind(request_id).first<any>();
 
         const adminSettings = await DB.prepare(`
-            SELECT customer_language, admin_language FROM admin_settings WHERE id = 'global'
+            SELECT customer_language, admin_language, admin_contacts FROM admin_settings WHERE id = 'global'
         `).first<any>();
         
         const customerLang = adminSettings?.customer_language || 'vi';
@@ -96,7 +96,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             const newDateParts = newDateStr.split('-');
             const formattedNewDate = newDateParts.length === 3 ? `${newDateParts[2]}-${newDateParts[1]}-${newDateParts[0]}` : newDateStr;
 
-            const dataForNotification = { ...reqInfo, totalPaid: totalPaid.toLocaleString(), formattedNewDate };
+            const dataForNotification = { 
+                ...reqInfo, 
+                totalPaid: Number(totalPaid).toLocaleString(), 
+                formattedNewDate,
+                admin_contacts: adminSettings?.admin_contacts
+            };
 
             if (reqInfo.send_email !== 0) {
                 const userNotif = getNotificationContent(customerLang, 'payment_approve', dataForNotification);
@@ -121,7 +126,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 DB.prepare("UPDATE subscriptions SET status = 'active' WHERE id = ?").bind(reqInfo.subscription_id)
             ]);
 
-            const dataForNotification = { ...reqInfo, rejectReason };
+            const dataForNotification = { 
+                ...reqInfo, 
+                admin_note: rejectReason,
+                admin_contacts: adminSettings?.admin_contacts
+            };
 
             if (reqInfo.send_email !== 0) {
                 const userNotif = getNotificationContent(customerLang, 'payment_reject', dataForNotification);
