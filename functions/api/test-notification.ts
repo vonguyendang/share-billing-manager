@@ -26,11 +26,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const testLang = lang || 'vi';
 
         // Dummy data for testing
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const formattedDate = tomorrow.toISOString().split('T')[0].split('-').reverse().join('-');
+        const now = new Date();
+        
+        const dueDate = new Date(now);
+        dueDate.setDate(now.getDate() + 3);
+        const formattedDate = dueDate.toISOString().split('T')[0].split('-').reverse().join('-');
 
-        const nextMonth = new Date();
+        const deadlineDate = new Date(dueDate);
+        deadlineDate.setDate(dueDate.getDate() + 2);
+        const formattedDeadline = deadlineDate.toISOString().split('T')[0].split('-').reverse().join('-');
+
+        const nextMonth = new Date(now);
         nextMonth.setMonth(nextMonth.getMonth() + 1);
         const formattedNewDate = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-');
 
@@ -38,12 +44,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             full_name: 'Nguyễn Văn Test',
             email: test_email,
             plan_name: 'Gói VIP 1 năm',
-            amount_due: 500000,
-            amount: 500000,
+            amount_due: '500,000',
+            amount: '500,000',
             totalPaid: '500,000',
             formattedDate: formattedDate,
             formattedNewDate: formattedNewDate,
-            formattedDeadline: formattedDate, // Just mock it same as formattedDate or tomorrow
+            formattedDeadline: formattedDeadline,
             days_left: 3,
             actualLink: 'https://share-billing-manager.pages.dev/user/test_token_123',
             admin_note: 'Khách chuyển khoản đúng hẹn, cảm ơn!',
