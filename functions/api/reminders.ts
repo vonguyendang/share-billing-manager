@@ -26,6 +26,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             return jsonResponse({ success: true, data: { sent: 0, errors: 0, message: "No reminder days configured" } });
         }
 
+        const autoPauseDay = Math.min(...reminderDaysArr);
+
         // 2. Find subscriptions due based on configured days
         const dueQuery = await DB.prepare(`
             SELECT s.id, s.next_due_date, s.amount_due, m.email, m.full_name, p.name as plan_name,
@@ -66,7 +68,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 let formattedDeadline = '';
                 if (parts.length === 3) {
                     const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    d.setDate(d.getDate() + 4);
+                    const daysToDeadline = autoPauseDay < 0 ? Math.abs(autoPauseDay) : 0;
+                    d.setDate(d.getDate() + daysToDeadline);
                     const dd = String(d.getDate()).padStart(2, '0');
                     const mm = String(d.getMonth() + 1).padStart(2, '0');
                     const yyyy = d.getFullYear();
@@ -80,7 +83,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     formattedDate: formattedDate,
                     formattedDeadline: formattedDeadline,
                     amount_due: sub.amount_due.toLocaleString(),
-                    actualLink: actualLink
+                    actualLink: actualLink,
+                    isAutoPauseDay: sub.days_left === autoPauseDay && autoPauseDay < 0
                 };
 
                 const userNotif = getNotificationContent(customerLang, 'reminder', dataForNotification);
@@ -99,8 +103,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                     const adminNotif = getNotificationContent(adminLang, 'reminder_admin', dataForNotification);
                     context.waitUntil(sendTelegramNotification(context.env, adminNotif.tgMessage!));
 
-                    // Auto pause if days_left is -4
-                    if (sub.days_left === -4) {
+                    // Auto pause if it is the most negative day configured
+                    if (sub.days_left === autoPauseDay && autoPauseDay < 0) {
                         await DB.prepare("UPDATE subscriptions SET status = 'paused' WHERE id = ?").bind(sub.id).run();
                     }
                 } else {
