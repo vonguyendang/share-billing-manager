@@ -114,8 +114,13 @@ export function formatAdminContacts(contactsJson: string | null): { html: string
                 break;
             case 'other':
             default:
-                iconHtml = '📝 '; iconText = '📝 ';
-                valueHtml = `<strong>${c.value}</strong>`;
+                const label = (c.label && c.label.trim() !== '') ? c.label : 'Khác';
+                iconHtml = `📝 ${label}: `; iconText = `📝 ${label}: `;
+                if (c.value.startsWith('http')) {
+                    valueHtml = `<a href="${c.value}" style="color: #1a73e8;" target="_blank">${c.value}</a>`;
+                } else {
+                    valueHtml = `<strong>${c.value}</strong>`;
+                }
                 break;
         }
 

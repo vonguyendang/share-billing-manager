@@ -728,7 +728,7 @@ window.adminApp = {
         row.className = 'contact-row';
         
         row.innerHTML = `
-            <select class="form-control contact-type" style="width: 150px; flex-shrink: 0;">
+            <select class="form-control contact-type" style="width: 150px; flex-shrink: 0;" onchange="this.nextElementSibling.style.display = this.value === 'other' ? 'block' : 'none'">
                 <option value="phone" ${contact.type === 'phone' ? 'selected' : ''}>📞 SĐT/Zalo</option>
                 <option value="email" ${contact.type === 'email' ? 'selected' : ''}>📧 Email</option>
                 <option value="facebook" ${contact.type === 'facebook' ? 'selected' : ''}>🌐 Facebook</option>
@@ -736,6 +736,7 @@ window.adminApp = {
                 <option value="website" ${contact.type === 'website' ? 'selected' : ''}>🌍 Website</option>
                 <option value="other" ${contact.type === 'other' ? 'selected' : ''}>📝 Khác</option>
             </select>
+            <input type="text" class="form-control contact-label" placeholder="Tên nền tảng..." value="${contact.label || ''}" style="width: 120px; flex-shrink: 0; display: ${contact.type === 'other' ? 'block' : 'none'};">
             <input type="text" class="form-control contact-value" placeholder="Nhập thông tin liên hệ..." value="${contact.value}" style="flex: 1;">
             <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()" style="padding: 0.5rem; flex-shrink: 0;"><i class="ph ph-trash"></i></button>
         `;
@@ -1079,6 +1080,7 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         admin_language: document.getElementById('setting-admin-language').value,
         admin_contacts: Array.from(document.querySelectorAll('#admin-contacts-container .contact-row')).map(row => ({
             type: row.querySelector('.contact-type').value,
+            label: row.querySelector('.contact-label').value,
             value: row.querySelector('.contact-value').value
         })).filter(c => c.value.trim() !== '')
     };
