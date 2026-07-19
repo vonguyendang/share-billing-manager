@@ -73,7 +73,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
         // Check if action is cancel_pending
         if (body.action === 'cancel_pending') {
-            const settings = await DB.prepare("SELECT allow_user_cancel FROM admin_settings WHERE id = 'global'").first<any>();
+            const settings = await DB.prepare("SELECT allow_user_cancel, admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc FROM admin_settings WHERE id = 'global'").first<any>();
             if (settings?.allow_user_cancel !== 1) {
                 return jsonResponse({ success: false, error: 'Tính năng tự hủy gia hạn chưa được bật.' }, 403);
             }
@@ -82,6 +82,31 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             
             const tgMessage = `⚠️ <b>Khách hàng yêu cầu hủy gia hạn</b>\n👤 Khách hàng: <b>${subInfo.full_name}</b>\n📦 Gói: <b>${subInfo.plan_name}</b>\n\n👉 Khách hàng không muốn gia hạn chu kỳ sau. Hệ thống sẽ tự động hủy quyền khi đến hạn.`;
             context.waitUntil(sendTelegramNotification(context.env, tgMessage));
+            
+            if (settings.admin_email_notifications_enabled === 1 && settings.admin_email_notification_to) {
+                const adminEmailBody = `Khách hàng ${subInfo.full_name} yêu cầu hủy gia hạn.\n\nGói: ${subInfo.plan_name}\n\nKhách hàng không muốn gia hạn chu kỳ sau. Hệ thống sẽ tự động hủy quyền khi đến hạn. Vui lòng kiểm tra trên trang quản trị.`;
+                const adminHtmlBody = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div style="background-color: #EF4444; padding: 20px; text-align: center;">
+                        <h2 style="color: white; margin: 0;">Khách hàng yêu cầu hủy gia hạn ⚠️</h2>
+                    </div>
+                    <div style="padding: 30px; background-color: #ffffff;">
+                        <p><strong>Khách hàng:</strong> ${subInfo.full_name}</p>
+                        <p><strong>Gói:</strong> ${subInfo.plan_name}</p>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+                        <p>Khách hàng không muốn gia hạn chu kỳ sau. Tới ngày đến hạn, hãy ngắt quyền truy cập của khách hàng này.</p>
+                    </div>
+                </div>
+                `;
+                context.waitUntil(sendEmail(context.env, {
+                    to: settings.admin_email_notification_to,
+                    cc: settings.admin_email_notification_cc || undefined,
+                    bcc: settings.admin_email_notification_bcc || undefined,
+                    subject: `[Thông báo] Khách hàng ${subInfo.full_name} hủy gia hạn gói ${subInfo.plan_name}`,
+                    body: adminEmailBody,
+                    htmlBody: adminHtmlBody
+                }));
+            }
             
             return jsonResponse({ success: true, message: 'Đã gửi yêu cầu hủy gia hạn thành công.' });
         }
