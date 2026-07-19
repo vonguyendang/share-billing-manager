@@ -146,6 +146,41 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         const tgMessage = `🔔 <b>Yêu cầu thanh toán mới</b>\n👤 Khách hàng: <b>${subInfo.full_name}</b>\n📦 Gói: <b>${subInfo.plan_name}</b>\n💰 Số tiền: <b>${amount.toLocaleString()}đ</b>${note}\n\n👉 Vui lòng vào trang quản trị để kiểm tra và duyệt.`;
         context.waitUntil(sendTelegramNotification(context.env, tgMessage));
 
+        // 6. Send Email notification to admin (if enabled)
+        const adminSettings = await DB.prepare(`
+            SELECT admin_email_notifications_enabled, admin_email_notification_to, admin_email_notification_cc, admin_email_notification_bcc
+            FROM admin_settings WHERE id = 'global'
+        `).first<any>();
+
+        if (adminSettings && adminSettings.admin_email_notifications_enabled === 1 && adminSettings.admin_email_notification_to) {
+            const adminEmailBody = `Có yêu cầu thanh toán mới từ ${subInfo.full_name}.\n\nKhách hàng: ${subInfo.full_name}\nGói: ${subInfo.plan_name}\nSố tiền: ${amount.toLocaleString()}đ\nGhi chú: ${body.user_note || 'Không có'}\n\nVui lòng vào trang quản trị để kiểm tra và duyệt.`;
+            
+            const adminHtmlBody = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #F59E0B; padding: 20px; text-align: center;">
+                    <h2 style="color: white; margin: 0;">Yêu cầu thanh toán mới 🔔</h2>
+                </div>
+                <div style="padding: 30px; background-color: #ffffff;">
+                    <p><strong>Khách hàng:</strong> ${subInfo.full_name}</p>
+                    <p><strong>Gói:</strong> ${subInfo.plan_name}</p>
+                    <p><strong>Số tiền:</strong> ${amount.toLocaleString()} VNĐ</p>
+                    <p><strong>Ghi chú:</strong> ${body.user_note || 'Không có'}</p>
+                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+                    <p>Vui lòng vào trang quản trị để kiểm tra và duyệt.</p>
+                </div>
+            </div>
+            `;
+
+            context.waitUntil(sendEmail(context.env, {
+                to: adminSettings.admin_email_notification_to,
+                cc: adminSettings.admin_email_notification_cc || undefined,
+                bcc: adminSettings.admin_email_notification_bcc || undefined,
+                subject: `[Thông báo] Yêu cầu thanh toán mới từ ${subInfo.full_name}`,
+                body: adminEmailBody,
+                htmlBody: adminHtmlBody
+            }));
+        }
+
         return jsonResponse({ success: true });
     } catch (e: any) {
         return jsonResponse({ success: false, error: e.message }, 500);

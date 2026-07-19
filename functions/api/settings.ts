@@ -32,7 +32,11 @@ export async function onRequest(context: any) {
                 allow_user_cancel,
                 alt_bank_id,
                 alt_bank_account_number,
-                alt_bank_account_name
+                alt_bank_account_name,
+                admin_email_notifications_enabled,
+                admin_email_notification_to,
+                admin_email_notification_cc,
+                admin_email_notification_bcc
             } = body;
             
             // Validate reminder_days (e.g., must be a string like "7,3,1,0,-2,-4")
@@ -57,6 +61,10 @@ export async function onRequest(context: any) {
                     alt_bank_id = ?,
                     alt_bank_account_number = ?,
                     alt_bank_account_name = ?,
+                    admin_email_notifications_enabled = ?,
+                    admin_email_notification_to = ?,
+                    admin_email_notification_cc = ?,
+                    admin_email_notification_bcc = ?,
                     updated_at = CURRENT_TIMESTAMP 
                 WHERE id = 'global'
             `;
@@ -73,7 +81,11 @@ export async function onRequest(context: any) {
                 allow_user_cancel !== undefined ? allow_user_cancel : 0,
                 alt_bank_id || null,
                 alt_bank_account_number || null,
-                alt_bank_account_name || null
+                alt_bank_account_name || null,
+                admin_email_notifications_enabled !== undefined ? admin_email_notifications_enabled : 0,
+                admin_email_notification_to || null,
+                admin_email_notification_cc || null,
+                admin_email_notification_bcc || null
             ).run();
 
             return new Response(JSON.stringify({ success: true, message: 'Settings updated' }), {

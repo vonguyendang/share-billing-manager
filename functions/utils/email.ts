@@ -2,6 +2,8 @@ import { Env } from './types';
 
 export interface EmailPayload {
     to: string;
+    cc?: string;
+    bcc?: string;
     subject: string;
     body: string;
     htmlBody?: string;

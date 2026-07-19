@@ -365,6 +365,27 @@
                     </div>
 
                     <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem;" data-i18n="setting_admin_email_title">Email thông báo Admin (Khi có khách báo thanh toán)</h3>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="setting-admin-email-enabled">
+                            <strong data-i18n="setting_enable_admin_email">Bật gửi email cho Admin khi có báo thanh toán</strong>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="setting_admin_email_to">Email Nhận (To)</label>
+                        <input type="email" id="setting-admin-email-to" class="form-control" placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="setting_admin_email_cc">CC (Nhiều email cách nhau dấu phẩy - Tùy chọn)</label>
+                        <input type="text" id="setting-admin-email-cc" class="form-control" placeholder="cc1@example.com, cc2@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="setting_admin_email_bcc">BCC (Nhiều email cách nhau dấu phẩy - Tùy chọn)</label>
+                        <input type="text" id="setting-admin-email-bcc" class="form-control" placeholder="bcc1@example.com, bcc2@example.com">
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border-color);">
                     <h3 style="margin-bottom: 1rem;" data-i18n="setting_vietqr">Cấu hình thanh toán VietQR</h3>
                     <div class="form-group" style="position: relative; z-index: 100;">
                         <label data-i18n="bank_code">Mã Ngân Hàng (BIN hoặc Tên viết tắt)</label>

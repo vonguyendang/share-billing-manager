@@ -416,6 +416,11 @@ async function loadSettings() {
     document.getElementById('setting-telegram-chat-id').value = settingsData.telegram_chat_id || '';
     document.getElementById('setting-telegram-topic-id').value = settingsData.telegram_topic_id || '';
 
+    document.getElementById('setting-admin-email-enabled').checked = settingsData.admin_email_notifications_enabled === 1;
+    document.getElementById('setting-admin-email-to').value = settingsData.admin_email_notification_to || '';
+    document.getElementById('setting-admin-email-cc').value = settingsData.admin_email_notification_cc || '';
+    document.getElementById('setting-admin-email-bcc').value = settingsData.admin_email_notification_bcc || '';
+
     document.getElementById('setting-bank-id').value = settingsData.bank_id || '';
     document.getElementById('setting-bank-account-number').value = settingsData.bank_account_number || '';
     document.getElementById('setting-bank-account-name').value = settingsData.bank_account_name || '';
@@ -1021,6 +1026,10 @@ document.getElementById('form-settings').addEventListener('submit', async (e) =>
         telegram_bot_token: document.getElementById('setting-telegram-bot-token').value,
         telegram_chat_id: document.getElementById('setting-telegram-chat-id').value,
         telegram_topic_id: document.getElementById('setting-telegram-topic-id').value,
+        admin_email_notifications_enabled: document.getElementById('setting-admin-email-enabled').checked ? 1 : 0,
+        admin_email_notification_to: document.getElementById('setting-admin-email-to').value,
+        admin_email_notification_cc: document.getElementById('setting-admin-email-cc').value,
+        admin_email_notification_bcc: document.getElementById('setting-admin-email-bcc').value,
         bank_id: document.getElementById('setting-bank-id').value,
         bank_account_number: document.getElementById('setting-bank-account-number').value,
         bank_account_name: document.getElementById('setting-bank-account-name').value,
