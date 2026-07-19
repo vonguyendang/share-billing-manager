@@ -742,6 +742,33 @@ window.adminApp = {
         `;
         container.appendChild(row);
     },
+    sendTestNotification: async () => {
+        const type = document.getElementById('test-notification-type').value;
+        const email = document.getElementById('test-notification-email').value;
+        
+        if (!email) {
+            window.ui.alert("Vui lòng nhập email nhận test!");
+            return;
+        }
+
+        const btn = document.getElementById('btn-test-notification');
+        const oldText = btn.innerText;
+        btn.innerText = "Đang gửi...";
+        btn.disabled = true;
+
+        try {
+            await apiCall('/test-notification', 'POST', {
+                template: type,
+                test_email: email
+            });
+            window.ui.alert("Đã gửi thông báo test thành công! Hãy kiểm tra Email (và Telegram nếu có cấu hình).");
+        } catch (e) {
+            window.ui.alert("Lỗi gửi test: " + e.message);
+        } finally {
+            btn.innerText = oldText;
+            btn.disabled = false;
+        }
+    },
     openExpenseModal: () => {
         document.getElementById('form-expense').reset();
         document.getElementById('expense-id').value = '';

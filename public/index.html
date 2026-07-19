@@ -497,6 +497,29 @@
                     <button class="btn btn-primary" onclick="adminApp.exportData('expenses')"><span data-i18n="btn_export_expenses">Export Expenses</span></button>
                 </div>
             </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Kiểm tra Thông báo (Test)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Gửi thử thông báo mẫu để xem trước hiển thị trên Email và Telegram. Đảm bảo bạn đã lưu cấu hình Liên hệ và Telegram trước khi test.</p>
+                
+                <div class="form-group">
+                    <label>Chọn Loại thông báo để Test:</label>
+                    <select id="test-notification-type" class="form-control">
+                        <option value="reminder">Nhắc hạn thanh toán</option>
+                        <option value="payment_user">Khách báo thanh toán (User Notification)</option>
+                        <option value="payment_approve">Duyệt thanh toán thành công</option>
+                        <option value="payment_reject">Từ chối thanh toán</option>
+                        <option value="cancel_user">Khách Hủy gia hạn</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Email nhận Test:</label>
+                    <input type="email" id="test-notification-email" class="form-control" placeholder="Nhập email cá nhân của bạn...">
+                </div>
+
+                <button class="btn btn-primary" onclick="adminApp.sendTestNotification()" id="btn-test-notification">Gửi Test ngay</button>
+            </div>
         </div>
 
         <!-- History View -->
