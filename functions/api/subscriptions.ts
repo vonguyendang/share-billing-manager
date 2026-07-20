@@ -91,7 +91,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
                 full_name: sub.member_name,
                 totalPaid: Number(body.total_paid).toLocaleString(),
                 formattedNewDate: formattedNewDate,
-                admin_contacts: adminSettings?.admin_contacts
+                admin_contacts: adminSettings?.admin_contacts,
+                actualLink: `${context.env.APP_URL}/portal.html?token=${sub.user_token}`
             };
 
             const userNotif = getNotificationContent(customerLang, 'payment_approve', dataForNotification);
