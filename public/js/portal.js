@@ -91,6 +91,7 @@ async function init() {
         if (sub.status === 'active') statusText = t('status_active_txt');
         if (sub.status === 'pending_payment') statusText = t('status_pending_txt');
         if (sub.status === 'cancel_pending') statusText = t('status_cancel_txt');
+        if (sub.status === 'paused') statusText = t('status_paused_txt');
         document.getElementById('p-status').innerText = statusText;
 
         const settings = res.data.settings;

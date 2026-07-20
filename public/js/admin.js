@@ -284,6 +284,33 @@ async function loadDashboard() {
         }
     }
 
+
+    // Recent Paused List
+    const tbodyPaused = document.querySelector('#table-dashboard-recent-paused tbody');
+    if (tbodyPaused) {
+        tbodyPaused.innerHTML = '';
+        if (res.data.recentPausedList && res.data.recentPausedList.length === 0) {
+            tbodyPaused.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">${t('msg_no_data') || 'No data'}</td></tr>`;
+        } else if (res.data.recentPausedList) {
+            res.data.recentPausedList.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.member_name}</td>
+                    <td>${item.plan_name}</td>
+                    <td style="color: var(--secondary); font-weight: bold;">${formatDate(item.next_due_date)}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.25rem;">
+                            <button class="btn btn-primary" onclick="adminApp.copyPortalLink('${item.user_token}')" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Copy Link"><i class="ph ph-link"></i></button>
+                            <button class="btn btn-success" onclick="adminApp.markPaid('${item.id}', ${item.amount_due})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Mark Paid"><i class="ph ph-check"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbodyPaused.appendChild(tr);
+            });
+        }
+    }
+
     // Populate plan utilization
     let totalEmptySlots = 0;
     const tbodyUtil = document.querySelector('#table-dashboard-utilization tbody');
@@ -614,6 +641,7 @@ async function loadSubscriptions() {
             <td><a href="${link}" target="_blank" style="font-size: 0.8rem">Portal</a></td>
             <td>
                 <div style="display: flex; gap: 0.25rem;">
+                    <button class="btn btn-success" onclick="adminApp.markPaid('${sub.id}', ${sub.amount_due})" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Mark Paid"><i class="ph ph-check"></i></button>
                     <button class="btn btn-primary" onclick="adminApp.editSub('${sub.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Edit"><i class="ph ph-pencil-simple"></i></button>
                     <button class="btn btn-danger" onclick="adminApp.deleteSub('${sub.id}')" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" title="Delete"><i class="ph ph-trash"></i></button>
                 </div>

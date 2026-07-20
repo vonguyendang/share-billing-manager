@@ -101,6 +101,18 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             FROM plans p
             WHERE p.active = 1
         `).all();
+        
+        // Recent Paused List (Last 7 days based on due date)
+        const recentPausedList = await DB.prepare(`
+            SELECT s.id, m.full_name as member_name, p.name as plan_name, s.next_due_date, s.amount_due, s.user_token
+            FROM subscriptions s
+            JOIN members m ON s.member_id = m.id
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.status = 'paused' 
+            AND s.next_due_date >= date('now', '-7 days', 'localtime')
+            ORDER BY s.next_due_date DESC
+            LIMIT 5
+        `).all();
 
         // 6. Pending Payments List
         const pendingList = await DB.prepare(`
@@ -153,6 +165,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
                 dueSoonList: dueSoonList.results || [],
                 overdueList: overdueList.results || [],
                 cancelPendingList: cancelPendingList.results || [],
+                recentPausedList: recentPausedList.results || [],
                 planUtilList: planUtilList.results || [],
                 pendingList: pendingList.results || [],
                 recentPayments: recentPayments.results || [],

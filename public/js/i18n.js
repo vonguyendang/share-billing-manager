@@ -53,7 +53,8 @@ const translations = {
         'dash_overdue': 'Quá hạn / Chưa thanh toán',
         'dash_due_7_days': 'Đến hạn trong 7 ngày tới',
         'dash_cancel_pending': 'Chờ huỷ gia hạn',
-        'filter_all_status': 'Tất cả trạng thái',
+        'dash_pending_payment': 'Chờ duyệt thanh toán',
+        'dash_recent_paused': 'Tạm ngưng (7 ngày gần nhất)',
         'dash_plan_util': 'Mức sử dụng Gói (Slots)',
 
         // Members
@@ -330,6 +331,7 @@ const translations = {
         'status_active_txt': 'Đang hoạt động',
         'status_pending_txt': 'Chờ duyệt thanh toán',
         'status_cancel_txt': 'Chờ huỷ gia hạn',
+        'status_paused_txt': 'Tạm ngưng',
         'msg_portal_sent': 'Cảm ơn bạn! Yêu cầu đã được gửi.',
         'msg_portal_confirm_cancel': 'Bạn có chắc chắn muốn hủy gia hạn? Gói dịch vụ của bạn sẽ tự động kết thúc vào kỳ hạn tiếp theo.',
         'msg_portal_confirm_cancel_final': 'XÁC NHẬN LẦN CUỐI: Thao tác này không thể hoàn tác. Bạn đã chắc chắn 100% muốn HỦY GIA HẠN gói dịch vụ này chưa?',
@@ -394,7 +396,8 @@ const translations = {
         'dash_overdue': 'Overdue / Unpaid',
         'dash_due_7_days': 'Due in Next 7 Days',
         'dash_cancel_pending': 'Cancel Pending',
-        'filter_all_status': 'All Statuses',
+        'dash_pending_payment': 'Pending Payments',
+        'dash_recent_paused': 'Paused (Last 7 days)',
         'dash_plan_util': 'Plan Utilization (Slots)',
 
         // Members
@@ -671,6 +674,7 @@ const translations = {
         'status_active_txt': 'Active',
         'status_pending_txt': 'Pending Approval',
         'status_cancel_txt': 'Cancellation Pending',
+        'status_paused_txt': 'Paused',
         'msg_portal_sent': 'Thank you! Your request has been sent.',
         'msg_portal_confirm_cancel': 'Are you sure you want to cancel renewal? Your service will end at the next due date.',
         'msg_portal_confirm_cancel_final': 'FINAL CONFIRMATION: This action cannot be undone. Are you 100% sure you want to CANCEL your subscription?',
