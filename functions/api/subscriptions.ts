@@ -71,7 +71,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             
             const reqId = 'pay_' + Date.now();
             await context.env.DB.prepare(`
-                INSERT INTO payment_requests (id, subscription_id, amount, status, created_at, processed_at)
+                INSERT INTO payment_requests (id, subscription_id, amount, status, created_at, approved_at)
                 VALUES (?, ?, ?, 'approved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             `).bind(reqId, body.id, body.total_paid).run();
             
