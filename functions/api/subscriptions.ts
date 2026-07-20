@@ -67,13 +67,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             oldDate.setDate(oldDate.getDate() + addedDays);
             const newDateStr = oldDate.toISOString().split('T')[0];
 
-            await context.env.DB.prepare("UPDATE subscriptions SET next_due_date = ?, status = 'active' WHERE id = ?").bind(newDateStr, body.id).run();
-            
             const reqId = 'pay_' + Date.now();
-            await context.env.DB.prepare(`
-                INSERT INTO payment_requests (id, subscription_id, amount, status, created_at, approved_at)
-                VALUES (?, ?, ?, 'approved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            `).bind(reqId, body.id, body.total_paid).run();
+            await context.env.DB.batch([
+                context.env.DB.prepare("UPDATE subscriptions SET next_due_date = ?, status = 'active' WHERE id = ?").bind(newDateStr, body.id),
+                context.env.DB.prepare(`
+                    INSERT INTO payment_requests (id, subscription_id, amount, status, created_at, approved_at)
+                    VALUES (?, ?, ?, 'approved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                `).bind(reqId, body.id, body.total_paid)
+            ]);
             
             // Try sending email
             const newDateParts = newDateStr.split('-');
